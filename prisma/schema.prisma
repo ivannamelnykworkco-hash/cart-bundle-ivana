@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+model Bundle {
+  id            String   @id @default(cuid())
+  shop          String
+  name          String
+  type          String
+  status        String   @default("draft")
+  products      Json
+  discountType  String
+  discountValue Float
+  stats         Json
+  settings      Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([shop])
+  @@index([status])
+}
+
+model Analytics {
+  id              String   @id @default(cuid())
+  shop            String   @unique
+  thisMonthRevenue Float   @default(0)
+  allTimeRevenue   Float   @default(0)
+  lastResetDate    DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model BundleView {
+  id        String   @id @default(cuid())
+  bundleId  String
+  shop      String
+  visitorId String
+  createdAt DateTime @default(now())
+  
+  @@index([bundleId])
+  @@index([shop])
+}
+
+model BundlePurchase {
+  id        String   @id @default(cuid())
+  bundleId  String
+  shop      String
+  orderId   String
+  revenue   Float
+  createdAt DateTime @default(now())
+  
+  @@index([bundleId])
+  @@index([shop])
+}
+
+model GeneralSetting {
+  id String @id
+  bundleName String
+  discountName String
+  blockTitle String
+  excludedProducts  String
+  excludedCollections String
+  selectedProducts String
+  selectedCollections String
+  excludeB2B Boolean
+  excludePOS Boolean
+  startDateTime     DateTime @default(now())
+  setEndDate  Boolean 
+  updatedAt     DateTime @updatedAt
+  endDateTime   DateTime @default(now())
+  letCustomer Boolean
+  showVariant Boolean
+  hideTheme   Boolean
+  colorSwatch   String
+  imageSwatch   String
+  swatchSize    String
+  swatchShape   String
+  setDefaultVariant   String
+  showPrices  Boolean
+  showBothPrices  Boolean
+  unitLabel   String
+  useProductCompare Boolean
+  showPricesWithout Boolean
+  priceRounding     String
+  updateTheme       String
+  skipCart    Boolean
+  showWhenStock     Int
+  msgText     String
+  msgColor    String
+  createdAt DateTime @default(now())
+
+}
+
+model CountdownTimer {
+  id    String @id @default(cuid())
+  isCountdown   Boolean
+  visibility String
+  fixedDurationTime   Int
+  endDateTime   DateTime @default(now())
+  msgText       String
+  msgAlignment  Int
+  msgBold       Boolean
+  msgItalic     Boolean
+  msgSize     Int
+  msgBgColor    String
+  msgTextColor  String    
+  createdAt DateTime @default(now())
+
+}
