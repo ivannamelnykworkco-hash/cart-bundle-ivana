@@ -172,6 +172,10 @@ const fontStyleMap = {
   styleBoldItalic: 'italic',
 };
 
+
+interface BoxQuantity {
+  id: number;
+}
 export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
 
@@ -192,6 +196,16 @@ export default function BundleSettingsAdvanced() {
       [id]: newText,
     }));
   };
+
+  //left Layout add Quantity Breack
+  const [quantityBreaks, setQuantityBreaks] = useState<BoxQuantity[]>([]);
+  const addQuantityBreak = () => [
+    setQuantityBreaks(prev => [...prev, { id: Date.now() }])
+  ]
+
+  const deleteQuantityBreak = (id: any) => {
+    setQuantityBreaks(prev => prev.filter(item => item.id !== id))
+  }
 
   // right layout add upsell and delete upsell
   const [upsellsState, setUpsellsState] = useState([]);
@@ -242,26 +256,26 @@ export default function BundleSettingsAdvanced() {
     }
   };
 
- const [addUpsellcalculatedPrice, setAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
- const [addupselldefaultBasePrice, setAddupselldefaultBasePrice] = useState<Record<number, string>>({});
+  const [addUpsellcalculatedPrice, setAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
+  const [addupselldefaultBasePrice, setAddupselldefaultBasePrice] = useState<Record<number, string>>({});
 
-const handleAddUpsellPriceChange = (
-  id: number,
-  price: string,
-  defaultPrice?: string
-) => {
-  setAddUpsellcalculatedPrice(prev => ({
-    ...prev,
-    [id]: price,
-  }));
-
-  if (defaultPrice !== undefined) {
-    setAddupselldefaultBasePrice(prev => ({
+  const handleAddUpsellPriceChange = (
+    id: number,
+    price: string,
+    defaultPrice?: string
+  ) => {
+    setAddUpsellcalculatedPrice(prev => ({
       ...prev,
-      [id]: defaultPrice,
+      [id]: price,
     }));
-  }
-};
+
+    if (defaultPrice !== undefined) {
+      setAddupselldefaultBasePrice(prev => ({
+        ...prev,
+        [id]: defaultPrice,
+      }));
+    }
+  };
 
   const [badgeSelected, setBadgeSelected] = useState("simple");
 
@@ -460,17 +474,23 @@ const handleAddUpsellPriceChange = (
                 <CountDownPanel conf={loaderData.countdownTimerConf} />
                 <GeneralCheckboxUpsell />
                 <GeneralStickyAddToCart />
-                <GeneralQuentityBreack heading="Bar #1 - Single"
-                  upBundlesChooseTitleChange={handleBundlesChooseTitleChange}
-                  upBundlesChooseSubTitleChange={handleBundlesChooseSubTitleChange}
-                  upBundlesBadgeTextChange={handleBundlesChooseBadgeTextChange}
-                  upBunlesBarLabelTextChange={handleBundlesChooseBarLabelTextChanges}
-                  upBundlesBarUpsellTextChange={handleBundlesChooseBarUpsellTextChanges}
-                  upPriceChange={handlePriceChange}
-                  upAddUpsellPriceChange={handleAddUpsellPriceChange}
-                  upBadgeSelectedChange={handleBadgeSelectedChange}
-                  onAddUpsell={handelonAddUpsellChange}
-                  onDeleteUpsell={handleonDeleteUpsellChange} />
+                {quantityBreaks.map((item) => (
+                  <GeneralQuentityBreack
+                    id={item.id}
+                    key={item.id}
+                    deleteId={item.id} deleteSection={deleteQuantityBreak}
+                    heading="Bar #1 - Single"
+                    upBundlesChooseTitleChange={handleBundlesChooseTitleChange}
+                    upBundlesChooseSubTitleChange={handleBundlesChooseSubTitleChange}
+                    upBundlesBadgeTextChange={handleBundlesChooseBadgeTextChange}
+                    upBunlesBarLabelTextChange={handleBundlesChooseBarLabelTextChanges}
+                    upBundlesBarUpsellTextChange={handleBundlesChooseBarUpsellTextChanges}
+                    upPriceChange={handlePriceChange}
+                    upAddUpsellPriceChange={handleAddUpsellPriceChange}
+                    upBadgeSelectedChange={handleBadgeSelectedChange}
+                    onAddUpsell={handelonAddUpsellChange}
+                    onDeleteUpsell={handleonDeleteUpsellChange} />
+                ))}
                 {showOriginal ? (
                   <div style={{ border: "1px dashed  black", borderRadius: '10px', padding: '15px' }}>
                     <Button fullWidth icon={PlusCircleIcon} variant="primary" onClick={() => setShowOriginal(false)}>Add bar</Button>
@@ -478,7 +498,7 @@ const handleAddUpsellPriceChange = (
                 ) : (
                   <Card>
                     <InlineGrid columns={3} gap="200">
-                      <Button icon={DiscountIcon}>Quantity break</Button>
+                      <Button icon={DiscountIcon} onClick={addQuantityBreak}>Quantity break</Button>
                       <Button icon={MegaphoneIcon}>Buy X, Get Y free</Button>
                       <Button icon={ProductIcon}>Bundle upsell</Button>
                     </InlineGrid>
@@ -576,113 +596,115 @@ const handleAddUpsellPriceChange = (
                           </Box>
                           {/* Single Option */}
 
-                          <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
-                            <InlineStack align="space-between" blockAlign="center">
-                              <InlineStack gap="200" blockAlign="center">
-                                <div
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    borderRadius: "50%",
-                                    border: "2px solid #ddd",
-                                  }}
-                                />
-                                <BlockStack gap="050">
-                                  <InlineStack gap="100">
-                                    <p className="barTitle" style={{
-                                      color: barTitleColor,
-                                      fontSize: `${bartitleSize}px`,
-                                      fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                      fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                    }}>
-                                      {barTitle}
-                                    </p>
-                                    <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
-                                      <p className="bar-label--text" style={{
-                                        color: barLabelTextColor,
-                                        fontSize: `${labelSize}px`,
-                                        fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
-                                        fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
+                          {quantityBreaks.map((item) => (
+                            <div key={item.id} className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
+                              <InlineStack align="space-between" blockAlign="center">
+                                <InlineStack gap="200" blockAlign="center">
+                                  <div
+                                    style={{
+                                      width: "20px",
+                                      height: "20px",
+                                      borderRadius: "50%",
+                                      border: "2px solid #ddd",
+                                    }}
+                                  />
+                                  <BlockStack gap="050">
+                                    <InlineStack gap="100">
+                                      <p className="barTitle" style={{
+                                        color: barTitleColor,
+                                        fontSize: `${bartitleSize}px`,
+                                        fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                        fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        {barLabelText}
+                                        {barTitle}
                                       </p>
-                                    </div>
-                                  </InlineStack>
-                                  <span className="barSubTitle" style={{
-                                    color: barSubTitleColor,
-                                    fontSize: `${subTitleSize}px`,
-                                    fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
-                                    fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
-                                  }}>
-                                    {barSubTitle}
-                                  </span>
-                                </BlockStack>
-                              </InlineStack>
-                              <div style={{ textAlign: "right" }}>
-                                <BlockStack gap="050">
-                                  <div className="bar-price" style={{
-                                    color: barPriceColor,
-                                    fontSize: `${bartitleSize}px`,
-                                    fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                    fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                  }}>
-                                    ${calculatedPrice}
-                                  </div>
-                                  {defaultBasePrice && (
-                                    <div className="bar-fullPrice" style={{
-                                      color: barFullPriceColor,
+                                      <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                        <p className="bar-label--text" style={{
+                                          color: barLabelTextColor,
+                                          fontSize: `${labelSize}px`,
+                                          fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
+                                          fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
+                                        }}>
+                                          {barLabelText}
+                                        </p>
+                                      </div>
+                                    </InlineStack>
+                                    <span className="barSubTitle" style={{
+                                      color: barSubTitleColor,
                                       fontSize: `${subTitleSize}px`,
                                       fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                       fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                     }}>
-                                      {parseFloat(defaultBasePrice) !== parseFloat(calculatedPrice || "0") ? (
-                                        <s>${defaultBasePrice}</s>
-                                      ) : (
-                                        `$${defaultBasePrice}`
-                                      )}
+                                      {barSubTitle}
+                                    </span>
+                                  </BlockStack>
+                                </InlineStack>
+                                <div style={{ textAlign: "right" }}>
+                                  <BlockStack gap="050">
+                                    <div className="bar-price" style={{
+                                      color: barPriceColor,
+                                      fontSize: `${bartitleSize}px`,
+                                      fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                      fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                    }}>
+                                      ${calculatedPrice}
                                     </div>
-                                  )}
-                                </BlockStack>
-                              </div>
-                            </InlineStack>
-                            {/* Add Upsell */}
-                            <div className="bar-upsell-container-main">
-                              {upsellsState.map(upsell => (
-                                <div key={upsell.id} className="upsell-box">
-                                  <div className="bar-upsell-container">
-                                    <div className="bar-upsell-checkbox">
-                                      <Checkbox
-                                        label=""
-                                        checked={upsellChecked[upsell.id] || false}
-                                        onChange={(value) => handleUpsellValueChange(upsell.id, value)}
-                                      />
-                                    </div>
-                                    <div className="bar-upsell-checkbox-content">
-                                      <div className="bar-upsell-img"></div>
-                                      <span>
-                                      {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
-                                      </span>
-                                    </div>
-                                    <div className="bar-upsell-price">
-                                      <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "0"}</div>
-                                      {addupselldefaultBasePrice[upsell.id] && (
-                                        <div className="bar-upsell-fullprice">
-                                          {parseFloat(addupselldefaultBasePrice[upsell.id]) !== 
-                                            parseFloat(addUpsellcalculatedPrice[upsell.id] || "0")
+                                    {defaultBasePrice && (
+                                      <div className="bar-fullPrice" style={{
+                                        color: barFullPriceColor,
+                                        fontSize: `${subTitleSize}px`,
+                                        fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
+                                        fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
+                                      }}>
+                                        {parseFloat(defaultBasePrice) !== parseFloat(calculatedPrice || "0") ? (
+                                          <s>${defaultBasePrice}</s>
+                                        ) : (
+                                          `$${defaultBasePrice}`
+                                        )}
+                                      </div>
+                                    )}
+                                  </BlockStack>
+                                </div>
+                              </InlineStack>
+                              {/* Add Upsell */}
+                              <div className="bar-upsell-container-main">
+                                {upsellsState.map(upsell => (
+                                  <div key={upsell.id} className="upsell-box">
+                                    <div className="bar-upsell-container">
+                                      <div className="bar-upsell-checkbox">
+                                        <Checkbox
+                                          label=""
+                                          checked={upsellChecked[upsell.id] || false}
+                                          onChange={(value) => handleUpsellValueChange(upsell.id, value)}
+                                        />
+                                      </div>
+                                      <div className="bar-upsell-checkbox-content">
+                                        <div className="bar-upsell-img"></div>
+                                        <span>
+                                          {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                        </span>
+                                      </div>
+                                      <div className="bar-upsell-price">
+                                        <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "0"}</div>
+                                        {addupselldefaultBasePrice[upsell.id] && (
+                                          <div className="bar-upsell-fullprice">
+                                            {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
+                                              parseFloat(addUpsellcalculatedPrice[upsell.id] || "0")
                                               ? (
-                                                  <s>${addupselldefaultBasePrice[upsell.id]}</s>
-                                                ) : (
-                                                  `$${addupselldefaultBasePrice[upsell.id]}`
-                                                )
+                                                <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                              ) : (
+                                                `$${addupselldefaultBasePrice[upsell.id]}`
+                                              )
                                             }
-                                        </div>
-                                      )}
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              ))}
+                                ))}
+                              </div>
                             </div>
-                          </div>
+                          ))}
                           {/* Bundle Option */}
                         </BlockStack>
                       </BlockStack>

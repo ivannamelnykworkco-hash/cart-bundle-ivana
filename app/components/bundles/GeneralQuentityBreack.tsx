@@ -17,9 +17,12 @@ interface Gifts {
 }
 
 
-export function GeneralQuentityBreack({ 
-  heading, 
-  upBundlesChooseTitleChange, 
+export function GeneralQuentityBreack({
+  id,
+  deleteId,
+  deleteSection,
+  heading,
+  upBundlesChooseTitleChange,
   upBundlesChooseSubTitleChange,
   upBunlesBarLabelTextChange,
   upBundlesBadgeTextChange,
@@ -27,10 +30,14 @@ export function GeneralQuentityBreack({
   onAddUpsell,
   onDeleteUpsell,
   upAddUpsellPriceChange,
-  upPriceChange, 
-  upBadgeSelectedChange }: 
-  { heading: any, 
-    upBundlesChooseTitleChange: any, 
+  upPriceChange,
+  upBadgeSelectedChange }:
+  {
+    id: any,
+    deleteId: any,
+    deleteSection: any
+    heading: any,
+    upBundlesChooseTitleChange: any,
     upBundlesChooseSubTitleChange: any,
     upBundlesBadgeTextChange: any,
     upBunlesBarLabelTextChange: any,
@@ -38,7 +45,8 @@ export function GeneralQuentityBreack({
     onAddUpsell: any,
     onDeleteUpsell: any,
     upAddUpsellPriceChange: (price: string, defaultBasePrice?: string) => void,
-    upPriceChange?: (price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void }) {
+    upPriceChange?: (price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
+  }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const [open, setOpen] = useState(false);
@@ -81,7 +89,7 @@ export function GeneralQuentityBreack({
     setBarLabelText(v);
     upBunlesBarLabelTextChange(v);
   };
-  
+
 
 
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
@@ -123,10 +131,10 @@ export function GeneralQuentityBreack({
     const quantity = barDefaultQualityalue;
     const basePrice = parseFloat(barDefaultPrice || "0");
     const discountPercent = parseFloat(upsellValue || "0");
-    
+
     let calculatedPrice = 0;
     let defaulBasePrice = quantity * basePrice;
-    
+
     if (selected === 'discounted%') {
       calculatedPrice = quantity * basePrice * (1 - discountPercent / 100);
     } else if (selected === 'discounted$') {
@@ -136,7 +144,7 @@ export function GeneralQuentityBreack({
     } else {
       calculatedPrice = quantity * basePrice;
     }
-    
+
     if (upPriceChange) {
       upPriceChange(calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
     }
@@ -171,19 +179,19 @@ export function GeneralQuentityBreack({
   ]
 
   const QuantityBackground = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
   const handleColorQuantityBackground = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
   const QuantityText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
   const handleColorQuantityText = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
@@ -205,7 +213,7 @@ export function GeneralQuentityBreack({
             <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
             <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
             <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
-            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" />
+            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(deleteId)} />
           </InlineStack>
         </InlineStack>
         <Collapsible
@@ -295,7 +303,7 @@ export function GeneralQuentityBreack({
             {/* {Badge text} */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
-                <PopUpover title='Badge text' defaultPopText={bagdeText} upPopTextChange={handleBadgeTextChange} badgeSelected={badgeSelected}/>
+                <PopUpover title='Badge text' defaultPopText={bagdeText} upPopTextChange={handleBadgeTextChange} badgeSelected={badgeSelected} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 5 }}>
                 <BlockStack gap='200'>
@@ -314,7 +322,7 @@ export function GeneralQuentityBreack({
             {/* {Label} */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
-                <PopUpover title='Label' defaultPopText='' upPopTextChange={handlesBarLabelTextChange} badgeSelected={barLabelText}  />
+                <PopUpover title='Label' defaultPopText='' upPopTextChange={handlesBarLabelTextChange} badgeSelected={barLabelText} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
                 <Checkbox
@@ -334,7 +342,7 @@ export function GeneralQuentityBreack({
               <BlockStack gap="300">
                 {/* {Add upsell} */}
                 {boxUpSells.map((item) => (
-                <BoxUpSellItem id={item.id} key={item.id} upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange} upAddUpsellPriceChange={upAddUpsellPriceChange} deleteId={item.id} deleteSection={deleteBoxUpsell}/>
+                  <BoxUpSellItem id={item.id} key={item.id} upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange} upAddUpsellPriceChange={upAddUpsellPriceChange} deleteId={item.id} deleteSection={deleteBoxUpsell} />
                 ))}
               </BlockStack>
               <BlockStack gap="300">
