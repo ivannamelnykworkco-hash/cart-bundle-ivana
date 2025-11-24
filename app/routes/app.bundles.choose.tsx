@@ -29,8 +29,8 @@ import { GeneralStickyAddToCart } from "app/components/bundles/GeneralStickyAddT
 import { GeneralQuentityBreack } from "app/components/bundles/GeneralQuentityBreack";
 import { CountDownPanel } from "app/components/bundles/CountDownPanel";
 import { MostPopularfancy } from "app/components/common/MostPopularfancy";
-import { getCountdownTimer } from "app/models/countdownTimer.server";
-import { CountdownTimer } from "app/models/types";
+// import { getCountdownTimer } from "app/models/countdownTimer.server";
+// import { CountdownTimer } from "app/models/types";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
@@ -192,7 +192,6 @@ export default function BundleSettingsAdvanced() {
       [id]: newText,
     }));
   };
-  console.log("dddd", loaderData.countdownTimerConf);
 
   // right layout add upsell and delete upsell
   const [upsellsState, setUpsellsState] = useState([]);
@@ -205,10 +204,6 @@ export default function BundleSettingsAdvanced() {
     setUpsellsState(prev => prev.filter((item: any) => item.id !== id));
 
   };
-
-
-
-
   // Tab state
 
   const [selectedProduct, setSelectedProduct] = useState(
@@ -218,30 +213,24 @@ export default function BundleSettingsAdvanced() {
     loaderData.selectedCountry
   );
   const [showOriginal, setShowOriginal] = useState(true)
-
   // PopUpover received title state
   const [barTitle, setBarTitle] = useState(loaderData.barTitle);
-
   const handleBundlesChooseTitleChange = (v: string) => {
     setBarTitle(v);
   };
 
   const [barSubTitle, setBarSubTitle] = useState(loaderData.barSubTitle);
-
   const handleBundlesChooseSubTitleChange = (v: string) => {
     setBarSubTitle(v);
   };
   const [bagdeText, setBagdeText] = useState(loaderData.bagdeText);
-
   const handleBundlesChooseBadgeTextChange = (v: string) => {
     setBagdeText(v);
   };
   const [barLabelText, setBarLabelText] = useState(loaderData.barLabelText);
-
   const handleBundlesChooseBarLabelTextChanges = (v: string) => {
     setBarLabelText(v);
   };
-
 
   const [calculatedPrice, setCalculatedPrice] = useState('');
   const [defaultBasePrice, setDefaultBasePrice] = useState('');
@@ -253,15 +242,26 @@ export default function BundleSettingsAdvanced() {
     }
   };
 
-  const [addUpsellcalculatedPrice, aetAddUpsellcalculatedPrice] = useState('');
-  const [addupselldefaultBasePrice, SetAddupselldefaultBasePrice] = useState('');
+ const [addUpsellcalculatedPrice, setAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
+ const [addupselldefaultBasePrice, setAddupselldefaultBasePrice] = useState<Record<number, string>>({});
 
-  const handleAddUpsellPriceChange = (price: string, defaultPrice?: string) => {
-    aetAddUpsellcalculatedPrice(price);
-    if (defaultPrice) {
-      SetAddupselldefaultBasePrice(defaultPrice);
-    }
-  };
+const handleAddUpsellPriceChange = (
+  id: number,
+  price: string,
+  defaultPrice?: string
+) => {
+  setAddUpsellcalculatedPrice(prev => ({
+    ...prev,
+    [id]: price,
+  }));
+
+  if (defaultPrice !== undefined) {
+    setAddupselldefaultBasePrice(prev => ({
+      ...prev,
+      [id]: defaultPrice,
+    }));
+  }
+};
 
   const [badgeSelected, setBadgeSelected] = useState("simple");
 
@@ -659,21 +659,22 @@ export default function BundleSettingsAdvanced() {
                                     </div>
                                     <div className="bar-upsell-checkbox-content">
                                       <div className="bar-upsell-img"></div>
-                                      <TextField
-                                        label=""
-                                        value={barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
-                                        onChange={(value) => handleBundlesChooseBarUpsellTextChanges(upsell.id, value)}
-                                      />
+                                      <span>
+                                      {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                      </span>
                                     </div>
                                     <div className="bar-upsell-price">
-                                      <div className="bar-upsell-discountprice">${addUpsellcalculatedPrice}</div>
-                                      {addupselldefaultBasePrice && (
+                                      <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "0"}</div>
+                                      {addupselldefaultBasePrice[upsell.id] && (
                                         <div className="bar-upsell-fullprice">
-                                          {parseFloat(addupselldefaultBasePrice) !== parseFloat(addUpsellcalculatedPrice || "0") ? (
-                                            <s>${addupselldefaultBasePrice}</s>
-                                          ) : (
-                                            `$${addupselldefaultBasePrice}`
-                                          )}
+                                          {parseFloat(addupselldefaultBasePrice[upsell.id]) !== 
+                                            parseFloat(addUpsellcalculatedPrice[upsell.id] || "0")
+                                              ? (
+                                                  <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                                ) : (
+                                                  `$${addupselldefaultBasePrice[upsell.id]}`
+                                                )
+                                            }
                                         </div>
                                       )}
                                     </div>
