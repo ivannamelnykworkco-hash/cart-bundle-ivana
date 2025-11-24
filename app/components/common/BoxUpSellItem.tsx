@@ -4,7 +4,7 @@ import { PopUpover } from "./PopUpover";
 import { ImageLoad } from "./ImageLoad";
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
-export function BoxUpSellItem({ id, deleteId, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange,  }: {id: any, deleteId: any, upAddUpsellPriceChange: any, upBundlesBarUpsellTextChange:  any, deleteSection: (id: any) => void }) {
+export function BoxUpSellItem({ id, deleteId, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, }: { id: any, deleteId: any, upAddUpsellPriceChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const [selected, setSelected] = useState("default");
@@ -13,37 +13,44 @@ export function BoxUpSellItem({ id, deleteId, deleteSection, upBundlesBarUpsellT
   const [isSelectedDefault, setIsSelectedDefault] = useState(true);
   const [isVisibleSelected, setIsVisibleSelected] = useState(false);
 
-  const [barAddUpsellDefaultPrice, setBarAddUpsellDefaultPrice] = useState((loaderData as any).barAddUpsellDefaultPrice);
-  const [upsellValue, setUpsellValue] = useState('20');
+  const [barAddUpsellDefaultPrice, setBarAddUpsellDefaultPrice] = useState(
+    (loaderData as any).barAddUpsellDefaultPrice
+  );
+  const [upsellValue, setUpsellValue] = useState("20");
 
-    useEffect(() => {
-      const basePrice = parseFloat(barAddUpsellDefaultPrice || "0");
-      const discountPercent = parseFloat(upsellValue || "0");
-      
-      let calculatedPrice = 0;
-      let defaulBasePrice =  basePrice;
-      
-      if (selected === 'discounted%') {
-        calculatedPrice =  basePrice * (1 - discountPercent / 100);
-      } else if (selected === 'discounted$') {
-        calculatedPrice =  basePrice - ( discountPercent);
-      } else if (selected === 'specific') {
-        calculatedPrice = parseFloat(upsellValue || "0");
-      } else {
-        calculatedPrice =  basePrice;
-      }
-      
-      if (upAddUpsellPriceChange) {
-        upAddUpsellPriceChange(calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
-      }
-    }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange]);
+  useEffect(() => {
+    const base = Number(barAddUpsellDefaultPrice) || 0;
+    const value = Number(upsellValue) || 0;
+
+    let calculated = base;
+
+    if (selected === "discounted%") {
+      calculated = base * (1 - value / 100);
+    } else if (selected === "discounted$") {
+      calculated = base - value;
+    } else if (selected === "specific") {
+      calculated = value;
+    }
+
+    if (calculated < 0) calculated = 0;
+
+    // IMPORTANT → Add upsell.id here
+    if (upAddUpsellPriceChange) {
+      upAddUpsellPriceChange(
+        id,
+        calculated.toFixed(2),
+        base.toFixed(2)
+      );
+    }
+  }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange]);
+
 
   const handleChange = useCallback(
-      (newValue: string) => {
-        setUpsellValue(newValue);
-      },
-      [],
-    );
+    (newValue: string) => {
+      setUpsellValue(newValue);
+    },
+    [],
+  );
   const handleImageSizeChange = useCallback(
     (newValue: string) => setImageSizeValue(newValue),
     [],

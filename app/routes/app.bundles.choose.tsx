@@ -685,11 +685,11 @@ export default function BundleSettingsAdvanced() {
                                         </span>
                                       </div>
                                       <div className="bar-upsell-price">
-                                        <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "0"}</div>
+                                        <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
                                         {addupselldefaultBasePrice[upsell.id] && (
                                           <div className="bar-upsell-fullprice">
                                             {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
-                                              parseFloat(addUpsellcalculatedPrice[upsell.id] || "0")
+                                              parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
                                               ? (
                                                 <s>${addupselldefaultBasePrice[upsell.id]}</s>
                                               ) : (
