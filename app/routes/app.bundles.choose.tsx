@@ -170,7 +170,7 @@ export async function action({ request, params }) {
     return json({ success: true, result });
   } catch (err) {
     return json(
-      { success: false, error: data },
+      { success: false, error: error.message || err },
       { status: 500 }
     );
   }
