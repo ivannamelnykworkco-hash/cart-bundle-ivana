@@ -153,6 +153,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   });
 };
 
+interface BoxQuantity {
+  id: number;
+}
+
 const fontWeightMap = {
   styleLight: '200',
   styleLightItalic: '200',
@@ -173,85 +177,51 @@ const fontStyleMap = {
   styleBoldItalic: 'italic',
 };
 
-
-interface BoxQuantity {
-  id: number;
-}
 export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
-
   //id: ==> upsellchecked state
   const [upsellChecked, setUpsellChecked] = useState({});
   const handleUpsellValueChange = useCallback((id: any, newChecked: any) => {
-    setUpsellChecked(prev => ({
-      ...prev,
-      [id]: newChecked
-    }));
+    setUpsellChecked(prev => ({ ...prev, [id]: newChecked }));
   }, []);
-
   //id: ==> upsellTexts state.,
   const [barUpsellTexts, setBarUpsellTexts] = useState({});
-  const handleBundlesChooseBarUpsellTextChanges = (id: number, newText: string) => {
-    setBarUpsellTexts(prev => ({
-      ...prev,
-      [id]: newText,
-    }));
-  };
-
   //left Layout add Quantity Breack
   const [quantityBreaks, setQuantityBreaks] = useState<BoxQuantity[]>([]);
   const addQuantityBreak = () => [
     setQuantityBreaks(prev => [...prev, { id: Date.now() }])
   ]
-
   const deleteQuantityBreak = (id: any) => {
     setQuantityBreaks(prev => prev.filter(item => item.id !== id))
   }
-
-  // right layout add upsell and delete upsell
+  // quantity break
   const [upsellsState, setUpsellsState] = useState([]);
-
-  const handelonAddUpsellChange = (item: any) => {
-    setUpsellsState((prev) => [...prev, item]);
-  };
-
-  const handleonDeleteUpsellChange = (id: any) => {
-    setUpsellsState(prev => prev.filter((item: any) => item.id !== id));
-
-  };
-  // Tab state
-
-  const [selectedProduct, setSelectedProduct] = useState(
-    loaderData.selectedProduct
-  );
-  const [selectedCountry, setSelectedCountry] = useState(
-    loaderData.selectedCountry
-  );
+  const [selectedProduct, setSelectedProduct] = useState(loaderData.selectedProduct);
+  const [selectedCountry, setSelectedCountry] = useState(loaderData.selectedCountry);
   const [showOriginal, setShowOriginal] = useState(true)
-  // PopUpover received title state
   const [barTitle, setBarTitle] = useState(loaderData.barTitle);
-  const handleBundlesChooseTitleChange = (v: string) => {
-    setBarTitle(v);
-  };
-
   const [barSubTitle, setBarSubTitle] = useState(loaderData.barSubTitle);
-  const handleBundlesChooseSubTitleChange = (v: string) => {
-    setBarSubTitle(v);
-  };
   const [bagdeText, setBagdeText] = useState(loaderData.bagdeText);
-  const handleBundlesChooseBadgeTextChange = (v: string) => {
-    setBagdeText(v);
-  };
   const [barLabelText, setBarLabelText] = useState(loaderData.barLabelText);
-  const handleBundlesChooseBarLabelTextChanges = (v: string) => {
-    setBarLabelText(v);
-  };
-
-  const [calculatedPrice, setCalculatedPrice] = useState('');
+  const [badgeSelected, setBadgeSelected] = useState("simple");
+  //buy x and get y free
   const [defaultBasePrice, setDefaultBasePrice] = useState('');
+  const [calculatedPrice, setCalculatedPrice] = useState('');
+  const [xybarTitle, setXyBarTitle] = useState(loaderData.barTitle);
+  const [xybarSubTitle, setXyBarSubTitle] = useState(loaderData.barSubTitle);
+  const [xybagdeText, setXysetBagdeText] = useState(loaderData.bagdeText);
+  const [xybarLabelText, setXyBarLabelText] = useState(loaderData.barLabelText);
+  const [xybadgeSelected, setXybadgeSelected] = useState("simple");
+  const [xycalculatedPrice, setXyCalculatedPrice] = useState('');
 
   const handlePriceChange = (price: string, defaultPrice?: string) => {
     setCalculatedPrice(price);
+    if (defaultPrice) {
+      setDefaultBasePrice(defaultPrice);
+    }
+  };
+  const handleXyPriceChange = (price: string, defaultPrice?: string) => {
+    setXyCalculatedPrice(price);
     if (defaultPrice) {
       setDefaultBasePrice(defaultPrice);
     }
@@ -277,138 +247,27 @@ export default function BundleSettingsAdvanced() {
       }));
     }
   };
-
-  const [badgeSelected, setBadgeSelected] = useState("simple");
-
-  const handleBadgeSelectedChange = (value: string) => {
-    setBadgeSelected(value);
-  };
-
+  // color style and text style
   const [cornerRadius, setCornerRadius] = useState(8);
-
-  const handleCornerRadiusChange = (value: number) => {
-    setCornerRadius(value);
-  };
-
   const [spacing, setSpacing] = useState(20);
-
-  const handleSpacingChange = (value: number) => {
-    setSpacing(value);
-  };
-
-  // Default cardsBg: hue: 37, saturation: 0.7, brightness: 1
   const [cardsBgColor, setCardsBgColor] = useState(hsbToHex({ hue: 0, saturation: 0.07, brightness: 1 }));
-
-  const handleCardsBgColorChange = (color: string) => {
-    setCardsBgColor(color);
-  };
-
-  // Default blockTitle: hue: 0, saturation: 0, brightness: 0 (black)
   const [blockTitleColor, setBlockTitleColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-
-  const handleBlockTitleColorChange = (color: string) => {
-    setBlockTitleColor(color);
-  };
-
-  // Default barTitle: hue: 0, saturation: 0, brightness: 0 (black)
   const [barTitleColor, setBarTitleColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-
-  const handleBarTitleColorChange = (color: string) => {
-    setBarTitleColor(color);
-  };
-
-  // Default barSubtitle: hue: 0, saturation: 0, brightness: 0.33 (gray)
   const [barSubTitleColor, setBarSubTitleColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0.33 }));
-
-  const handleBarSubTitleColorChange = (color: string) => {
-    setBarSubTitleColor(color);
-  };
-
-  // Default barPrice: hue: 0, saturation: 0, brightness: 0 (black)
   const [barPriceColor, setBarPriceColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-
-  const handleBarPriceColorChange = (color: string) => {
-    setBarPriceColor(color);
-  };
   const [barFullPriceColor, setBarFullPriceColor] = useState(hsbToHex({ hue: 0, saturation: 0.04, brightness: 0.53 }));
-
-  const handleBarFullPriceColorChange = (color: string) => {
-    setBarFullPriceColor(color);
-  };
-
   const [barLabelBack, setBarLabelBack] = useState(hsbToHex({ hue: 36, saturation: 0.15, brightness: 1 }));
-
-  const handleBarlabelBackChange = (color: string) => {
-    setBarLabelBack(color);
-  };
-  //
   const [barLabelTextColor, setBarLabelTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-
-  const handleBarlabelTextcolorChange = (color: string) => {
-    setBarLabelTextColor(color);
-  };
-  //
   const [barBadgebackColor, setBarBadgebackColor] = useState(hsbToHex({ hue: 36, saturation: 1, brightness: 1 }));
-
-  const handleBarBadgeBackcolorChange = (color: string) => {
-    setBarBadgebackColor(color);
-  };
-  //
   const [barBadgeTextColor, setBarBadgeTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 1 }));
-
-  const handleBarBadgeTextcolorChange = (color: string) => {
-    setBarBadgeTextColor(color);
-  };
-  //Block Title size
   const [barBlocktitle, setBarBlocktitle] = useState('12');
-
-  const handleBlockTitleChange = (size: string) => {
-    setBarBlocktitle(size);
-  };
-  // block title font style
   const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState('styleRegular');
-
-  const handleBlockTitleFontStyleChange = (style: string) => {
-    setBarBlocktitleFontStyle(style);
-  };
-  //
   const [bartitleSize, setBartitleSize] = useState('19');
-
-  const handleTitleChange = (size: string) => {
-    setBartitleSize(size);
-  };
-  //  title font style
   const [bartitleFontStyle, setBartitleFontStyle] = useState('styleLight');
-
-  const handleTitleFontStyleChange = (style: string) => {
-    setBartitleFontStyle(style);
-  };
-  //subtitle size 
   const [subTitleSize, setSubTitleSize] = useState('13');
-
-  const handleSubTitleChange = (size: string) => {
-    setSubTitleSize(size);
-  };
-  //  subtitle font style
   const [subTitleStyle, setSubTitleStyle] = useState('styleRegular');
-
-  const handleSubTitleStyleChange = (style: string) => {
-    setSubTitleStyle(style);
-  };
-  //labelSize size 
   const [labelSize, setLabelSize] = useState('13');
-
-  const handleLabelChange = (size: string) => {
-    setLabelSize(size);
-  };
-  //  subtitle font style
-  const [labelStyle, setLabelStyle] = useState('styleRegular');
-
-  const handleLabelStyleChange = (style: string) => {
-    setLabelStyle(style);
-  };
-  //
-
+  const [labelStyle, setLabelStyle] = useState('styleRegular');  //
 
   const productOptions = [
     { label: "Gift Card", value: "Gift Card" },
@@ -423,29 +282,27 @@ export default function BundleSettingsAdvanced() {
   ];
 
   const styleHandlers = {
-    upCornerRadiusChange: handleCornerRadiusChange,
-    upSpacingChange: handleSpacingChange,
-    upCardsBgColorChange: handleCardsBgColorChange,
-    upBlockTitleColorChange: handleBlockTitleColorChange,
-    upBarTitleColorChange: handleBarTitleColorChange,
-    upBarSubTitleColorChange: handleBarSubTitleColorChange,
-    upBarPriceColorChange: handleBarPriceColorChange,
-    upBarFullPriceColorChange: handleBarFullPriceColorChange,
-    upBarlabelBackChange: handleBarlabelBackChange,
-    upBarlabelTextColorChange: handleBarlabelTextcolorChange,
-    upBarBadgeBackColorChange: handleBarBadgeBackcolorChange,
-    upBarBadgeTextColorChange: handleBarBadgeTextcolorChange,
-
+    upCornerRadiusChange: setCornerRadius,
+    upSpacingChange: setSpacing,
+    upCardsBgColorChange: setCardsBgColor,
+    upBlockTitleColorChange: setBlockTitleColor,
+    upBarTitleColorChange: setBarTitleColor,
+    upBarSubTitleColorChange: setBarSubTitleColor,
+    upBarPriceColorChange: setBarPriceColor,
+    upBarFullPriceColorChange: setBarFullPriceColor,
+    upBarlabelBackChange: setBarLabelBack,
+    upBarlabelTextColorChange: setBarLabelTextColor,
+    upBarBadgeBackColorChange: setBarBadgebackColor,
+    upBarBadgeTextColorChange: setBarBadgeTextColor,
     //text
-    upBlockTitleChange: handleBlockTitleChange,
-    upBlockTitleFontStyleChange: handleBlockTitleFontStyleChange,
-    upTitleChange: handleTitleChange,
-    upTitleFontStyleChange: handleTitleFontStyleChange,
-    upSubTitleChange: handleSubTitleChange,
-    upSubTitleStyleChange: handleSubTitleStyleChange,
-    upLabelChange: handleLabelChange,
-    upLabelStyleChange: handleLabelStyleChange,
-
+    upBlockTitleChange: setBarBlocktitle,
+    upBlockTitleFontStyleChange: setBarBlocktitleFontStyle,
+    upTitleChange: setBartitleSize,
+    upTitleFontStyleChange: setBartitleFontStyle,
+    upSubTitleChange: setSubTitleSize,
+    upSubTitleStyleChange: setSubTitleStyle,
+    upLabelChange: setLabelSize,
+    upLabelStyleChange: setLabelStyle,
   };
 
   return (
@@ -481,20 +338,33 @@ export default function BundleSettingsAdvanced() {
                     key={item.id}
                     deleteId={item.id} deleteSection={deleteQuantityBreak}
                     heading="Bar #1 - Single"
-                    upBundlesChooseTitleChange={handleBundlesChooseTitleChange}
-                    upBundlesChooseSubTitleChange={handleBundlesChooseSubTitleChange}
-                    upBundlesBadgeTextChange={handleBundlesChooseBadgeTextChange}
-                    upBunlesBarLabelTextChange={handleBundlesChooseBarLabelTextChanges}
-                    upBundlesBarUpsellTextChange={handleBundlesChooseBarUpsellTextChanges}
+                    upBundlesChooseTitleChange={setBarTitle}
+                    upBundlesChooseSubTitleChange={setBarSubTitle}
+                    upBundlesBadgeTextChange={setBagdeText}
+                    upBunlesBarLabelTextChange={setBarLabelText}
+                    upBundlesBarUpsellTextChange={setBarUpsellTexts(prev => ({ ...prev, [id]: newText, }))}
                     upPriceChange={handlePriceChange}
                     upAddUpsellPriceChange={handleAddUpsellPriceChange}
-                    upBadgeSelectedChange={handleBadgeSelectedChange}
-                    onAddUpsell={handelonAddUpsellChange}
-                    onDeleteUpsell={handleonDeleteUpsellChange} />
+                    upBadgeSelectedChange={setBadgeSelected}
+                    onAddUpsell={setUpsellsState((prev) => [...prev, item])}
+                    onDeleteUpsell={setUpsellsState(prev => prev.filter((item: any) => item.id !== id))} />
                 ))}
-                <GeneralBuyXgetYfree id={undefined} deleteId={undefined} deleteSection={undefined} heading={undefined} upBundlesChooseTitleChange={undefined} upBundlesChooseSubTitleChange={undefined} upBundlesBadgeTextChange={undefined} upBunlesBarLabelTextChange={undefined} upBundlesBarUpsellTextChange={undefined} onAddUpsell={undefined} onDeleteUpsell={undefined} upAddUpsellPriceChange={function (price: string, defaultBasePrice?: string): void {
-                  throw new Error("Function not implemented.");
-                }} />
+                <GeneralBuyXgetYfree id={undefined}
+                  deleteId={undefined}
+                  deleteSection={undefined}
+                  heading={undefined}
+                  upBundlesChooseTitleChange={setXyBarTitle}
+                  upBundlesChooseSubTitleChange={setXyBarSubTitle}
+                  upBundlesBadgeTextChange={setXysetBagdeText}
+                  upBunlesBarLabelTextChange={setXyBarLabelText}
+                  upBundlesBarUpsellTextChange={undefined}
+                  upPriceChange={handleXyPriceChange}
+                  upBadgeSelectedChange={setXybadgeSelected}
+                  onAddUpsell={undefined}
+                  onDeleteUpsell={undefined}
+                  upAddUpsellPriceChange={function (price: string, defaultBasePrice?: string): void {
+                    throw new Error("Function not implemented.");
+                  }} />
                 {showOriginal ? (
                   <div style={{ border: "1px dashed  black", borderRadius: '10px', padding: '15px' }}>
                     <Button fullWidth icon={PlusCircleIcon} variant="primary" onClick={() => setShowOriginal(false)}>Add bar</Button>
@@ -598,7 +468,7 @@ export default function BundleSettingsAdvanced() {
                               </div>
                             )}
                           </Box>
-                          {/* Single Option */}
+                          {/* add upsell */}
 
                           {quantityBreaks.map((item) => (
                             <div key={item.id} className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
@@ -709,7 +579,140 @@ export default function BundleSettingsAdvanced() {
                               </div>
                             </div>
                           ))}
-                          {/* Bundle Option */}
+
+                          {/* {add buy x, get y free!} */}
+
+                          <Box position="relative">
+                            {/* {bundle most popular} */}
+                            {xybadgeSelected === "simple" && xybagdeText && (
+                              <div className="bundle_bar_most_popular">
+                                <div className="bundle_bar_most_popular_content" style={{
+                                  background: barBadgebackColor,
+                                  color: barBadgebackColor,
+                                }}>
+                                  <span style={{ color: barBadgeTextColor, }}>
+                                    {xybagdeText}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                            {/* {bundle most popular fancy} */}
+                            {xybadgeSelected === "mostpopular" && (
+                              <div className="bundle_bar_most_popular_fancy">
+                                <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
+                              </div>
+                            )}
+                          </Box>
+
+                          <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
+                            <InlineStack align="space-between" blockAlign="center">
+                              <InlineStack gap="200" blockAlign="center">
+                                <div
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    borderRadius: "50%",
+                                    border: "2px solid #ddd",
+                                  }}
+                                />
+                                <BlockStack gap="050">
+                                  <InlineStack gap="100">
+                                    <p className="barTitle" style={{
+                                      color: barTitleColor,
+                                      fontSize: `${bartitleSize}px`,
+                                      fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                      fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                    }}>
+                                      {xybarTitle}
+                                    </p>
+                                    <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                      <p className="bar-label--text" style={{
+                                        color: barLabelTextColor,
+                                        fontSize: `${labelSize}px`,
+                                        fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
+                                        fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
+                                      }}>
+                                        {xybarLabelText}
+                                      </p>
+                                    </div>
+                                  </InlineStack>
+                                  <span className="barSubTitle" style={{
+                                    color: barSubTitleColor,
+                                    fontSize: `${subTitleSize}px`,
+                                    fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
+                                    fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
+                                  }}>
+                                    {xybarSubTitle}
+                                  </span>
+                                </BlockStack>
+                              </InlineStack>
+                              <div style={{ textAlign: "right" }}>
+                                <BlockStack gap="050">
+                                  <div className="bar-price" style={{
+                                    color: barPriceColor,
+                                    fontSize: `${bartitleSize}px`,
+                                    fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                    fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                  }}>
+                                    ${xycalculatedPrice}
+                                  </div>
+                                  {defaultBasePrice && (
+                                    <div className="bar-fullPrice" style={{
+                                      color: barFullPriceColor,
+                                      fontSize: `${subTitleSize}px`,
+                                      fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
+                                      fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
+                                    }}>
+                                      {parseFloat(defaultBasePrice) !== parseFloat(xycalculatedPrice || "0") ? (
+                                        <s>${defaultBasePrice}</s>
+                                      ) : (
+                                        `$${defaultBasePrice}`
+                                      )}
+                                    </div>
+                                  )}
+                                </BlockStack>
+                              </div>
+                            </InlineStack>
+                            {/* Add Upsell */}
+                            <div className="bar-upsell-container-main">
+                              {upsellsState.map(upsell => (
+                                <div key={upsell.id} className="upsell-box">
+                                  <div className="bar-upsell-container">
+                                    <div className="bar-upsell-checkbox">
+                                      <Checkbox
+                                        label=""
+                                        checked={upsellChecked[upsell.id] || false}
+                                        onChange={(value) => handleUpsellValueChange(upsell.id, value)}
+                                      />
+                                    </div>
+                                    <div className="bar-upsell-checkbox-content">
+                                      <div className="bar-upsell-img"></div>
+                                      <span>
+                                        {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                      </span>
+                                    </div>
+                                    <div className="bar-upsell-price">
+                                      <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
+                                      {addupselldefaultBasePrice[upsell.id] && (
+                                        <div className="bar-upsell-fullprice">
+                                          {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
+                                            parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
+                                            ? (
+                                              <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                            ) : (
+                                              `$${addupselldefaultBasePrice[upsell.id]}`
+                                            )
+                                          }
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+
                         </BlockStack>
                       </BlockStack>
                     </Box>

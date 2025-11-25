@@ -268,7 +268,7 @@ export function GeneralBuyXgetYfree({
                     free!
                   </Text>
                   <div style={{ width: '100%' }}>
-                    <Tooltip active content="You can't set the price for  Buy X, get Y free bar as the discount is auto applied based on XIY quantities set. For volume discount please scroll down, click Add bar and select Quantity break.">
+                    <Tooltip content="You can't set the price for  Buy X, get Y free bar as the discount is auto applied based on XIY quantities set. For volume discount please scroll down, click Add bar and select Quantity break.">
                       <Select
                         label="Price"
                         options={upsellsOptions}
