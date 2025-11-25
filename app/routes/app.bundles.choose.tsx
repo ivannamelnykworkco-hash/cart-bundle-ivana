@@ -151,6 +151,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     bundleUpsellSubtitle: 'Save {{saved_amount}}!',
     bundleUpsellBagdeText: '',
     bunldeUpsellLabelText: '',
+    buyQualityalue: 3,
+    getQualityalue: 1,
 
     // Upsell products
     upsellProducts: [
@@ -241,7 +243,7 @@ export default function BundleSettingsAdvanced() {
   const [defaultBasePrice, setDefaultBasePrice] = useState('');
   const [calculatedPrice, setCalculatedPrice] = useState('');
   const [xybarTitle, setXyBarTitle] = useState(loaderData.xybarTitle);
-  const [xybarSubTitle, setXyBarSubTitle] = useState(loaderData.barSubTitle);
+  const [xybarSubTitle, setXyBarSubTitle] = useState(loaderData.xybarSubTitle);
   const [xybagdeText, setXysetBagdeText] = useState(loaderData.bagdeText);
   const [xybarLabelText, setXyBarLabelText] = useState(loaderData.barLabelText);
   const [xybadgeSelected, setXybadgeSelected] = useState("simple");
@@ -541,8 +543,8 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
-                                <InlineStack align="space-between" blockAlign="center">
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
                                       style={{
@@ -609,7 +611,7 @@ export default function BundleSettingsAdvanced() {
                                       )}
                                     </BlockStack>
                                   </div>
-                                </InlineStack>
+                                </div>
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
@@ -675,8 +677,8 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
-                                <InlineStack align="space-between" blockAlign="center">
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
                                       style={{
@@ -743,7 +745,7 @@ export default function BundleSettingsAdvanced() {
                                       )}
                                     </BlockStack>
                                   </div>
-                                </InlineStack>
+                                </div>
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
@@ -809,8 +811,8 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
-                                <InlineStack align="space-between" blockAlign="center">
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
                                       style={{
@@ -877,7 +879,7 @@ export default function BundleSettingsAdvanced() {
                                       )}
                                     </BlockStack>
                                   </div>
-                                </InlineStack>
+                                </div>
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
@@ -1082,7 +1084,7 @@ export default function BundleSettingsAdvanced() {
             </Layout.Section>
           </InlineGrid>
         </Box>
-      </Layout>
-    </Page>
+      </Layout >
+    </Page >
   );
 }

@@ -52,11 +52,8 @@ export function GeneralBuyXgetYfree({
   const [open, setOpen] = useState(false);
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>(
-    (loaderData as any).barDefaultQuality
-  );
-  // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [buyQualityalue, setBuyQualityalue] = useState<number>((loaderData as any).buyQualityalue);
+  const [getQualityalue, setGetQualityalue] = useState<number>((loaderData as any).getQualityalue);
   const [barDefaultPrice, setBarDefaultPrice] = useState((loaderData as any).barDefaultPrice);
   const [upsellValue, setUpsellValue] = useState('20');
   const [opacity, setOpacity] = useState<number>(20);
@@ -65,7 +62,6 @@ export function GeneralBuyXgetYfree({
   const [badgeSelected, setBadgeSelected] = useState("simple");
 
   const [title, setTitle] = useState((loaderData as any).xybarTitle || "");
-
   const handleTitleChange = (v: string) => {
     setTitle(v);
     upBundlesChooseTitleChange(v);
@@ -120,34 +116,26 @@ export function GeneralBuyXgetYfree({
 
   // Calculate price based on the formula: barDefaultQualityalue * barDefaultPrice * (1 - upsellValue / 100)
   useEffect(() => {
-    const quantity = barDefaultQualityalue;
+    const bQuantity = buyQualityalue;
+    const gQuantity = getQualityalue;
+    const tQuantity = bQuantity + gQuantity;
     const basePrice = parseFloat(barDefaultPrice || "0");
-    const discountPercent = parseFloat(upsellValue || "0");
 
     let calculatedPrice = 0;
-    let defaulBasePrice = quantity * basePrice;
-
-    if (selected === 'discounted%') {
-      calculatedPrice = quantity * basePrice * (1 - discountPercent / 100);
-    } else if (selected === 'discounted$') {
-      calculatedPrice = quantity * basePrice - (quantity * discountPercent);
-    } else if (selected === 'specific') {
-      calculatedPrice = parseFloat(upsellValue || "0");
-    } else {
-      calculatedPrice = quantity * basePrice;
-    }
+    let defaulBasePrice = tQuantity * basePrice;
+    calculatedPrice = bQuantity * basePrice;
 
     if (upPriceChange) {
       upPriceChange(calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
     }
-  }, [barDefaultQualityalue, barDefaultPrice, upsellValue, selected, upPriceChange]);
+  }, [barDefaultPrice, buyQualityalue, getQualityalue, upPriceChange]);
 
-  const handleChange = useCallback(
-    (newValue: string) => {
-      setUpsellValue(newValue);
-    },
-    [],
-  );
+  // const handleChange = useCallback(
+  //   (newValue: string) => {
+  //     setUpsellValue(newValue);
+  //   },
+  //   [],
+  // );
   const handleSettingsToggle = useCallback((
   ) => setOpen((open) => !open),
     []);
@@ -221,10 +209,10 @@ export function GeneralBuyXgetYfree({
                   <TextField
                     label='Quantity'
                     type="number"
-                    value={String(barDefaultQualityalue)}
+                    value={String(buyQualityalue)}
                     onChange={(val) => {
                       const newValue = Number(val);
-                      setBarDefaultQualityalue(newValue);
+                      setBuyQualityalue(newValue);
                     }}
                     autoComplete="off"
                     min={1}
@@ -240,10 +228,10 @@ export function GeneralBuyXgetYfree({
                   <TextField
                     label="Quantity"
                     type="number"
-                    value={String(barDefaultQualityalue)}
+                    value={String(getQualityalue)}
                     onChange={(val) => {
                       const newValue = Number(val);
-                      setBarDefaultQualityalue(newValue);
+                      setGetQualityalue(newValue);
                     }}
                     autoComplete="off"
                     min={1}
