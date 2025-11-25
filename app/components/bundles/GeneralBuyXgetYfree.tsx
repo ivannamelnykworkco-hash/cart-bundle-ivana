@@ -1,5 +1,5 @@
 import { BlockStack, Button, Card, Checkbox, Collapsible, Divider, Grid, InlineGrid, InlineStack, RangeSlider, Select, Text, TextField, Tooltip } from "@shopify/polaris";
-import { DeleteIcon, DiscountIcon, DomainNewIcon, GiftCardIcon, ProductAddIcon, SortAscendingIcon, ImageIcon, SortDescendingIcon } from '@shopify/polaris-icons';
+import { DeleteIcon, MegaphoneIcon, DomainNewIcon, GiftCardIcon, ProductAddIcon, SortAscendingIcon, ImageIcon, SortDescendingIcon } from '@shopify/polaris-icons';
 import { useCallback, useState, useEffect } from "react";
 import { PopUpover } from "../common/PopUpover";
 import { BoxUpSellItem } from "../common/BoxUpSellItem";
@@ -205,7 +205,7 @@ export function GeneralBuyXgetYfree({
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"
-            icon={DiscountIcon}
+            icon={MegaphoneIcon}
           >
             {heading}
           </Button>
@@ -226,7 +226,7 @@ export function GeneralBuyXgetYfree({
             <Grid>
               <Grid.Cell columnSpan={{ xs: 3, sm: 3, md: 3 }}>
                 <InlineStack gap="200" align="end" blockAlign="end" wrap={false}>
-                  <Text as="h6">
+                  <Text as="h6" fontWeight="bold">
                     Buy
                   </Text>
                   <TextField
@@ -245,7 +245,7 @@ export function GeneralBuyXgetYfree({
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 3, sm: 3, md: 3 }}>
                 <InlineStack gap="200" align="end" blockAlign="end" wrap={false}>
-                  <Text as='h6'>
+                  <Text as='h6' fontWeight="bold">
                     ,Get
                   </Text>
                   <TextField
@@ -264,7 +264,7 @@ export function GeneralBuyXgetYfree({
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6 }}>
                 <InlineStack gap='300' align="end" blockAlign="end" wrap={false}>
-                  <Text as='h6'>
+                  <Text as='h6' fontWeight="bold">
                     free!
                   </Text>
                   <div style={{ width: '100%' }}>

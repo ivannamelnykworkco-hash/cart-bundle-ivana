@@ -142,6 +142,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     barDefaultPrice: '702.45',
     barAddUpsellDefaultPrice: '20',
     barUpsellText: '+ Add at 20% discount',
+    xybarTitle: 'Buy 3, get 1 free!',
     // Upsell products
     upsellProducts: [
       { id: "1", title: "Product A", price: "$25.00", image: "" },
@@ -186,6 +187,13 @@ export default function BundleSettingsAdvanced() {
   }, []);
   //id: ==> upsellTexts state.,
   const [barUpsellTexts, setBarUpsellTexts] = useState({});
+
+  const handleBundlesChooseBarUpsellTextChanges = (id: number, newText: string) => {
+    setBarUpsellTexts(prev => ({
+      ...prev,
+      [id]: newText,
+    }));
+  };
   //left Layout add Quantity Breack
   const [quantityBreaks, setQuantityBreaks] = useState<BoxQuantity[]>([]);
   const addQuantityBreak = () => [
@@ -193,6 +201,14 @@ export default function BundleSettingsAdvanced() {
   ]
   const deleteQuantityBreak = (id: any) => {
     setQuantityBreaks(prev => prev.filter(item => item.id !== id))
+  }
+  // left layout add buy x get y 
+  const [buyXGetYs, setBuyXGetYs] = useState<BoxQuantity[]>([]);
+  const addBuyXGetY = () => [
+    setBuyXGetYs(prev => [...prev, { id: Date.now() }])
+  ]
+  const deleteBuyXGetY = (id: any) => {
+    setBuyXGetYs(prev => prev.filter(item => item.id !== id))
   }
   // quantity break
   const [upsellsState, setUpsellsState] = useState([]);
@@ -207,12 +223,22 @@ export default function BundleSettingsAdvanced() {
   //buy x and get y free
   const [defaultBasePrice, setDefaultBasePrice] = useState('');
   const [calculatedPrice, setCalculatedPrice] = useState('');
-  const [xybarTitle, setXyBarTitle] = useState(loaderData.barTitle);
+  const [xybarTitle, setXyBarTitle] = useState(loaderData.xybarTitle);
   const [xybarSubTitle, setXyBarSubTitle] = useState(loaderData.barSubTitle);
   const [xybagdeText, setXysetBagdeText] = useState(loaderData.bagdeText);
   const [xybarLabelText, setXyBarLabelText] = useState(loaderData.barLabelText);
   const [xybadgeSelected, setXybadgeSelected] = useState("simple");
   const [xycalculatedPrice, setXyCalculatedPrice] = useState('');
+
+  // right layout add upsell and delete Upsell
+  const handelonAddUpsellChange = (item: any) => {
+    setUpsellsState((prev) => [...prev, item]);
+  };
+
+  const handleonDeleteUpsellChange = (id: any) => {
+    setUpsellsState(prev => prev.filter((item: any) => item.id !== id));
+
+  };
 
   const handlePriceChange = (price: string, defaultPrice?: string) => {
     setCalculatedPrice(price);
@@ -263,7 +289,7 @@ export default function BundleSettingsAdvanced() {
   const [barBlocktitle, setBarBlocktitle] = useState('12');
   const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState('styleRegular');
   const [bartitleSize, setBartitleSize] = useState('19');
-  const [bartitleFontStyle, setBartitleFontStyle] = useState('styleLight');
+  const [bartitleFontStyle, setBartitleFontStyle] = useState('styleBold');
   const [subTitleSize, setSubTitleSize] = useState('13');
   const [subTitleStyle, setSubTitleStyle] = useState('styleRegular');
   const [labelSize, setLabelSize] = useState('13');
@@ -342,29 +368,33 @@ export default function BundleSettingsAdvanced() {
                     upBundlesChooseSubTitleChange={setBarSubTitle}
                     upBundlesBadgeTextChange={setBagdeText}
                     upBunlesBarLabelTextChange={setBarLabelText}
-                    upBundlesBarUpsellTextChange={setBarUpsellTexts(prev => ({ ...prev, [id]: newText, }))}
+                    upBundlesBarUpsellTextChange={handleBundlesChooseBarUpsellTextChanges}
                     upPriceChange={handlePriceChange}
                     upAddUpsellPriceChange={handleAddUpsellPriceChange}
                     upBadgeSelectedChange={setBadgeSelected}
-                    onAddUpsell={setUpsellsState((prev) => [...prev, item])}
-                    onDeleteUpsell={setUpsellsState(prev => prev.filter((item: any) => item.id !== id))} />
+                    onAddUpsell={handelonAddUpsellChange}
+                    onDeleteUpsell={handleonDeleteUpsellChange} />
                 ))}
-                <GeneralBuyXgetYfree id={undefined}
-                  deleteId={undefined}
-                  deleteSection={undefined}
-                  heading={undefined}
-                  upBundlesChooseTitleChange={setXyBarTitle}
-                  upBundlesChooseSubTitleChange={setXyBarSubTitle}
-                  upBundlesBadgeTextChange={setXysetBagdeText}
-                  upBunlesBarLabelTextChange={setXyBarLabelText}
-                  upBundlesBarUpsellTextChange={undefined}
-                  upPriceChange={handleXyPriceChange}
-                  upBadgeSelectedChange={setXybadgeSelected}
-                  onAddUpsell={undefined}
-                  onDeleteUpsell={undefined}
-                  upAddUpsellPriceChange={function (price: string, defaultBasePrice?: string): void {
-                    throw new Error("Function not implemented.");
-                  }} />
+
+                {buyXGetYs.map((buyitem) => (
+                  <GeneralBuyXgetYfree
+                    id={buyitem.id}
+                    key={buyitem.id}
+                    deleteId={buyitem.id}
+                    deleteSection={deleteBuyXGetY}
+                    heading=" Buy 3, get 1 free!"
+                    upBundlesChooseTitleChange={setXyBarTitle}
+                    upBundlesChooseSubTitleChange={setXyBarSubTitle}
+                    upBundlesBadgeTextChange={setXysetBagdeText}
+                    upBunlesBarLabelTextChange={setXyBarLabelText}
+                    upBundlesBarUpsellTextChange={undefined}
+                    upPriceChange={handleXyPriceChange}
+                    upBadgeSelectedChange={setXybadgeSelected}
+                    upAddUpsellPriceChange={handleAddUpsellPriceChange}
+                    onAddUpsell={handelonAddUpsellChange}
+                    onDeleteUpsell={handleonDeleteUpsellChange}
+                  />
+                ))}
                 {showOriginal ? (
                   <div style={{ border: "1px dashed  black", borderRadius: '10px', padding: '15px' }}>
                     <Button fullWidth icon={PlusCircleIcon} variant="primary" onClick={() => setShowOriginal(false)}>Add bar</Button>
@@ -373,7 +403,7 @@ export default function BundleSettingsAdvanced() {
                   <Card>
                     <InlineGrid columns={3} gap="200">
                       <Button icon={DiscountIcon} onClick={addQuantityBreak}>Quantity break</Button>
-                      <Button icon={MegaphoneIcon}>Buy X, Get Y free</Button>
+                      <Button icon={MegaphoneIcon} onClick={addBuyXGetY}>Buy X, Get Y free</Button>
                       <Button icon={ProductIcon}>Bundle upsell</Button>
                     </InlineGrid>
                   </Card>
@@ -447,272 +477,272 @@ export default function BundleSettingsAdvanced() {
 
                         {/* Bundle Options */}
                         <BlockStack gap="200">
-                          <Box position="relative">
-                            {/* {bundle most popular} */}
-                            {badgeSelected === "simple" && bagdeText && (
-                              <div className="bundle_bar_most_popular">
-                                <div className="bundle_bar_most_popular_content" style={{
-                                  background: barBadgebackColor,
-                                  color: barBadgebackColor,
-                                }}>
-                                  <span style={{ color: barBadgeTextColor, }}>
-                                    {bagdeText}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-                            {/* {bundle most popular fancy} */}
-                            {badgeSelected === "mostpopular" && (
-                              <div className="bundle_bar_most_popular_fancy">
-                                <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
-                              </div>
-                            )}
-                          </Box>
-                          {/* add upsell */}
-
                           {quantityBreaks.map((item) => (
-                            <div key={item.id} className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
-                              <InlineStack align="space-between" blockAlign="center">
-                                <InlineStack gap="200" blockAlign="center">
-                                  <div
-                                    style={{
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "50%",
-                                      border: "2px solid #ddd",
-                                    }}
-                                  />
-                                  <BlockStack gap="050">
-                                    <InlineStack gap="100">
-                                      <p className="barTitle" style={{
-                                        color: barTitleColor,
-                                        fontSize: `${bartitleSize}px`,
-                                        fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                        fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                      }}>
-                                        {barTitle}
-                                      </p>
-                                      <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
-                                        <p className="bar-label--text" style={{
-                                          color: barLabelTextColor,
-                                          fontSize: `${labelSize}px`,
-                                          fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
-                                          fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
-                                        }}>
-                                          {barLabelText}
-                                        </p>
-                                      </div>
-                                    </InlineStack>
-                                    <span className="barSubTitle" style={{
-                                      color: barSubTitleColor,
-                                      fontSize: `${subTitleSize}px`,
-                                      fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
-                                      fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
+                            <div key={item.id} className="main-quantity-break">
+                              <Box position="relative">
+                                {/* {bundle most popular} */}
+                                {badgeSelected === "simple" && bagdeText && (
+                                  <div className="bundle_bar_most_popular">
+                                    <div className="bundle_bar_most_popular_content" style={{
+                                      background: barBadgebackColor,
+                                      color: barBadgebackColor,
                                     }}>
-                                      {barSubTitle}
-                                    </span>
-                                  </BlockStack>
-                                </InlineStack>
-                                <div style={{ textAlign: "right" }}>
-                                  <BlockStack gap="050">
-                                    <div className="bar-price" style={{
-                                      color: barPriceColor,
-                                      fontSize: `${bartitleSize}px`,
-                                      fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                      fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                    }}>
-                                      ${calculatedPrice}
+                                      <span style={{ color: barBadgeTextColor, }}>
+                                        {bagdeText}
+                                      </span>
                                     </div>
-                                    {defaultBasePrice && (
-                                      <div className="bar-fullPrice" style={{
-                                        color: barFullPriceColor,
+                                  </div>
+                                )}
+                                {/* {bundle most popular fancy} */}
+                                {badgeSelected === "mostpopular" && (
+                                  <div className="bundle_bar_most_popular_fancy">
+                                    <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
+                                  </div>
+                                )}
+                              </Box>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
+                                <InlineStack align="space-between" blockAlign="center">
+                                  <InlineStack gap="200" blockAlign="center">
+                                    <div
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        borderRadius: "50%",
+                                        border: "2px solid #ddd",
+                                      }}
+                                    />
+                                    <BlockStack gap="050">
+                                      <InlineStack gap="100">
+                                        <p className="barTitle" style={{
+                                          color: barTitleColor,
+                                          fontSize: `${bartitleSize}px`,
+                                          fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                          fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                        }}>
+                                          {barTitle}
+                                        </p>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                          <p className="bar-label--text" style={{
+                                            color: barLabelTextColor,
+                                            fontSize: `${labelSize}px`,
+                                            fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
+                                            fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
+                                          }}>
+                                            {barLabelText}
+                                          </p>
+                                        </div>
+                                      </InlineStack>
+                                      <span className="barSubTitle" style={{
+                                        color: barSubTitleColor,
                                         fontSize: `${subTitleSize}px`,
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        {parseFloat(defaultBasePrice) !== parseFloat(calculatedPrice || "0") ? (
-                                          <s>${defaultBasePrice}</s>
-                                        ) : (
-                                          `$${defaultBasePrice}`
-                                        )}
+                                        {barSubTitle}
+                                      </span>
+                                    </BlockStack>
+                                  </InlineStack>
+                                  <div style={{ textAlign: "right" }}>
+                                    <BlockStack gap="050">
+                                      <div className="bar-price" style={{
+                                        color: barPriceColor,
+                                        fontSize: `${bartitleSize}px`,
+                                        fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                        fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                      }}>
+                                        ${calculatedPrice}
                                       </div>
-                                    )}
-                                  </BlockStack>
-                                </div>
-                              </InlineStack>
-                              {/* Add Upsell */}
-                              <div className="bar-upsell-container-main">
-                                {upsellsState.map(upsell => (
-                                  <div key={upsell.id} className="upsell-box">
-                                    <div className="bar-upsell-container">
-                                      <div className="bar-upsell-checkbox">
-                                        <Checkbox
-                                          label=""
-                                          checked={upsellChecked[upsell.id] || false}
-                                          onChange={(value) => handleUpsellValueChange(upsell.id, value)}
-                                        />
-                                      </div>
-                                      <div className="bar-upsell-checkbox-content">
-                                        <div className="bar-upsell-img"></div>
-                                        <span>
-                                          {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
-                                        </span>
-                                      </div>
-                                      <div className="bar-upsell-price">
-                                        <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
-                                        {addupselldefaultBasePrice[upsell.id] && (
-                                          <div className="bar-upsell-fullprice">
-                                            {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
-                                              parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
-                                              ? (
-                                                <s>${addupselldefaultBasePrice[upsell.id]}</s>
-                                              ) : (
-                                                `$${addupselldefaultBasePrice[upsell.id]}`
-                                              )
-                                            }
-                                          </div>
-                                        )}
+                                      {defaultBasePrice && (
+                                        <div className="bar-fullPrice" style={{
+                                          color: barFullPriceColor,
+                                          fontSize: `${subTitleSize}px`,
+                                          fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
+                                          fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
+                                        }}>
+                                          {parseFloat(defaultBasePrice) !== parseFloat(calculatedPrice || "0") ? (
+                                            <s>${defaultBasePrice}</s>
+                                          ) : (
+                                            `$${defaultBasePrice}`
+                                          )}
+                                        </div>
+                                      )}
+                                    </BlockStack>
+                                  </div>
+                                </InlineStack>
+                                {/* Add Upsell */}
+                                <div className="bar-upsell-container-main">
+                                  {upsellsState.map(upsell => (
+                                    <div key={upsell.id} className="upsell-box">
+                                      <div className="bar-upsell-container">
+                                        <div className="bar-upsell-checkbox">
+                                          <Checkbox
+                                            label=""
+                                            checked={upsellChecked[upsell.id] || false}
+                                            onChange={(value) => handleUpsellValueChange(upsell.id, value)}
+                                          />
+                                        </div>
+                                        <div className="bar-upsell-checkbox-content">
+                                          <div className="bar-upsell-img"></div>
+                                          <span>
+                                            {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                          </span>
+                                        </div>
+                                        <div className="bar-upsell-price">
+                                          <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
+                                          {addupselldefaultBasePrice[upsell.id] && (
+                                            <div className="bar-upsell-fullprice">
+                                              {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
+                                                parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
+                                                ? (
+                                                  <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                                ) : (
+                                                  `$${addupselldefaultBasePrice[upsell.id]}`
+                                                )
+                                              }
+                                            </div>
+                                          )}
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ))}
+                                </div>
                               </div>
                             </div>
                           ))}
 
                           {/* {add buy x, get y free!} */}
-
-                          <Box position="relative">
-                            {/* {bundle most popular} */}
-                            {xybadgeSelected === "simple" && xybagdeText && (
-                              <div className="bundle_bar_most_popular">
-                                <div className="bundle_bar_most_popular_content" style={{
-                                  background: barBadgebackColor,
-                                  color: barBadgebackColor,
-                                }}>
-                                  <span style={{ color: barBadgeTextColor, }}>
-                                    {xybagdeText}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-                            {/* {bundle most popular fancy} */}
-                            {xybadgeSelected === "mostpopular" && (
-                              <div className="bundle_bar_most_popular_fancy">
-                                <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
-                              </div>
-                            )}
-                          </Box>
-
-                          <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
-                            <InlineStack align="space-between" blockAlign="center">
-                              <InlineStack gap="200" blockAlign="center">
-                                <div
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    borderRadius: "50%",
-                                    border: "2px solid #ddd",
-                                  }}
-                                />
-                                <BlockStack gap="050">
-                                  <InlineStack gap="100">
-                                    <p className="barTitle" style={{
-                                      color: barTitleColor,
-                                      fontSize: `${bartitleSize}px`,
-                                      fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                      fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                          {buyXGetYs.map((buyitem) => (
+                            <div key={buyitem.id} className="main-buyX-getY">
+                              <Box position="relative">
+                                {/* {bundle most popular} */}
+                                {xybadgeSelected === "simple" && xybagdeText && (
+                                  <div className="bundle_bar_most_popular">
+                                    <div className="bundle_bar_most_popular_content" style={{
+                                      background: barBadgebackColor,
+                                      color: barBadgebackColor,
                                     }}>
-                                      {xybarTitle}
-                                    </p>
-                                    <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
-                                      <p className="bar-label--text" style={{
-                                        color: barLabelTextColor,
-                                        fontSize: `${labelSize}px`,
-                                        fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
-                                        fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
-                                      }}>
-                                        {xybarLabelText}
-                                      </p>
-                                    </div>
-                                  </InlineStack>
-                                  <span className="barSubTitle" style={{
-                                    color: barSubTitleColor,
-                                    fontSize: `${subTitleSize}px`,
-                                    fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
-                                    fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
-                                  }}>
-                                    {xybarSubTitle}
-                                  </span>
-                                </BlockStack>
-                              </InlineStack>
-                              <div style={{ textAlign: "right" }}>
-                                <BlockStack gap="050">
-                                  <div className="bar-price" style={{
-                                    color: barPriceColor,
-                                    fontSize: `${bartitleSize}px`,
-                                    fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                    fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
-                                  }}>
-                                    ${xycalculatedPrice}
-                                  </div>
-                                  {defaultBasePrice && (
-                                    <div className="bar-fullPrice" style={{
-                                      color: barFullPriceColor,
-                                      fontSize: `${subTitleSize}px`,
-                                      fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
-                                      fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
-                                    }}>
-                                      {parseFloat(defaultBasePrice) !== parseFloat(xycalculatedPrice || "0") ? (
-                                        <s>${defaultBasePrice}</s>
-                                      ) : (
-                                        `$${defaultBasePrice}`
-                                      )}
-                                    </div>
-                                  )}
-                                </BlockStack>
-                              </div>
-                            </InlineStack>
-                            {/* Add Upsell */}
-                            <div className="bar-upsell-container-main">
-                              {upsellsState.map(upsell => (
-                                <div key={upsell.id} className="upsell-box">
-                                  <div className="bar-upsell-container">
-                                    <div className="bar-upsell-checkbox">
-                                      <Checkbox
-                                        label=""
-                                        checked={upsellChecked[upsell.id] || false}
-                                        onChange={(value) => handleUpsellValueChange(upsell.id, value)}
-                                      />
-                                    </div>
-                                    <div className="bar-upsell-checkbox-content">
-                                      <div className="bar-upsell-img"></div>
-                                      <span>
-                                        {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                      <span style={{ color: barBadgeTextColor, }}>
+                                        {xybagdeText}
                                       </span>
                                     </div>
-                                    <div className="bar-upsell-price">
-                                      <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
-                                      {addupselldefaultBasePrice[upsell.id] && (
-                                        <div className="bar-upsell-fullprice">
-                                          {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
-                                            parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
-                                            ? (
-                                              <s>${addupselldefaultBasePrice[upsell.id]}</s>
-                                            ) : (
-                                              `$${addupselldefaultBasePrice[upsell.id]}`
-                                            )
-                                          }
+                                  </div>
+                                )}
+                                {/* {bundle most popular fancy} */}
+                                {xybadgeSelected === "mostpopular" && (
+                                  <div className="bundle_bar_most_popular_fancy">
+                                    <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
+                                  </div>
+                                )}
+                              </Box>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor }}>
+                                <InlineStack align="space-between" blockAlign="center">
+                                  <InlineStack gap="200" blockAlign="center">
+                                    <div
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        borderRadius: "50%",
+                                        border: "2px solid #ddd",
+                                      }}
+                                    />
+                                    <BlockStack gap="050">
+                                      <InlineStack gap="100">
+                                        <p className="barTitle" style={{
+                                          color: barTitleColor,
+                                          fontSize: `${bartitleSize}px`,
+                                          fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                          fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                        }}>
+                                          {xybarTitle}
+                                        </p>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                          <p className="bar-label--text" style={{
+                                            color: barLabelTextColor,
+                                            fontSize: `${labelSize}px`,
+                                            fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
+                                            fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
+                                          }}>
+                                            {xybarLabelText}
+                                          </p>
+                                        </div>
+                                      </InlineStack>
+                                      <span className="barSubTitle" style={{
+                                        color: barSubTitleColor,
+                                        fontSize: `${subTitleSize}px`,
+                                        fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
+                                        fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
+                                      }}>
+                                        {xybarSubTitle}
+                                      </span>
+                                    </BlockStack>
+                                  </InlineStack>
+                                  <div style={{ textAlign: "right" }}>
+                                    <BlockStack gap="050">
+                                      <div className="bar-price" style={{
+                                        color: barPriceColor,
+                                        fontSize: `${bartitleSize}px`,
+                                        fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                        fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
+                                      }}>
+                                        ${xycalculatedPrice}
+                                      </div>
+                                      {defaultBasePrice && (
+                                        <div className="bar-fullPrice" style={{
+                                          color: barFullPriceColor,
+                                          fontSize: `${subTitleSize}px`,
+                                          fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
+                                          fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
+                                        }}>
+                                          {parseFloat(defaultBasePrice) !== parseFloat(xycalculatedPrice || "0") ? (
+                                            <s>${defaultBasePrice}</s>
+                                          ) : (
+                                            `$${defaultBasePrice}`
+                                          )}
                                         </div>
                                       )}
-                                    </div>
+                                    </BlockStack>
                                   </div>
+                                </InlineStack>
+                                {/* Add Upsell */}
+                                <div className="bar-upsell-container-main">
+                                  {upsellsState.map(upsell => (
+                                    <div key={upsell.id} className="upsell-box">
+                                      <div className="bar-upsell-container">
+                                        <div className="bar-upsell-checkbox">
+                                          <Checkbox
+                                            label=""
+                                            checked={upsellChecked[upsell.id] || false}
+                                            onChange={(value) => handleUpsellValueChange(upsell.id, value)}
+                                          />
+                                        </div>
+                                        <div className="bar-upsell-checkbox-content">
+                                          <div className="bar-upsell-img"></div>
+                                          <span>
+                                            {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                          </span>
+                                        </div>
+                                        <div className="bar-upsell-price">
+                                          <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
+                                          {addupselldefaultBasePrice[upsell.id] && (
+                                            <div className="bar-upsell-fullprice">
+                                              {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
+                                                parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
+                                                ? (
+                                                  <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                                ) : (
+                                                  `$${addupselldefaultBasePrice[upsell.id]}`
+                                                )
+                                              }
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
-                              ))}
+                              </div>
                             </div>
-                          </div>
-
-
+                          ))}
                         </BlockStack>
                       </BlockStack>
                     </Box>
