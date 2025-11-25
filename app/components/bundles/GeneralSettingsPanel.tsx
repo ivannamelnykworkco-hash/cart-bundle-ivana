@@ -247,10 +247,10 @@ export function GeneralSettingsPanel({ loaderData }) {
                   visibility === "except" && (
                     <BlockStack gap="200">
                       <InlineStack align="space-around" gap="200" >
-                        <Box width="45%">
+                        <Box width="48%">
                           < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multiple" />
                         </Box>
-                        <Box width="45%">
+                        <Box width="48%">
                           < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select collections" selectionMode="multiple" />
                         </Box>
                       </InlineStack>
@@ -265,7 +265,7 @@ export function GeneralSettingsPanel({ loaderData }) {
 
                 {
                   visibility === "specific" && (
-                    < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multiple" />
+                    < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="nestedTable" />
                   )
                 }
 

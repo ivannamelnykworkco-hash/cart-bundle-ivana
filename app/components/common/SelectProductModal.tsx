@@ -30,7 +30,8 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
   // Select a product row
   const handleSelectProduct = (product) => {
     setSelectedProduct(product);
-    const count = selectedProduct?.filter(obj => obj.name === "variants");
+    console.log("setSelectedProduct", selectedProduct);
+    // const count = selectedProduct?.filter(obj => obj.name === "variants");
   };
 
   // Save selected product & close modal
@@ -64,12 +65,14 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
           onAction: handleClose,
         },
       ]}
+
       footer={
-        <InlineStack align="space-between" blockAlign="center">
+        <InlineStack InlineStack align="space-between" blockAlign="center" >
           <Text variant="bodySm" tone="subdued">
-            {selectedProduct?.filter(obj => obj.name === "variants").length ? selectedProduct?.length : 0}/{productArray?.length} products selected
+            {/* {selectedProduct?.length ? selectedProduct?.length : 0}/{productArray?.length} products selected */}
+            {selectedProduct?.filter(obj => obj.variants).length}/{productArray?.length} products selected
           </Text>
-        </InlineStack>
+        </InlineStack >
       }
     >
       <Modal.Section>
@@ -77,6 +80,6 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
           <IndexDataTable inputArray={productArray} onSelect={handleSelectProduct} selectionMode={selectionMode} />
         </Box>
       </Modal.Section>
-    </Modal>
+    </Modal >
   );
 }
