@@ -1,5 +1,5 @@
 
-export function SelectableImageButton({ selected, onClick, src }) {
+export function SelectableImageButton({ selected, onClick, src }: { selected: any, onClick: any, src: any }) {
   return (
     <div
       onClick={onClick}
@@ -9,6 +9,8 @@ export function SelectableImageButton({ selected, onClick, src }) {
         padding: "4px",
         cursor: "pointer",
         transition: "0.15s",
+        display: 'flex',
+        justifyContent: 'center'
       }}
     >
       <img
