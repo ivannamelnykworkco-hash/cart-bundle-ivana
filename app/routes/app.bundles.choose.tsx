@@ -395,6 +395,8 @@ export default function BundleSettingsAdvanced() {
   const [barLabelTextColor, setBarLabelTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
   const [barBadgebackColor, setBarBadgebackColor] = useState(hsbToHex({ hue: 36, saturation: 1, brightness: 1 }));
   const [barBadgeTextColor, setBarBadgeTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 1 }));
+  const [barUpsellBackColor, setBarUpsellBackColor] = useState(hsbToHex({ hue: 0, saturation: 0.2, brightness: 1 }));
+  const [barUpsellTextColor, setBarUpsellTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
   const [barBlocktitle, setBarBlocktitle] = useState('12');
   const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState('styleRegular');
   const [bartitleSize, setBartitleSize] = useState('19');
@@ -444,6 +446,8 @@ export default function BundleSettingsAdvanced() {
     upBarlabelTextColorChange: setBarLabelTextColor,
     upBarBadgeBackColorChange: setBarBadgebackColor,
     upBarBadgeTextColorChange: setBarBadgeTextColor,
+    upBarUpsellBackColorChange: setBarUpsellBackColor,
+    upBarUpsellTextColorChange: setBarUpsellTextColor,
     //text
     upBlockTitleChange: setBarBlocktitle,
     upBlockTitleFontStyleChange: setBarBlocktitleFontStyle,
@@ -714,9 +718,10 @@ export default function BundleSettingsAdvanced() {
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
-                                    <div key={upsell.id} className="upsell-box">
+                                    <div key={upsell.id} className="upsell-box" style={{ background: barUpsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
+
                                           <Checkbox
                                             label=""
                                             checked={upsellChecked[upsell.id] || false}
@@ -725,7 +730,7 @@ export default function BundleSettingsAdvanced() {
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
-                                          <span>
+                                          <span tyle={{ color: barUpsellTextColor }}>
                                             {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>
@@ -848,7 +853,7 @@ export default function BundleSettingsAdvanced() {
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
-                                    <div key={upsell.id} className="upsell-box">
+                                    <div key={upsell.id} className="upsell-box" style={{ background: barUpsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
                                           <Checkbox
@@ -859,7 +864,7 @@ export default function BundleSettingsAdvanced() {
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
-                                          <span>
+                                          <span tyle={{ color: barUpsellTextColor }}>
                                             {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>
@@ -982,7 +987,7 @@ export default function BundleSettingsAdvanced() {
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
-                                    <div key={upsell.id} className="upsell-box">
+                                    <div key={upsell.id} className="upsell-box" style={{ background: barUpsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
                                           <Checkbox
@@ -993,7 +998,7 @@ export default function BundleSettingsAdvanced() {
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
-                                          <span>
+                                          <span style={{ color: barUpsellTextColor }}>
                                             {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>

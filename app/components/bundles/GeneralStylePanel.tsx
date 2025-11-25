@@ -41,6 +41,8 @@ interface GeneralStylePanelProps {
     upBarlabelTextColorChange: (...args: any[]) => void;
     upBarBadgeBackColorChange: (...args: any[]) => void;
     upBarBadgeTextColorChange: (...args: any[]) => void;
+    upBarUpsellBackColorChange: (...args: any[]) => void;
+    upBarUpsellTextColorChange: (...args: any[]) => void;
 
     upBlockTitleChange: (...args: any[]) => void;
     upBlockTitleFontStyleChange: (...args: any[]) => void;
@@ -68,6 +70,8 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
     upBarlabelTextColorChange,
     upBarBadgeBackColorChange,
     upBarBadgeTextColorChange,
+    upBarUpsellBackColorChange,
+    upBarUpsellTextColorChange,
 
     upBlockTitleChange,
     upBlockTitleFontStyleChange,
@@ -455,8 +459,16 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                     Upsell
                   </Text>
                   <InlineGrid columns={4} gap="200">
-                    <ColorPickerPopoverItem subtitle="Background" defaultColorSetting={UpsellBack} colorWidth="100%" onColorChange={undefined} />
-                    <ColorPickerPopoverItem subtitle="Text" defaultColorSetting={UpsellText} colorWidth="100%" onColorChange={undefined} />
+                    <ColorPickerPopoverItem subtitle="Background" defaultColorSetting={UpsellBack} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upBarUpsellBackColorChange) {
+                        upBarUpsellBackColorChange(hex);
+                      }
+                    }} />
+                    <ColorPickerPopoverItem subtitle="Text" defaultColorSetting={UpsellText} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upBarUpsellTextColorChange) {
+                        upBarUpsellTextColorChange(hex);
+                      }
+                    }} />
                     <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={UpsellSelectedBack} colorWidth="100%" onColorChange={undefined} />
                     <ColorPickerPopoverItem subtitle="Selected text" defaultColorSetting={UpsellSelectedText} colorWidth="100%" onColorChange={undefined} />
                   </InlineGrid>
