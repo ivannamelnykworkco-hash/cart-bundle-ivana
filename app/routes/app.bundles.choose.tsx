@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { PlusCircleIcon, DiscountIcon, MegaphoneIcon, ProductIcon } from '@shopify/polaris-icons';
 
 import {
@@ -19,6 +19,8 @@ import {
   hsbToHex,
   Checkbox,
   TextField,
+  Toast,
+  Frame,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import { GeneralSettingsPanel } from "app/components/bundles/GeneralSettingsPanel";
@@ -29,7 +31,7 @@ import { GeneralStickyAddToCart } from "app/components/bundles/GeneralStickyAddT
 import { GeneralQuentityBreack } from "app/components/bundles/GeneralQuentityBreack";
 import { CountDownPanel } from "app/components/bundles/CountDownPanel";
 import { MostPopularfancy } from "app/components/common/MostPopularfancy";
-import { getCountdownTimer } from "app/models/countdownTimer.server";
+import { createCountdownTimer, getCountdownTimer, updateCountdownTimer } from "app/models/countdownTimer.server";
 import { CountdownTimer } from "app/models/types";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -78,7 +80,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 `);
 
   const body = await response.json();
-  ///////////////////
+  //Product data from backend
   const productEdges = body?.data?.products?.edges ?? [];
   const products = productEdges.map(({ node }) => ({
     id: node.id,
@@ -88,29 +90,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     compareAtPrice: node.variants?.edges?.[0]?.node?.compareAtPrice ?? null,
     variants: node.variants?.edges ?? null
   }));
+  //Collection data from backend
   const collectionEdges = body?.data?.collections.edges ?? [];
   const collections = collectionEdges.map(({ node }) => ({
     id: node.id,
     title: node.title,
     imageUrl: node.image?.url ?? "",
   }));
+
   //  const createPrisma = await createCountdownTimer();
-  // const countdownTimerConf = await getCountdownTimer();
-  const countdownTimerConf: CountdownTimer = {
-    id: Math.random().toString(36).substr(2, 9),
-    isCountdown: false,
-    visibility: "showFixedDuration",
-    fixedDurationTime: 0,
-    endDateTime: new Date().toISOString(),
-    msgText: "msgText1",
-    msgAlignment: 0,
-    msgBold: false,
-    msgItalic: false,
-    msgSize: 14,
-    msgBgColor: "#FF0000",
-    msgTextColor: "#00FF00",
-    createdAt: new Date().toISOString()
-  };
+  const countdownTimerConf = await getCountdownTimer();
 
   return json({
     bundleName: "Bundle",
@@ -152,6 +141,28 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   });
 };
 
+/*********************Action to receive submit data****************/
+//Save data in database
+export async function action({ request, params }) {
+  const { admin, session } = await authenticate.admin(request);
+  const parsedData = {
+    ...Object.fromEntries(await request.formData()),
+    params
+  };
+  let data = { ...parsedData };
+  try {
+    const result = await updateCountdownTimer(data.id, data);
+    return json({ success: true, result });
+  } catch (err) {
+    return json(
+      { success: false, error: data },
+      { status: 500 }
+    );
+  }
+}
+
+/**************************************************************/
+
 const fontWeightMap = {
   styleLight: '200',
   styleLightItalic: '200',
@@ -174,6 +185,18 @@ const fontStyleMap = {
 
 export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
+  /*recevie response from action function*/
+  const actionData = useActionData();
+  console.log("---", actionData);
+  useEffect(() => {
+    if (actionData) {
+      if (actionData.success) {
+        showToast("Countdown timer setting updated successfully!", "success");
+      } else {
+        showToast(`Error: ${actionData.error}`, "error");
+      }
+    }
+  }, [actionData]);
 
   //id: ==> upsellchecked state
   const [upsellChecked, setUpsellChecked] = useState({});
@@ -184,6 +207,62 @@ export default function BundleSettingsAdvanced() {
     }));
   }, []);
 
+
+  /************Database Migration Part**************/
+  //Receive data from CountdownTimer
+
+  const [toastActive, setToastActive] = useState(false);
+  const [toastContent, setToastContent] = useState('');
+  const [toastError, setToastError] = useState(false); // For styling, optional
+
+  const showToast = (message, type = 'success') => {
+    setToastContent(message);
+    setToastActive(true);
+    setToastError(type === 'error');
+  };
+
+  const handleToastDismiss = () => {
+    setToastActive(false);
+  };
+  const [countdownTimerData, setCountdownTimerData] = useState(loaderData.countdownTimerConf);
+
+  const handleCountdownTimerChange = useCallback((updated: any) => {
+    setCountdownTimerData(prev => ({ ...prev, ...updated }));
+  }, []);
+
+  // Send data to action
+  const submit = useSubmit();
+
+  function saveData() {
+    const data = new FormData();
+    Object.entries(countdownTimerData).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        data.append(key, JSON.stringify(value));
+      }
+      else {
+        data.append(key, value as string);
+      }
+    });
+    console.log("ididid", data.id);
+    console.log("Formdata", data.id);
+
+    submit(data, { method: "post" });
+    //   const result = response.json();
+
+    //   if (response.ok) {
+    //     console.log("response-ok", response);
+    //     showToast('Countdown timer created successfully!', 'success');
+    //   } else {
+    //     showToast(`Error: ${result.error || 'Unknown error'}`, 'error');
+    //     console.log("unknow error", response);
+    //   }
+    // } catch (error) {
+    //   showToast(`Network error: ${error.message}`, 'error');
+
+    // }
+  }
+  /***************Database Migration Part************/
+
   //id: ==> upsellTexts state.,
   const [barUpsellTexts, setBarUpsellTexts] = useState({});
   const handleBundlesChooseBarUpsellTextChanges = (id: number, newText: string) => {
@@ -192,7 +271,6 @@ export default function BundleSettingsAdvanced() {
       [id]: newText,
     }));
   };
-  console.log("dddd", loaderData.countdownTimerConf);
 
   // right layout add upsell and delete upsell
   const [upsellsState, setUpsellsState] = useState([]);
@@ -203,14 +281,9 @@ export default function BundleSettingsAdvanced() {
 
   const handleonDeleteUpsellChange = (id: any) => {
     setUpsellsState(prev => prev.filter((item: any) => item.id !== id));
-
   };
 
-
-
-
   // Tab state
-
   const [selectedProduct, setSelectedProduct] = useState(
     loaderData.selectedProduct
   );
@@ -241,7 +314,6 @@ export default function BundleSettingsAdvanced() {
   const handleBundlesChooseBarLabelTextChanges = (v: string) => {
     setBarLabelText(v);
   };
-
 
   const [calculatedPrice, setCalculatedPrice] = useState('');
   const [defaultBasePrice, setDefaultBasePrice] = useState('');
@@ -368,7 +440,7 @@ export default function BundleSettingsAdvanced() {
   const handleTitleFontStyleChange = (style: string) => {
     setBartitleFontStyle(style);
   };
-  //subtitle size 
+  //subtitle size
   const [subTitleSize, setSubTitleSize] = useState('13');
 
   const handleSubTitleChange = (size: string) => {
@@ -380,7 +452,7 @@ export default function BundleSettingsAdvanced() {
   const handleSubTitleStyleChange = (style: string) => {
     setSubTitleStyle(style);
   };
-  //labelSize size 
+  //labelSize size
   const [labelSize, setLabelSize] = useState('13');
 
   const handleLabelChange = (size: string) => {
@@ -439,7 +511,7 @@ export default function BundleSettingsAdvanced() {
       backAction={{ content: "Back", url: "/app" }}
       primaryAction={{
         content: "Save",
-        onAction: () => console.log("Save clicked"),
+        onAction: saveData, /////////////
       }}
       secondaryActions={[
         {
@@ -457,7 +529,7 @@ export default function BundleSettingsAdvanced() {
                 <GeneralSettingsPanel loaderData={loaderData} />
                 <GeneralStylePanel styleHandlers={styleHandlers} />
                 <GeneralVolumePanel />
-                <CountDownPanel conf={loaderData.countdownTimerConf} />
+                <CountDownPanel conf={loaderData.countdownTimerConf} onChange={handleCountdownTimerChange} />
                 <GeneralCheckboxUpsell />
                 <GeneralStickyAddToCart />
                 <GeneralQuentityBreack heading="Bar #1 - Single"
@@ -847,6 +919,15 @@ export default function BundleSettingsAdvanced() {
             </Layout.Section>
           </InlineGrid>
         </Box>
+        {toastActive && (
+          <Frame>
+            <Toast
+              content={toastContent}
+              onDismiss={handleToastDismiss}
+              error={toastError} // Optional: style as error
+            />
+          </Frame>
+        )}
       </Layout>
     </Page>
   );

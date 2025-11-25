@@ -13,7 +13,6 @@ import {
   InlineGrid,
   Checkbox,
   Tabs,
-
 } from "@shopify/polaris";
 
 import { PaintBrushFlatIcon } from "@shopify/polaris-icons";
@@ -113,127 +112,127 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
     },
   ];
 
-   const cardsBg = {
-    hue: 0,         
-    saturation: 0.07,   
-    brightness: 1,   
-    alpha: 1,          
+  const cardsBg = {
+    hue: 0,
+    saturation: 0.07,
+    brightness: 1,
+    alpha: 1,
   };
-   const selectedBg = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const selectedBg = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
-   const borderColor = {
-    hue: 0,         
-    saturation: 1,   
-    brightness: 1,   
-    alpha: 1,         
+  const borderColor = {
+    hue: 0,
+    saturation: 1,
+    brightness: 1,
+    alpha: 1,
   };
-   const blockTitle = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const blockTitle = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const barTitle = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const barTitle = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const barSubtitle = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0.33,   
-    alpha: 1,         
+  const barSubtitle = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0.33,
+    alpha: 1,
   };
-   const barPrice = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const barPrice = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const barFullPrice = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0.33,   
-    alpha: 1,         
+  const barFullPrice = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0.33,
+    alpha: 1,
   };
-   const labelBack = {
-    hue: 36,         
-    saturation: 0.15,   
-    brightness: 1,   
-    alpha: 1,         
+  const labelBack = {
+    hue: 36,
+    saturation: 0.15,
+    brightness: 1,
+    alpha: 1,
   };
-   const labelText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const labelText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const badgeBack = {
-    hue: 36,         
-    saturation: 1,   
-    brightness: 1,   
-    alpha: 1,         
+  const badgeBack = {
+    hue: 36,
+    saturation: 1,
+    brightness: 1,
+    alpha: 1,
   };
-   const badgeText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const badgeText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
-   const giftBack = {
-    hue: 36,         
-    saturation: 0.3,   
-    brightness: 1,   
-    alpha: 1,         
+  const giftBack = {
+    hue: 36,
+    saturation: 0.3,
+    brightness: 1,
+    alpha: 1,
   };
-    const giftText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const giftText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-    const giftSelectedBack = {
-    hue: 0,         
-    saturation: 1,   
-    brightness: 1,   
-    alpha: 1,         
+  const giftSelectedBack = {
+    hue: 0,
+    saturation: 1,
+    brightness: 1,
+    alpha: 1,
   };
-    const giftSelectedText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const giftSelectedText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
 
   //upsell
-   const UpsellBack = {
-    hue: 36,         
-    saturation: 0.3,   
-    brightness: 1,   
-    alpha: 1,         
+  const UpsellBack = {
+    hue: 36,
+    saturation: 0.3,
+    brightness: 1,
+    alpha: 1,
   };
-    const UpsellText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const UpsellText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-    const UpsellSelectedBack = {
-    hue: 36,         
-    saturation: 0.2,   
-    brightness: 1,   
-    alpha: 1,         
+  const UpsellSelectedBack = {
+    hue: 36,
+    saturation: 0.2,
+    brightness: 1,
+    alpha: 1,
   };
-    const UpsellSelectedText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const UpsellSelectedText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
 
   const handleSettingsToggle = useCallback(
@@ -410,7 +409,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                         upBarlabelBackChange(hex);
                       }
                     }} />
-                    <ColorPickerPopoverItem   subtitle="Text" defaultColorSetting={labelText} colorWidth="100%" onColorChange={(hex: string) => {
+                    <ColorPickerPopoverItem subtitle="Text" defaultColorSetting={labelText} colorWidth="100%" onColorChange={(hex: string) => {
                       if (upBarlabelTextColorChange) {
                         upBarlabelTextColorChange(hex);
                       }
@@ -433,7 +432,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                       if (upBarBadgeTextColorChange) {
                         upBarBadgeTextColorChange(hex);
                       }
-                    }}/>
+                    }} />
                   </InlineGrid>
                 </BlockStack>
 

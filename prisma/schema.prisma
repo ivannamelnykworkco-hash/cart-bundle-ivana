@@ -92,10 +92,9 @@ model GeneralSetting {
   selectedCollections String
   excludeB2B Boolean
   excludePOS Boolean
-  startDateTime     DateTime @default(now())
+  startDateTime     String
   setEndDate  Boolean 
-  updatedAt     DateTime @updatedAt
-  endDateTime   DateTime @default(now())
+  endDateTime   String
   letCustomer Boolean
   showVariant Boolean
   hideTheme   Boolean
@@ -115,7 +114,8 @@ model GeneralSetting {
   showWhenStock     Int
   msgText     String
   msgColor    String
-  createdAt DateTime @default(now())
+  createdAt String
+  updatedAt     String
 
 }
 
@@ -124,7 +124,7 @@ model CountdownTimer {
   isCountdown   Boolean
   visibility String
   fixedDurationTime   Int
-  endDateTime   DateTime @default(now())
+  endDateTime   String
   msgText       String
   msgAlignment  Int
   msgBold       Boolean
@@ -132,6 +132,6 @@ model CountdownTimer {
   msgSize     Int
   msgBgColor    String
   msgTextColor  String    
-  createdAt DateTime @default(now())
-
+  createdAt String 
+  updatedAt String
 }
