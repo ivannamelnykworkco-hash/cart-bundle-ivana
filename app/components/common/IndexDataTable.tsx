@@ -13,6 +13,7 @@ import {
 } from "@shopify/polaris";
 import { SearchIcon, ImageIcon } from "@shopify/polaris-icons";
 
+//Filtered indextable of products
 export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
   const [queryValue, setQueryValue] = useState("");
   const [searchMode, setSearchMode] = useState("all");

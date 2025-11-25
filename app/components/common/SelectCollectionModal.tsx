@@ -16,22 +16,18 @@ export function SelectCollectionModal({ collectionArray, onSelect, title, select
   //selectionMode: single or multiple
   const [active, setActive] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState(null);
-
   // Open modal
   const handleOpen = useCallback(() => {
     setActive(true);
   }, []);
-
   // Close modal (do NOT send data)
   const handleClose = useCallback(() => {
     setActive(false);
   }, []);
-
   // Select a Collection row
   const handleSelectCollection = (collection) => {
     setSelectedCollection(collection);
   };
-
   // Save selected collection & close modal
   const handleSave = () => {
     if (selectedCollection) {
@@ -46,13 +42,6 @@ export function SelectCollectionModal({ collectionArray, onSelect, title, select
     </Button>
   );
 
-  // const loaderData = useContext(LoaderDataContext);
-  // const productArray = items.map((product: any) => ({
-  //   title: product.title,
-  //   imageUrl: product.featuredImage,
-  //   id: product.id
-  // }));
-  console.log("collection", collectionArray);
   return (
     <Modal
       activator={activator}
