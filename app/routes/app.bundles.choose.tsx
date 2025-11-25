@@ -18,7 +18,6 @@ import {
   InlineGrid,
   hsbToHex,
   Checkbox,
-  TextField,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
 import { GeneralSettingsPanel } from "app/components/bundles/GeneralSettingsPanel";
@@ -311,6 +310,8 @@ export default function BundleSettingsAdvanced() {
   const [barLabelTextColor, setBarLabelTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
   const [barBadgebackColor, setBarBadgebackColor] = useState(hsbToHex({ hue: 36, saturation: 1, brightness: 1 }));
   const [barBadgeTextColor, setBarBadgeTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 1 }));
+  const [upsellBackColor, setUpsellBackColor] = useState(hsbToHex({ hue: 0, saturation: 0.2, brightness: 1 }));
+  const [upsellTextColor, setUpsellTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
   const [barBlocktitle, setBarBlocktitle] = useState('12');
   const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState('styleRegular');
   const [bartitleSize, setBartitleSize] = useState('19');
@@ -345,6 +346,8 @@ export default function BundleSettingsAdvanced() {
     upBarlabelTextColorChange: setBarLabelTextColor,
     upBarBadgeBackColorChange: setBarBadgebackColor,
     upBarBadgeTextColorChange: setBarBadgeTextColor,
+    upBarUpsellBackColorChange: setUpsellBackColor,
+    upBarUpsellTextColorChange: setUpsellTextColor,
     //text
     upBlockTitleChange: setBarBlocktitle,
     upBlockTitleFontStyleChange: setBarBlocktitleFontStyle,
@@ -615,7 +618,7 @@ export default function BundleSettingsAdvanced() {
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
-                                    <div key={upsell.id} className="upsell-box">
+                                    <div key={upsell.id} className="upsell-box" style={{ background: upsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
                                           <Checkbox
@@ -626,7 +629,7 @@ export default function BundleSettingsAdvanced() {
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
-                                          <span>
+                                          <span style={{ color: upsellTextColor }}>
                                             {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>
@@ -677,7 +680,7 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -749,7 +752,7 @@ export default function BundleSettingsAdvanced() {
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
-                                    <div key={upsell.id} className="upsell-box">
+                                    <div key={upsell.id} className="upsell-box" style={{ background: upsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
                                           <Checkbox
@@ -760,7 +763,7 @@ export default function BundleSettingsAdvanced() {
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
-                                          <span>
+                                          <span style={{ color: upsellTextColor }}>
                                             {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>
@@ -811,7 +814,7 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -883,7 +886,7 @@ export default function BundleSettingsAdvanced() {
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
                                   {upsellsState.map(upsell => (
-                                    <div key={upsell.id} className="upsell-box">
+                                    <div key={upsell.id} className="upsell-box" style={{ background: upsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
                                           <Checkbox
@@ -894,7 +897,7 @@ export default function BundleSettingsAdvanced() {
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
-                                          <span>
+                                          <span style={{ color: upsellTextColor }}>
                                             {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>

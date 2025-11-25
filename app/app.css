@@ -220,20 +220,24 @@
 .Polaris-Button[aria-controls="collapsible-settings"]:hover {
   text-decoration: none !important;
 }
+
 .productPriceContainer {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .productPrice {
   font-size: 14px;
   font-weight: bold;
 }
+
 .productComparePrice {
   font-size: 14px;
   font-weight: bold;
   text-decoration: line-through;
 }
+
 .productChooseButton {
   padding: 10px;
   color: white;
@@ -241,24 +245,29 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
 .porductTitle {
   margin: 0;
   font-weight: bold;
 }
+
 .productTitleContainer {
   display: flex;
   flex-direction: column;
   justify-content: start;
 }
+
 .productImage {
   border-radius: 8px;
   width: 100%;
   height: 100%;
 }
+
 .productImageContainer {
   overflow: hidden;
   border-radius: 8px;
 }
+
 .customStyleProduct {
   padding: 10px;
   display: flex;
@@ -267,15 +276,18 @@
   border-bottom: 1px solid #e0e0e0;
   flex-wrap: nowrap;
 }
+
 .ProductViewHeading {
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   background-color: white;
   padding: 10px;
 }
+
 .ProductViewheadingContainer {
   padding: 10px;
 }
+
 .customProductMain {
   border-radius: 10px;
   border-color: lightgrey;
@@ -288,6 +300,7 @@
   z-index: 1;
   right: 8px;
 }
+
 .bundle_bar_most_popular_content {
   margin: 0 8px;
   padding: 6px 8px;
@@ -300,15 +313,18 @@
   color: white;
   background-color: red;
 }
+
 .bundle_bar_most_popular_content::before {
   left: 0;
   border-left: 8px solid transparent;
 }
+
 .bundle_bar_most_popular_content::after {
   right: 0;
   border-right: 8px solid transparent;
 }
-.bundle_bar_most_popular_content::after, 
+
+.bundle_bar_most_popular_content::after,
 .bundle_bar_most_popular_content::before {
   display: block;
   position: absolute;
@@ -321,11 +337,12 @@
   filter: brightness(.7);
   border-bottom-color: inherit;
 }
+
 .bundle_bar_most_popular_fancy {
   position: absolute;
   top: -30px;
   right: -15px;
-} 
+}
 
 .bundle_bar_most {
   position: absolute;
@@ -349,8 +366,10 @@
 .bar-label--text-container {
   padding: 5px;
 }
+
 .bar-upsell-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 5px 10px;
 }

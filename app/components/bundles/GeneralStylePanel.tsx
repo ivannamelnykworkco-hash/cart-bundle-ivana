@@ -42,6 +42,8 @@ interface GeneralStylePanelProps {
     upBarlabelTextColorChange: (...args: any[]) => void;
     upBarBadgeBackColorChange: (...args: any[]) => void;
     upBarBadgeTextColorChange: (...args: any[]) => void;
+    upBarUpsellBackColorChange: (...args: any[]) => void;
+    upBarUpsellTextColorChange: (...args: any[]) => void;
 
     upBlockTitleChange: (...args: any[]) => void;
     upBlockTitleFontStyleChange: (...args: any[]) => void;
@@ -69,6 +71,8 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
     upBarlabelTextColorChange,
     upBarBadgeBackColorChange,
     upBarBadgeTextColorChange,
+    upBarUpsellBackColorChange,
+    upBarUpsellTextColorChange,
 
     upBlockTitleChange,
     upBlockTitleFontStyleChange,
@@ -113,127 +117,127 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
     },
   ];
 
-   const cardsBg = {
-    hue: 0,         
-    saturation: 0.07,   
-    brightness: 1,   
-    alpha: 1,          
+  const cardsBg = {
+    hue: 0,
+    saturation: 0.07,
+    brightness: 1,
+    alpha: 1,
   };
-   const selectedBg = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const selectedBg = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
-   const borderColor = {
-    hue: 0,         
-    saturation: 1,   
-    brightness: 1,   
-    alpha: 1,         
+  const borderColor = {
+    hue: 0,
+    saturation: 1,
+    brightness: 1,
+    alpha: 1,
   };
-   const blockTitle = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const blockTitle = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const barTitle = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const barTitle = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const barSubtitle = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0.33,   
-    alpha: 1,         
+  const barSubtitle = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0.33,
+    alpha: 1,
   };
-   const barPrice = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const barPrice = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const barFullPrice = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0.33,   
-    alpha: 1,         
+  const barFullPrice = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0.33,
+    alpha: 1,
   };
-   const labelBack = {
-    hue: 36,         
-    saturation: 0.15,   
-    brightness: 1,   
-    alpha: 1,         
+  const labelBack = {
+    hue: 36,
+    saturation: 0.15,
+    brightness: 1,
+    alpha: 1,
   };
-   const labelText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const labelText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-   const badgeBack = {
-    hue: 36,         
-    saturation: 1,   
-    brightness: 1,   
-    alpha: 1,         
+  const badgeBack = {
+    hue: 36,
+    saturation: 1,
+    brightness: 1,
+    alpha: 1,
   };
-   const badgeText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const badgeText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
-   const giftBack = {
-    hue: 36,         
-    saturation: 0.3,   
-    brightness: 1,   
-    alpha: 1,         
+  const giftBack = {
+    hue: 36,
+    saturation: 0.3,
+    brightness: 1,
+    alpha: 1,
   };
-    const giftText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const giftText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-    const giftSelectedBack = {
-    hue: 0,         
-    saturation: 1,   
-    brightness: 1,   
-    alpha: 1,         
+  const giftSelectedBack = {
+    hue: 0,
+    saturation: 1,
+    brightness: 1,
+    alpha: 1,
   };
-    const giftSelectedText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const giftSelectedText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
 
   //upsell
-   const UpsellBack = {
-    hue: 36,         
-    saturation: 0.3,   
-    brightness: 1,   
-    alpha: 1,         
+  const UpsellBack = {
+    hue: 0,
+    saturation: 0.2,
+    brightness: 1,
+    alpha: 1,
   };
-    const UpsellText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const UpsellText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-    const UpsellSelectedBack = {
-    hue: 36,         
-    saturation: 0.2,   
-    brightness: 1,   
-    alpha: 1,         
+  const UpsellSelectedBack = {
+    hue: 36,
+    saturation: 0.2,
+    brightness: 1,
+    alpha: 1,
   };
-    const UpsellSelectedText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const UpsellSelectedText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
 
   const handleSettingsToggle = useCallback(
@@ -410,7 +414,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                         upBarlabelBackChange(hex);
                       }
                     }} />
-                    <ColorPickerPopoverItem   subtitle="Text" defaultColorSetting={labelText} colorWidth="100%" onColorChange={(hex: string) => {
+                    <ColorPickerPopoverItem subtitle="Text" defaultColorSetting={labelText} colorWidth="100%" onColorChange={(hex: string) => {
                       if (upBarlabelTextColorChange) {
                         upBarlabelTextColorChange(hex);
                       }
@@ -433,7 +437,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                       if (upBarBadgeTextColorChange) {
                         upBarBadgeTextColorChange(hex);
                       }
-                    }}/>
+                    }} />
                   </InlineGrid>
                 </BlockStack>
 
@@ -456,8 +460,16 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                     Upsell
                   </Text>
                   <InlineGrid columns={4} gap="200">
-                    <ColorPickerPopoverItem subtitle="Background" defaultColorSetting={UpsellBack} colorWidth="100%" onColorChange={undefined} />
-                    <ColorPickerPopoverItem subtitle="Text" defaultColorSetting={UpsellText} colorWidth="100%" onColorChange={undefined} />
+                    <ColorPickerPopoverItem subtitle="Background" defaultColorSetting={UpsellBack} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upBarUpsellBackColorChange) {
+                        upBarUpsellBackColorChange(hex)
+                      }
+                    }} />
+                    <ColorPickerPopoverItem subtitle="Text" defaultColorSetting={UpsellText} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upBarUpsellTextColorChange) {
+                        upBarUpsellTextColorChange(hex)
+                      }
+                    }} />
                     <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={UpsellSelectedBack} colorWidth="100%" onColorChange={undefined} />
                     <ColorPickerPopoverItem subtitle="Selected text" defaultColorSetting={UpsellSelectedText} colorWidth="100%" onColorChange={undefined} />
                   </InlineGrid>
