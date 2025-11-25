@@ -1,5 +1,5 @@
-import { BlockStack, Button, Card, Checkbox, Collapsible, Divider, Grid, InlineGrid, InlineStack, RangeSlider, Select, Text, TextField } from "@shopify/polaris";
-import { DeleteIcon, DiscountIcon, DomainNewIcon, GiftCardIcon, ProductAddIcon, SortAscendingIcon, ImageIcon, SortDescendingIcon } from '@shopify/polaris-icons';
+import { BlockStack, Button, Card, Checkbox, Collapsible, Divider, Grid, InlineGrid, InlineStack, RangeSlider, Select, Text, TextField, Tooltip } from "@shopify/polaris";
+import { DeleteIcon, MegaphoneIcon, DomainNewIcon, GiftCardIcon, ProductAddIcon, SortAscendingIcon, ImageIcon, SortDescendingIcon } from '@shopify/polaris-icons';
 import { useCallback, useState, useEffect } from "react";
 import { PopUpover } from "../common/PopUpover";
 import { BoxUpSellItem } from "../common/BoxUpSellItem";
@@ -17,7 +17,7 @@ interface Gifts {
 }
 
 
-export function GeneralQuentityBreack({
+export function GeneralBuyXgetYfree({
   id,
   deleteId,
   deleteSection,
@@ -52,11 +52,8 @@ export function GeneralQuentityBreack({
   const [open, setOpen] = useState(false);
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>(
-    (loaderData as any).barDefaultQuality
-  );
-  // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [buyQualityalue, setBuyQualityalue] = useState<number>((loaderData as any).buyQualityalue);
+  const [getQualityalue, setGetQualityalue] = useState<number>((loaderData as any).getQualityalue);
   const [barDefaultPrice, setBarDefaultPrice] = useState((loaderData as any).barDefaultPrice);
   const [upsellValue, setUpsellValue] = useState('20');
   const [opacity, setOpacity] = useState<number>(20);
@@ -64,37 +61,28 @@ export function GeneralQuentityBreack({
   const [selected, setSelected] = useState("default");
   const [badgeSelected, setBadgeSelected] = useState("simple");
 
-  const [title, setTitle] = useState((loaderData as any).barTitle || "");
-
+  const [title, setTitle] = useState((loaderData as any).xybarTitle || "");
   const handleTitleChange = (v: string) => {
     setTitle(v);
     upBundlesChooseTitleChange(v);
   };
-
-  const [subtitle, setSubtitle] = useState((loaderData as any).barSubTitle || "");
-
+  const [subtitle, setSubtitle] = useState((loaderData as any).xybarSubTitle || "");
   const handleSubtitleChange = (v: string) => {
     setSubtitle(v);
     upBundlesChooseSubTitleChange(v);
   };
-  const [bagdeText, setBagdeText] = useState((loaderData as any).bagdeText || "");
-
+  const [bagdeText, setBagdeText] = useState((loaderData as any).xybagdeText || "");
   const handleBadgeTextChange = (v: string) => {
     setBagdeText(v);
     upBundlesBadgeTextChange(v);
   };
-  const [barLabelText, setBarLabelText] = useState((loaderData as any).barLabelText || "");
-
+  const [barLabelText, setBarLabelText] = useState((loaderData as any).xybarLabelText || "");
   const handlesBarLabelTextChange = (v: string) => {
     setBarLabelText(v);
     upBunlesBarLabelTextChange(v);
   };
-
-
-
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
   const [gifts, setGifts] = useState<Gifts[]>([]);
-
   // { add upsellitem and delete}
   const addBoxUpSell = () => {
     setBoxUpSells(prev => [...prev, { id: Date.now() }])
@@ -128,44 +116,33 @@ export function GeneralQuentityBreack({
 
   // Calculate price based on the formula: barDefaultQualityalue * barDefaultPrice * (1 - upsellValue / 100)
   useEffect(() => {
-    const quantity = barDefaultQualityalue;
+    const bQuantity = buyQualityalue;
+    const gQuantity = getQualityalue;
+    const tQuantity = bQuantity + gQuantity;
     const basePrice = parseFloat(barDefaultPrice || "0");
-    const discountPercent = parseFloat(upsellValue || "0");
 
     let calculatedPrice = 0;
-    let defaulBasePrice = quantity * basePrice;
-
-    if (selected === 'discounted%') {
-      calculatedPrice = quantity * basePrice * (1 - discountPercent / 100);
-    } else if (selected === 'discounted$') {
-      calculatedPrice = quantity * basePrice - (quantity * discountPercent);
-    } else if (selected === 'specific') {
-      calculatedPrice = parseFloat(upsellValue || "0");
-    } else {
-      calculatedPrice = quantity * basePrice;
-    }
+    let defaulBasePrice = tQuantity * basePrice;
+    calculatedPrice = bQuantity * basePrice;
 
     if (upPriceChange) {
       upPriceChange(calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
     }
-  }, [barDefaultQualityalue, barDefaultPrice, upsellValue, selected, upPriceChange]);
+  }, [barDefaultPrice, buyQualityalue, getQualityalue, upPriceChange]);
 
-  const handleChange = useCallback(
-    (newValue: string) => {
-      setUpsellValue(newValue);
-    },
-    [],
-  );
-
+  // const handleChange = useCallback(
+  //   (newValue: string) => {
+  //     setUpsellValue(newValue);
+  //   },
+  //   [],
+  // );
   const handleSettingsToggle = useCallback((
-
   ) => setOpen((open) => !open),
     []);
   const handleSizeChange = useCallback(
     (newValue: string) => setSizeValue(newValue),
     [],
   );
-
   const upsellsOptions = [
     { label: "Default", value: 'default' },
     { label: "Discounted % (e.g, %25 off)", value: 'discounted%' },
@@ -205,7 +182,7 @@ export function GeneralQuentityBreack({
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"
-            icon={DiscountIcon}
+            icon={MegaphoneIcon}
           >
             {heading}
           </Button>
@@ -221,91 +198,83 @@ export function GeneralQuentityBreack({
           id="collapsible-settings"
           expandOnPrint
         >
-
           <BlockStack gap="300">
             {/* {Quanlity */}
             <Grid>
-              <Grid.Cell columnSpan={{ xs: 4, sm: 2, md: 2 }}>
-                <BlockStack gap="150">
-                  <Text as="span">Quanlity</Text>
+              <Grid.Cell columnSpan={{ xs: 3, sm: 3, md: 3 }}>
+                <InlineStack gap="200" align="end" blockAlign="end" wrap={false}>
+                  <Text as="h6" fontWeight="bold">
+                    Buy
+                  </Text>
                   <TextField
-                    label
+                    label='Quantity'
                     type="number"
-                    value={String(barDefaultQualityalue)}
+                    value={String(buyQualityalue)}
                     onChange={(val) => {
                       const newValue = Number(val);
-                      setBarDefaultQualityalue(newValue);
+                      setBuyQualityalue(newValue);
                     }}
                     autoComplete="off"
                     min={1}
                     max={100}
                   />
-                </BlockStack>
+                </InlineStack>
               </Grid.Cell>
-              <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 5 }}>
+              <Grid.Cell columnSpan={{ xs: 3, sm: 3, md: 3 }}>
+                <InlineStack gap="200" align="end" blockAlign="end" wrap={false}>
+                  <Text as='h6' fontWeight="bold">
+                    ,Get
+                  </Text>
+                  <TextField
+                    label="Quantity"
+                    type="number"
+                    value={String(getQualityalue)}
+                    onChange={(val) => {
+                      const newValue = Number(val);
+                      setGetQualityalue(newValue);
+                    }}
+                    autoComplete="off"
+                    min={1}
+                    max={100}
+                  />
+                </InlineStack>
+              </Grid.Cell>
+              <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6 }}>
+                <InlineStack gap='300' align="end" blockAlign="end" wrap={false}>
+                  <Text as='h6' fontWeight="bold">
+                    free!
+                  </Text>
+                  <div style={{ width: '100%' }}>
+                    <Tooltip content="You can't set the price for  Buy X, get Y free bar as the discount is auto applied based on XIY quantities set. For volume discount please scroll down, click Add bar and select Quantity break.">
+                      <Select
+                        label="Price"
+                        options={upsellsOptions}
+                        onChange={handleUpsellSelectChange}
+                        value={selected}
+                        disabled
+                      />
+                    </Tooltip>
+                  </div>
+                </InlineStack>
+              </Grid.Cell>
+
+            </Grid>
+            {/* title and subtitle  */}
+            <Grid>
+              <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6 }}>
                 <PopUpover title='Title' defaultPopText={title} upPopTextChange={handleTitleChange} badgeSelected={""} />
               </Grid.Cell>
-              <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 5 }}>
+              <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6 }}>
                 <PopUpover title='Subitle' defaultPopText={subtitle} upPopTextChange={handleSubtitleChange} badgeSelected={""} />
               </Grid.Cell>
             </Grid>
-            {/* {Price} */}
-            <Grid>
-              <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
-                <Select
-                  label="Price"
-                  options={upsellsOptions}
-                  onChange={handleUpsellSelectChange}
-                  value={selected}
-                />
-              </Grid.Cell>
-              <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 5 }}>
-                {selected === 'discounted%' && (
-                  <TextField
-                    label="Discount per item"
-                    type="number"
-                    value={upsellValue}
-                    onChange={handleChange}
-                    autoComplete="off"
-                    min={1}
-                    max={100}
-                    suffix="%"
-                  />
-                )}
-                {selected === 'discounted$' && (
-                  <TextField
-                    label="Discount per item"
-                    type="number"
-                    value={upsellValue}
-                    onChange={handleChange}
-                    autoComplete="off"
-                    min={1}
-                    max={100}
-                    suffix="USD"
-                    prefix="$"
-                  />
-                )}
-                {selected === 'specific' && (
-                  <TextField
-                    label="Total price"
-                    type="number"
-                    value={upsellValue}
-                    onChange={handleChange}
-                    autoComplete="off"
-                    min={1}
-                    max={100}
-                    suffix="USD"
-                    prefix="$"
-                  />
-                )}
-              </Grid.Cell>
-            </Grid>
+
             {/* {Badge text} */}
             <Grid>
-              <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
+              <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
                 <PopUpover title='Badge text' defaultPopText={bagdeText} upPopTextChange={handleBadgeTextChange} badgeSelected={badgeSelected} />
               </Grid.Cell>
-              <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 5 }}>
+              <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
                 <BlockStack gap='200'>
                   <Text as='span'>
                     Badge style
