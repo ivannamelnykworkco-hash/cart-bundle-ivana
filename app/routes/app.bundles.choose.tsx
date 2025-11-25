@@ -747,7 +747,6 @@ export default function BundleSettingsAdvanced() {
                                                 )
                                               }
                                             </div>
-
                                           )}
                                         </div>
                                       </div>
