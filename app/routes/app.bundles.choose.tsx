@@ -29,6 +29,7 @@ import { GeneralStickyAddToCart } from "app/components/bundles/GeneralStickyAddT
 import { GeneralQuentityBreack } from "app/components/bundles/GeneralQuentityBreack";
 import { CountDownPanel } from "app/components/bundles/CountDownPanel";
 import { MostPopularfancy } from "app/components/common/MostPopularfancy";
+import { GeneralBuyXgetYfree } from "app/components/bundles/GeneralBuyXgetYfree";
 // import { getCountdownTimer } from "app/models/countdownTimer.server";
 // import { CountdownTimer } from "app/models/types";
 
@@ -491,6 +492,9 @@ export default function BundleSettingsAdvanced() {
                     onAddUpsell={handelonAddUpsellChange}
                     onDeleteUpsell={handleonDeleteUpsellChange} />
                 ))}
+                <GeneralBuyXgetYfree id={undefined} deleteId={undefined} deleteSection={undefined} heading={undefined} upBundlesChooseTitleChange={undefined} upBundlesChooseSubTitleChange={undefined} upBundlesBadgeTextChange={undefined} upBunlesBarLabelTextChange={undefined} upBundlesBarUpsellTextChange={undefined} onAddUpsell={undefined} onDeleteUpsell={undefined} upAddUpsellPriceChange={function (price: string, defaultBasePrice?: string): void {
+                  throw new Error("Function not implemented.");
+                }} />
                 {showOriginal ? (
                   <div style={{ border: "1px dashed  black", borderRadius: '10px', padding: '15px' }}>
                     <Button fullWidth icon={PlusCircleIcon} variant="primary" onClick={() => setShowOriginal(false)}>Add bar</Button>
