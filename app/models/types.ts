@@ -83,5 +83,6 @@ export interface CountdownTimer {
   msgBgColor: string
   msgTextColor: string
   msgSize: number
-  createdAt: string;
+  createdAt: string
+  updatedAt: string
 }

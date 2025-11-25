@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Card,
   BlockStack,
@@ -23,32 +23,10 @@ import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 import { SwitchIcon } from "../common/SwitchIcon";
 
 
-export function CountDownPanel({ conf }) {
+export function CountDownPanel({ conf, onChange }) {
 
-  //CONST VARIABLES
-  const firstLoaderData = {
-    bundleName: "Bundle",
-    unitLabel: '',
-    discountName: "",
-    blockTitle: "BUNDLE & SAVE",
-    visibility: "showFixedDuration",
-    startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
-    startTime: "09:00",
-    endTime: "09:00",
-    selectedProduct: "Gift Card",
-    selectedCountry: "United States",
-    showStock: 1,
-    timeDuration: 20,
-    messageText: "Hurry! Offer expires in {{ timer }} ⏰",
-    textFontSize: 13,
-    textAlignment: 0
-  }
-
-  console.log("conf", conf);
-  //USESTATE FUNCTIONS
   const [open, setOpen] = useState(false);
-  const [showCountdownTimer, setShowCountdownTimer] = useState(conf?.isCountdown ?? false);
+  const [showCountdownTimer, setShowCountdownTimer] = useState(conf.isCountdown);
   const [visibility, setVisibility] = useState(conf.visibility);
   const [timeDuration, setTimeDuration] = useState<any>(conf.fixedDurationTime);;
   const [endDate, setEndDate] = useState(conf.endDateTime.split('T')[0]);
@@ -60,14 +38,45 @@ export function CountDownPanel({ conf }) {
   const [textFontSize, setTextFontSize] = useState<any>(conf.msgSize);
   const defaultBgColor = conf.msgBgColor;
   const defaultTextColor = conf.msgTextColor;
-  ////msgBgColor, msgTextColor
+  const [active, setActive] = useState<any>(null);
+
+  const gatherStateData = () => ({
+    showCountdownTimer,
+    visibility,
+    timeDuration,
+    endDate,
+    endTime,
+    textValue,
+    activeAlignmentButtonIndex,
+    activeTextBoldButton,
+    activeTextItalicButton,
+    textFontSize,
+  });
+
+  // Send data to parent on any change
+  useEffect(() => {
+    if (onChange) {
+      onChange(gatherStateData());
+    }
+  }, [
+    showCountdownTimer,
+    visibility,
+    timeDuration,
+    endDate,
+    endTime,
+    textValue,
+    activeAlignmentButtonIndex,
+    activeTextBoldButton,
+    activeTextItalicButton,
+    textFontSize,
+    onChange,
+  ]);
+
   const handleSettingsToggle = useCallback(() => setOpen((open) => !open), []);
   const handleSetTimeDuration = useCallback(
     (newValue: string) => setTimeDuration(newValue),
     [],
   );
-
-  const [active, setActive] = useState<any>(null);
 
   const toggleActive = (id: string) => () => {
     setActive((activeId: string) => (activeId !== id ? id : null));
@@ -91,7 +100,6 @@ export function CountDownPanel({ conf }) {
     (newValue: string) => setTextFontSize(newValue),
     [],
   );
-
 
 
   return (
@@ -155,7 +163,7 @@ export function CountDownPanel({ conf }) {
                 label="Ends at midnight (user's local time)"
                 checked={visibility === "showEndsAtMidnight"}
                 id="endsAtMidnight"
-                onChange={() => setVisibility("endsAtMidnight")}
+                onChange={() => setVisibility("showEndsAtMidnight")}
               />
               <Tooltip content="The countdown resets everyday at night">
                 <Icon
@@ -169,7 +177,7 @@ export function CountDownPanel({ conf }) {
                 label="Custom end date"
                 checked={visibility === "showCustomEndDate"}
                 id="customEndDate"
-                onChange={() => setVisibility("customEndDate")}
+                onChange={() => setVisibility("showCustomEndDate")}
               />
               <Tooltip content="The countdown ends at a specific date and time. The countdown section will hide when it ends">
                 <Icon

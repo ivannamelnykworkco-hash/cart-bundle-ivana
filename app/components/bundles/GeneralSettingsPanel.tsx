@@ -29,7 +29,6 @@ import { SetDefaultVariantsModal } from "../common/SetDefaultVariantsModal";
 import { ColorPickerPopover } from "../common/ColorPickerPopover";
 import { SwitchIcon } from "../common/SwitchIcon"
 import { SelectCollectionModal } from "../common/SelectCollectionModal";
-import { LoaderDataContext } from "../../routes/app.bundles.choose";
 import { SelectProductModal } from "../common/SelectProductModal";
 
 export function GeneralSettingsPanel({ loaderData }) {
@@ -247,16 +246,20 @@ export function GeneralSettingsPanel({ loaderData }) {
                 {
                   visibility === "except" && (
                     <BlockStack gap="200">
-                      <ButtonGroup fullWidth={true}>
-                        <Button variant="primary">Select excluded products</Button>
-                        <Button variant="primary">Select excluded collections</Button>
-                      </ButtonGroup>
+                      <InlineStack align="space-around" gap="200" >
+                        <Box width="45%">
+                          < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multiple" />
+                        </Box>
+                        <Box width="45%">
+                          < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select collections" selectionMode="multiple" />
+                        </Box>
+                      </InlineStack>
+
                       <Banner
                         title={`Some of the products are in "Bundle" deal which may result in conflicting discounts`}
                         tone="warning"
                       ></Banner>
                     </BlockStack>
-
                   )
                 }
 
