@@ -30,8 +30,6 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
   // Select a product row
   const handleSelectProduct = (product) => {
     setSelectedProduct(product);
-    console.log("setSelectedProduct", selectedProduct);
-    // const count = selectedProduct?.filter(obj => obj.name === "variants");
   };
 
   // Save selected product & close modal
