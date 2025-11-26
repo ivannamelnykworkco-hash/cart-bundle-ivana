@@ -286,7 +286,8 @@
 .bundle_bar_most_popular {
   position: absolute;
   z-index: 1;
-  right: 8px;
+  right: 10px;
+  top: -8px;
 }
 .bundle_bar_most_popular_content {
   margin: 0 8px;
@@ -353,4 +354,58 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.bar-upsell-container-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.upsell-box {
+  padding: 5px 10px;
+}
+.kaching-bundles__bundle-products__divider-line {
+  display: flex;
+  flex: 1;
+  width: 1px;
+}
+.bundles-products__divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bundles-products__product {
+  text-align: center;
+}
+.bundles-products__product--placeholder {
+  justify-content: center;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #555;
+}
+.main_bundles-products {
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+.main_bundles-products--container {
+  display: flex;
+  align-items: center;
+  border: 1px solid red;
+  margin: 10px 20px;
+}
+.bundles-products {
+  display: flex;
+  flex-direction: row;
+}
+.products__divider-inline {
+  background-color: red;
+  width: 1px;
+  height: 100%;
+}
+.products__divider-icon {
+  width: 20px;
+  height: 20px;
+}
+.bundles-products:last-child .bundles-products__divider {
+  visibility: hidden;
 }

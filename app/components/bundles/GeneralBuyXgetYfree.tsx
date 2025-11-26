@@ -19,7 +19,7 @@ interface Gifts {
 
 export function GeneralBuyXgetYfree({
   id,
-  deleteId,
+  bundleId,
   deleteSection,
   heading,
   upBundlesChooseTitleChange,
@@ -34,7 +34,7 @@ export function GeneralBuyXgetYfree({
   upBadgeSelectedChange }:
   {
     id: any,
-    deleteId: any,
+    bundleId: any,
     deleteSection: any
     heading: any,
     upBundlesChooseTitleChange: any,
@@ -44,8 +44,8 @@ export function GeneralBuyXgetYfree({
     upBundlesBarUpsellTextChange: any,
     onAddUpsell: any,
     onDeleteUpsell: any,
-    upAddUpsellPriceChange: (price: string, defaultBasePrice?: string) => void,
-    upPriceChange?: (price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
+    upAddUpsellPriceChange: (id: any, price: string, defaultBasePrice?: string) => void,
+    upPriceChange?: (id: any, price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
   }) {
 
   const loaderData = useLoaderData<typeof loader>();
@@ -64,34 +64,38 @@ export function GeneralBuyXgetYfree({
   const [title, setTitle] = useState((loaderData as any).xybarTitle || "");
   const handleTitleChange = (v: string) => {
     setTitle(v);
-    upBundlesChooseTitleChange(v);
+    upBundlesChooseTitleChange(id, v);
   };
   const [subtitle, setSubtitle] = useState((loaderData as any).xybarSubTitle || "");
   const handleSubtitleChange = (v: string) => {
     setSubtitle(v);
-    upBundlesChooseSubTitleChange(v);
+    upBundlesChooseSubTitleChange(id, v);
   };
   const [bagdeText, setBagdeText] = useState((loaderData as any).xybagdeText || "");
   const handleBadgeTextChange = (v: string) => {
     setBagdeText(v);
-    upBundlesBadgeTextChange(v);
+    upBundlesBadgeTextChange(id, v);
   };
   const [barLabelText, setBarLabelText] = useState((loaderData as any).xybarLabelText || "");
   const handlesBarLabelTextChange = (v: string) => {
     setBarLabelText(v);
-    upBunlesBarLabelTextChange(v);
+    upBunlesBarLabelTextChange(id, v);
   };
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
   const [gifts, setGifts] = useState<Gifts[]>([]);
   // { add upsellitem and delete}
   const addBoxUpSell = () => {
-    setBoxUpSells(prev => [...prev, { id: Date.now() }])
-    onAddUpsell({ id: Date.now() });
-  }
-  const deleteBoxUpsell = (id: any) => {
-    setBoxUpSells(prev => prev.filter(item => item.id !== id))
-    onDeleteUpsell(id);
-  }
+    const newId = Date.now();
+    const newUpsell = { id: newId };
+
+    setBoxUpSells(prev => [...prev, newUpsell]); // local child state if needed
+    onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
+  };
+  const deleteBoxUpsell = (bundleId: string | number, upsellId: any) => {
+    setBoxUpSells(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
+    onDeleteUpsell(bundleId, upsellId);
+  };
+
   const addGift = () => {
     setGifts(prev => [...prev, { id: Date.now() }])
   }
@@ -108,7 +112,7 @@ export function GeneralBuyXgetYfree({
     (value: string) => {
       setBadgeSelected(value);
       if (upBadgeSelectedChange) {
-        upBadgeSelectedChange(value);
+        upBadgeSelectedChange(id, value);
       }
     },
     [upBadgeSelectedChange],
@@ -126,9 +130,9 @@ export function GeneralBuyXgetYfree({
     calculatedPrice = bQuantity * basePrice;
 
     if (upPriceChange) {
-      upPriceChange(calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
+      upPriceChange(bundleId, calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
     }
-  }, [barDefaultPrice, buyQualityalue, getQualityalue, upPriceChange]);
+  }, [barDefaultPrice, buyQualityalue, getQualityalue, upPriceChange, bundleId]);
 
   // const handleChange = useCallback(
   //   (newValue: string) => {
@@ -190,7 +194,7 @@ export function GeneralBuyXgetYfree({
             <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
             <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
             <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
-            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(deleteId)} />
+            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(id)} />
           </InlineStack>
         </InlineStack>
         <Collapsible
@@ -311,7 +315,14 @@ export function GeneralBuyXgetYfree({
               <BlockStack gap="300">
                 {/* {Add upsell} */}
                 {boxUpSells.map((item) => (
-                  <BoxUpSellItem id={item.id} key={item.id} upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange} upAddUpsellPriceChange={upAddUpsellPriceChange} deleteId={item.id} deleteSection={deleteBoxUpsell} />
+                  <BoxUpSellItem
+                    key={item.id}
+                    id={item.id}
+                    bundleId={bundleId} // important
+                    upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
+                    upAddUpsellPriceChange={upAddUpsellPriceChange}
+                    deleteSection={deleteBoxUpsell} // calls parent's delete with bundleId + upsellId
+                  />
                 ))}
               </BlockStack>
               <BlockStack gap="300">

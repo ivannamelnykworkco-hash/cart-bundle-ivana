@@ -488,7 +488,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
               <BlockStack gap="200">
                 <InlineGrid columns={2} gap="200">
                   <SelectFont subtitle="Block title" defaultFontSize="12" defaultFontLabel="styleRegular" onSizeChange={upBlockTitleChange} onFontStytleChange={upBlockTitleFontStyleChange} />
-                  <SelectFont subtitle="Title" defaultFontSize="19" defaultFontLabel="styleLight" onSizeChange={upTitleChange} onFontStytleChange={upTitleFontStyleChange} />
+                  <SelectFont subtitle="Title" defaultFontSize="19" defaultFontLabel="styleBold" onSizeChange={upTitleChange} onFontStytleChange={upTitleFontStyleChange} />
                 </InlineGrid>
 
                 <Divider />
