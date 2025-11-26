@@ -35,6 +35,7 @@ import { createCountdownTimer, getCountdownTimer, updateCountdownTimer } from "a
 import { CountdownTimer } from "app/models/types";
 import { GeneralBuyXgetYfree } from "app/components/bundles/GeneralBuyXgetYfree";
 import { GeneralBundleUpsell } from "app/components/bundles/GeneralBundleUpsell";
+import { builtinModules } from "module";
 // import { getCountdownTimer } from "app/models/countdownTimer.server";
 // import { CountdownTimer } from "app/models/types";
 
@@ -82,7 +83,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 }
 `);
-
   const body = await response.json();
   //Product data from backend
   const productEdges = body?.data?.products?.edges ?? [];
@@ -218,9 +218,34 @@ export default function BundleSettingsAdvanced() {
 
   //id: ==> upsellchecked state
   const [upsellChecked, setUpsellChecked] = useState({});
-  const handleUpsellValueChange = useCallback((id: any, newChecked: any) => {
-    setUpsellChecked(prev => ({ ...prev, [id]: newChecked }));
-  }, []);
+  const handleUpsellValueChange = (bundlId: string | number, upsellId: boolean, value: boolean | undefined) => {
+    setUpsellChecked(prev => ({
+      ...prev, [bundlId]: {
+        ...(prev[bundlId] || {}),
+        [upsellId]: value
+      }
+    }))
+  }
+
+  const [xyupsellChecked, setXyupsellChecked] = useState({});
+  const handleXyUpsellValueChange = (bundlId: string | number, upsellId: boolean, value: boolean | undefined) => {
+    setXyupsellChecked(prev => ({
+      ...prev, [bundlId]: {
+        ...(prev[bundlId] || {}),
+        [upsellId]: value
+      }
+    }))
+  }
+
+  const [bundleupsellChecked, setBundleupsellChecked] = useState({});
+  const handleBundleUpsellValueChange = (bundlId: string | number, upsellId: boolean, value: boolean | undefined) => {
+    setBundleupsellChecked(prev => ({
+      ...prev, [bundlId]: {
+        ...(prev[bundlId] || {}),
+        [upsellId]: value
+      }
+    }))
+  }
 
 
   /************Database Migration Part**************/
@@ -266,15 +291,35 @@ export default function BundleSettingsAdvanced() {
   //id: ==> upsellTexts state.,
   const [barUpsellTexts, setBarUpsellTexts] = useState({});
 
-  const handleBundlesChooseBarUpsellTextChanges = (id: number, newText: string) => {
+  const handleBundlesChooseBarUpsellTextChanges = (bundleId: string | number, upsellId: any, value: any) => {
     setBarUpsellTexts(prev => ({
-      ...prev,
-      [id]: newText,
+      ...prev, [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [upsellId]: value
+      }
     }));
   };
+  const [xybarUpsellTexts, setXyBarUpsellTexts] = useState({});
 
+  const handlexyBundlesChooseBarUpsellTextChanges = (bundleId: string | number, upsellId: any, value: any) => {
+    setXyBarUpsellTexts(prev => ({
+      ...prev, [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [upsellId]: value
+      }
+    }));
+  };
+  const [bundleBarUpsellTexts, setBundleBarUpsellTexts] = useState({});
+
+  const handlexyBundleBaraddUpsellTextChanges = (bundleId: string | number, upsellId: any, value: any) => {
+    setBundleBarUpsellTexts(prev => ({
+      ...prev, [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [upsellId]: value
+      }
+    }));
+  };
   // right layout add upsell and delete upsell
-  //left Layout add Quantity Breack
   const [quantityBreaks, setQuantityBreaks] = useState<BoxQuantity[]>([]);
   const addQuantityBreak = () => [
     setQuantityBreaks(prev => [...prev, { id: Date.now() }])
@@ -282,7 +327,6 @@ export default function BundleSettingsAdvanced() {
   const deleteQuantityBreak = (id: any) => {
     setQuantityBreaks(prev => prev.filter(item => item.id !== id))
   }
-  // left layout add buy x get y 
   const [buyXGetYs, setBuyXGetYs] = useState<BoxQuantity[]>([]);
   const addBuyXGetY = () => [
     setBuyXGetYs(prev => [...prev, { id: Date.now() }])
@@ -290,7 +334,6 @@ export default function BundleSettingsAdvanced() {
   const deleteBuyXGetY = (id: any) => {
     setBuyXGetYs(prev => prev.filter(item => item.id !== id))
   }
-  // left layout add bundleUpsell
   const [bundleUpsells, setBundleUpsells] = useState<BoxQuantity[]>([]);
   const addBundleUpsell = () => [
     setBundleUpsells(prev => [...prev, { id: Date.now() }])
@@ -299,70 +342,196 @@ export default function BundleSettingsAdvanced() {
     setBundleUpsells(prev => prev.filter(item => item.id !== id))
   }
   // quantity break
-  const [upsellsState, setUpsellsState] = useState([]);
+  const [upsellsState, setUpsellsState] = useState<{ [bundleId: string]: any[] }>({});
+  const [productsState, setProductsState] = useState<{ [bundleId: string]: any[] }>({});
   const [selectedProduct, setSelectedProduct] = useState(loaderData.selectedProduct);
   const [selectedCountry, setSelectedCountry] = useState(loaderData.selectedCountry);
   const [showOriginal, setShowOriginal] = useState(true)
-  const [barTitle, setBarTitle] = useState(loaderData.barTitle);
-  const [barSubTitle, setBarSubTitle] = useState(loaderData.barSubTitle);
-  const [bagdeText, setBagdeText] = useState(loaderData.bagdeText);
-  const [barLabelText, setBarLabelText] = useState(loaderData.barLabelText);
-  const [badgeSelected, setBadgeSelected] = useState("simple");
+  const [barTitle, setBarTitle] = useState({});
+  const [barSubTitle, setBarSubTitle] = useState({});
+  const [bagdeText, setBagdeText] = useState({});
+  const [barLabelText, setBarLabelText] = useState({});
+  const [badgeSelected, setBadgeSelected] = useState({});
   //buy x and get y free
-  const [defaultBasePrice, setDefaultBasePrice] = useState('');
-  const [calculatedPrice, setCalculatedPrice] = useState('');
-  const [xybarTitle, setXyBarTitle] = useState(loaderData.xybarTitle);
-  const [xybarSubTitle, setXyBarSubTitle] = useState(loaderData.xybarSubTitle);
-  const [xybagdeText, setXysetBagdeText] = useState(loaderData.bagdeText);
-  const [xybarLabelText, setXyBarLabelText] = useState(loaderData.barLabelText);
-  const [xybadgeSelected, setXybadgeSelected] = useState("simple");
+  const [defaultBasePrice, setDefaultBasePrice] = useState({});
+  const [calculatedPrice, setCalculatedPrice] = useState({});
+  const [xybarTitle, setXyBarTitle] = useState({});
+  const [xybarSubTitle, setXyBarSubTitle] = useState({});
+  const [xybagdeText, setXysetBagdeText] = useState({});
+  const [xybarLabelText, setXyBarLabelText] = useState({});
+  const [xybadgeSelected, setXybadgeSelected] = useState({});
+  const [xydefaultBasePrice, setXyDefaultBasePrice] = useState({});
   const [xycalculatedPrice, setXyCalculatedPrice] = useState('');
   //Bundle Upsell
-  const [bundleUpsellBarTitle, setBundleUpsellBarTitle] = useState(loaderData.bundleUpsellTitle);
-  const [bundleUpsellSubTitle, setBundleUpsellSubTitle] = useState(loaderData.bundleUpsellSubtitle);
-  const [bundleUpsellBagdeText, setBundleUpsellBagdeText] = useState(loaderData.bundleUpsellBagdeText);
-  const [bunldeUpsellLabelText, setBunldeUpsellLabelText] = useState(loaderData.bunldeUpsellLabelText);
+  const [bundleUpsellBarTitle, setBundleUpsellBarTitle] = useState({});
+  const [bundleUpsellSubTitle, setBundleUpsellSubTitle] = useState({});
+  const [bundleUpsellBagdeText, setBundleUpsellBagdeText] = useState({});
+  const [bunldeUpsellLabelText, setBunldeUpsellLabelText] = useState({});
   const [bundleUpsellbadgeSelected, setBundleUpsellbadgeSelected] = useState("simple");
 
   // right layout add upsell and delete Upsell
-  const handelonAddUpsellChange = (item: any) => {
-    setUpsellsState((prev) => [...prev, item]);
+  const handelonAddUpsellChange = (bundleId: string | number, item: any) => {
+    setUpsellsState(prev => ({
+      ...prev,
+      [bundleId]: [...(prev[bundleId] || []), item]
+    }));
   };
 
-  const handleonDeleteUpsellChange = (id: any) => {
-    setUpsellsState(prev => prev.filter((item: any) => item.id !== id));
+  const handleonDeleteUpsellChange = (bundleId: string | number, upsellId: any) => {
+    setUpsellsState(prev => ({
+      ...prev,
+      [bundleId]: (prev[bundleId] || []).filter(item => item.id !== upsellId)
+    }));
   };
 
-  const handlePriceChange = (price: string, defaultPrice?: string) => {
-    setCalculatedPrice(price);
-    if (defaultPrice) {
-      setDefaultBasePrice(defaultPrice);
-    }
+  //product add
+  const hanldeonAddProductChange = (bundleId: string | number, item: any) => {
+    setProductsState(prev => ({
+      ...prev,
+      [bundleId]: [...(prev[bundleId] || []), item]
+    }));
   };
-  const handleXyPriceChange = (price: string, defaultPrice?: string) => {
-    setXyCalculatedPrice(price);
-    if (defaultPrice) {
-      setDefaultBasePrice(defaultPrice);
-    }
+
+  const handleBarTitleChange = (id: string | number, value: string) => {
+    setBarTitle(prev => ({ ...prev, [id]: value }));
+  }
+  const handlexyBarTitleChange = (id: string | number, value: string) => {
+    setXyBarTitle(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBundleUpsellTitleChange = (id: string | number, value: string) => {
+    setBundleUpsellBarTitle(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBarLabelTextChange = (id: string | number, value: string) => {
+    setBarLabelText(prev => ({ ...prev, [id]: value }));
+  }
+  const handlexyBarLabelTextChange = (id: string | number, value: string) => {
+    setXyBarLabelText(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBundleUpsellLabelTextChange = (id: string | number, value: string) => {
+    setBunldeUpsellLabelText(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBarSubTitleChange = (id: string | number, value: string) => {
+    setBarSubTitle(prev => ({ ...prev, [id]: value }));
+  }
+  const handlexyBarSubTitleChange = (id: string | number, value: string) => {
+    setXyBarSubTitle(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBundleUpsellSubTitleChange = (id: string | number, value: string) => {
+    setBundleUpsellSubTitle(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBagdeTextChange = (id: string | number, value: string) => {
+    setBagdeText(prev => ({ ...prev, [id]: value }));
+  }
+  const handlexyBagdeTextChange = (id: string | number, value: string) => {
+    setXysetBagdeText(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBundleUpsellTextChange = (id: string | number, value: string) => {
+    setBundleUpsellBagdeText(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBadgeSelectedChange = (id: string | number, value: string) => {
+    setBadgeSelected(prev => ({ ...prev, [id]: value }));
+  }
+  const handlexyBadgeSelectedChange = (id: string | number, value: string) => {
+    setXybadgeSelected(prev => ({ ...prev, [id]: value }));
+  }
+  const handleBundleUpsellSelectedChange = (id: string | number, value: string) => {
+    setBundleUpsellbadgeSelected(prev => ({ ...prev, [id]: value }));
+  }
+
+  const handlePriceChange = (bundleId: any, calc: any, base: any) => {
+    setCalculatedPrice(prev => ({
+      ...prev,
+      [bundleId]: calc
+    }));
+    setDefaultBasePrice(prev => ({
+      ...prev,
+      [bundleId]: base
+    }));
+  };
+  const handlexyPriceChange = (bundleId: any, calc: any, base: any) => {
+    setXyCalculatedPrice(prev => ({
+      ...prev,
+      [bundleId]: calc
+    }));
+    setXyDefaultBasePrice(prev => ({
+      ...prev,
+      [bundleId]: base
+    }));
   };
 
   const [addUpsellcalculatedPrice, setAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
   const [addupselldefaultBasePrice, setAddupselldefaultBasePrice] = useState<Record<number, string>>({});
+  const [xyaddUpsellcalculatedPrice, setXyAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
+  const [xyaddupselldefaultBasePrice, setXyAddupselldefaultBasePrice] = useState<Record<number, string>>({});
+  const [bundleAddUpsellcalculatedPrice, setBundleAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
+  const [bundleAddupselldefaultBasePrice, setBundleAddupselldefaultBasePrice] = useState<Record<number, string>>({});
 
   const handleAddUpsellPriceChange = (
-    id: number,
+    bundleId: number,
+    upsellId: number,
     price: string,
     defaultPrice?: string
   ) => {
     setAddUpsellcalculatedPrice(prev => ({
       ...prev,
-      [id]: price,
+      [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [upsellId]: price
+      }
     }));
-
     if (defaultPrice !== undefined) {
       setAddupselldefaultBasePrice(prev => ({
         ...prev,
-        [id]: defaultPrice,
+        [bundleId]: {
+          ...(prev[bundleId] || {}),
+          [upsellId]: defaultPrice
+        }
+      }));
+    }
+  };
+  const handlexyAddUpsellPriceChange = (
+    bundleId: number,
+    upsellId: number,
+    price: string,
+    defaultPrice?: string
+  ) => {
+    setXyAddUpsellcalculatedPrice(prev => ({
+      ...prev,
+      [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [upsellId]: price
+      }
+    }));
+    if (defaultPrice !== undefined) {
+      setXyAddupselldefaultBasePrice(prev => ({
+        ...prev,
+        [bundleId]: {
+          ...(prev[bundleId] || {}),
+          [upsellId]: defaultPrice
+        }
+      }));
+    }
+  };
+  const handleBundleAddUpsellPriceChange = (
+    bundleId: number,
+    upsellId: number,
+    price: string,
+    defaultPrice?: string
+  ) => {
+    setBundleAddUpsellcalculatedPrice(prev => ({
+      ...prev,
+      [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [upsellId]: price
+      }
+    }));
+    if (defaultPrice !== undefined) {
+      setBundleAddupselldefaultBasePrice(prev => ({
+        ...prev,
+        [bundleId]: {
+          ...(prev[bundleId] || {}),
+          [upsellId]: defaultPrice
+        }
       }));
     }
   };
@@ -384,24 +553,9 @@ export default function BundleSettingsAdvanced() {
   const [barBlocktitle, setBarBlocktitle] = useState('12');
   const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState('styleRegular');
   const [bartitleSize, setBartitleSize] = useState('19');
-
-  const handleTitleChange = (size: string) => {
-    setBartitleSize(size);
-  };
-  //  title font style
-  const [bartitleFontStyle, setBartitleFontStyle] = useState('styleLight');
-
-  const handleTitleFontStyleChange = (style: string) => {
-    setBartitleFontStyle(style);
-  };
-  //subtitle size
+  const [bartitleFontStyle, setBartitleFontStyle] = useState('stylebold');  //subtitle size
   const [subTitleSize, setSubTitleSize] = useState('13');
   const [subTitleStyle, setSubTitleStyle] = useState('styleRegular');
-
-  const handleSubTitleStyleChange = (style: string) => {
-    setSubTitleStyle(style);
-  };
-  //labelSize size
   const [labelSize, setLabelSize] = useState('13');
   const [labelStyle, setLabelStyle] = useState('styleRegular');  //
 
@@ -410,13 +564,11 @@ export default function BundleSettingsAdvanced() {
     { label: "Product A", value: "Product A" },
     { label: "Product B", value: "Product B" },
   ];
-
   const countryOptions = [
     { label: "United States", value: "United States" },
     { label: "Canada", value: "Canada" },
     { label: "United Kingdom", value: "United Kingdom" },
   ];
-
   const styleHandlers = {
     upCornerRadiusChange: setCornerRadius,
     upSpacingChange: setSpacing,
@@ -474,16 +626,17 @@ export default function BundleSettingsAdvanced() {
                   <GeneralQuentityBreack
                     id={item.id}
                     key={item.id}
-                    deleteId={item.id} deleteSection={deleteQuantityBreak}
+                    bundleId={item.id}
+                    deleteSection={deleteQuantityBreak}
                     heading="Bar #1 - Single"
-                    upBundlesChooseTitleChange={setBarTitle}
-                    upBundlesChooseSubTitleChange={setBarSubTitle}
-                    upBundlesBadgeTextChange={setBagdeText}
-                    upBunlesBarLabelTextChange={setBarLabelText}
+                    upBundlesChooseTitleChange={handleBarTitleChange}
+                    upBundlesChooseSubTitleChange={handleBarSubTitleChange}
+                    upBundlesBadgeTextChange={handleBagdeTextChange}
+                    upBunlesBarLabelTextChange={handleBarLabelTextChange}
                     upBundlesBarUpsellTextChange={handleBundlesChooseBarUpsellTextChanges}
                     upPriceChange={handlePriceChange}
                     upAddUpsellPriceChange={handleAddUpsellPriceChange}
-                    upBadgeSelectedChange={setBadgeSelected}
+                    upBadgeSelectedChange={handleBadgeSelectedChange}
                     onAddUpsell={handelonAddUpsellChange}
                     onDeleteUpsell={handleonDeleteUpsellChange} />
                 ))}
@@ -492,17 +645,17 @@ export default function BundleSettingsAdvanced() {
                   <GeneralBuyXgetYfree
                     id={buyitem.id}
                     key={buyitem.id}
-                    deleteId={buyitem.id}
+                    bundleId={buyitem.id}
                     deleteSection={deleteBuyXGetY}
                     heading=" Buy 3, get 1 free!"
-                    upBundlesChooseTitleChange={setXyBarTitle}
-                    upBundlesChooseSubTitleChange={setXyBarSubTitle}
-                    upBundlesBadgeTextChange={setXysetBagdeText}
-                    upBunlesBarLabelTextChange={setXyBarLabelText}
-                    upBundlesBarUpsellTextChange={undefined}
-                    upPriceChange={handleXyPriceChange}
-                    upBadgeSelectedChange={setXybadgeSelected}
-                    upAddUpsellPriceChange={handleAddUpsellPriceChange}
+                    upBundlesChooseTitleChange={handlexyBarTitleChange}
+                    upBundlesChooseSubTitleChange={handlexyBarSubTitleChange}
+                    upBundlesBadgeTextChange={handlexyBagdeTextChange}
+                    upBunlesBarLabelTextChange={handlexyBarLabelTextChange}
+                    upBundlesBarUpsellTextChange={handlexyBundlesChooseBarUpsellTextChanges}
+                    upPriceChange={handlexyPriceChange}
+                    upBadgeSelectedChange={handlexyBadgeSelectedChange}
+                    upAddUpsellPriceChange={handlexyAddUpsellPriceChange}
                     onAddUpsell={handelonAddUpsellChange}
                     onDeleteUpsell={handleonDeleteUpsellChange}
                   />
@@ -511,17 +664,18 @@ export default function BundleSettingsAdvanced() {
                   <GeneralBundleUpsell
                     id={bundleitem.id}
                     key={bundleitem.id}
-                    deleteId={bundleitem.id}
+                    bundleId={bundleitem.id}
                     deleteSection={deleteBundleUpsell}
                     heading='Complete the bundle'
-                    upBundlesChooseTitleChange={setBundleUpsellBarTitle}
-                    upBundlesChooseSubTitleChange={setBundleUpsellSubTitle}
-                    upBundlesBadgeTextChange={setBundleUpsellBagdeText}
-                    upBunlesBarLabelTextChange={setBunldeUpsellLabelText}
-                    upBundlesBarUpsellTextChange={undefined}
-                    upBadgeSelectedChange={setBundleUpsellbadgeSelected}
-                    upAddUpsellPriceChange={handleAddUpsellPriceChange}
+                    upBundlesChooseTitleChange={handleBundleUpsellTitleChange}
+                    upBundlesChooseSubTitleChange={handleBundleUpsellSubTitleChange}
+                    upBundlesBadgeTextChange={handleBundleUpsellTextChange}
+                    upBunlesBarLabelTextChange={handleBundleUpsellLabelTextChange}
+                    upBundlesBarUpsellTextChange={handlexyBundleBaraddUpsellTextChanges}
+                    upBadgeSelectedChange={handleBundleUpsellSelectedChange}
+                    upAddUpsellPriceChange={handleBundleAddUpsellPriceChange}
                     onAddUpsell={handelonAddUpsellChange}
+                    onAddProduct={hanldeonAddProductChange}
                     onDeleteUpsell={handleonDeleteUpsellChange}
                   />
                 ))}
@@ -554,9 +708,7 @@ export default function BundleSettingsAdvanced() {
                       </Text>
                       <Button>Run A/B test</Button>
                     </InlineStack>
-
                     <Divider />
-
                     {/* Preview Selectors */}
                     <InlineStack gap="400">
                       <Box minWidth="48%">
@@ -576,9 +728,7 @@ export default function BundleSettingsAdvanced() {
                         />
                       </Box>
                     </InlineStack>
-
                     <Divider />
-
                     {/* Bundle Preview Card */}
                     <Box
                       padding="400"
@@ -604,33 +754,31 @@ export default function BundleSettingsAdvanced() {
                             BUNDLE & SAVE
                           </p>
                         </Text>
-
                         {/* Bundle Options */}
                         <BlockStack gap="200">
                           {quantityBreaks.map((item) => (
                             <div key={item.id} className="main-quantity-break">
                               <Box position="relative">
                                 {/* {bundle most popular} */}
-                                {badgeSelected === "simple" && bagdeText && (
+                                {badgeSelected[item.id] === "simple" && bagdeText[item.id] && (
                                   <div className="bundle_bar_most_popular">
                                     <div className="bundle_bar_most_popular_content" style={{
                                       background: barBadgebackColor,
                                       color: barBadgebackColor,
                                     }}>
                                       <span style={{ color: barBadgeTextColor, }}>
-                                        {bagdeText}
+                                        {bagdeText[item.id] || ''}
                                       </span>
                                     </div>
                                   </div>
                                 )}
-                                {/* {bundle most popular fancy} */}
-                                {badgeSelected === "mostpopular" && (
+                                {badgeSelected[item.id] === "mostpopular" && (
                                   <div className="bundle_bar_most_popular_fancy">
                                     <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -649,7 +797,7 @@ export default function BundleSettingsAdvanced() {
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
-                                          {barTitle}
+                                          {barTitle[item.id] || 'Single'}
                                         </p>
                                         <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
                                           <p className="bar-label--text" style={{
@@ -658,7 +806,7 @@ export default function BundleSettingsAdvanced() {
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
-                                            {barLabelText}
+                                            {barLabelText[item.id] || ''}
                                           </p>
                                         </div>
                                       </InlineStack>
@@ -668,7 +816,7 @@ export default function BundleSettingsAdvanced() {
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        {barSubTitle}
+                                        {barSubTitle[item.id] || 'Standard price'}
                                       </span>
                                     </BlockStack>
                                   </InlineStack>
@@ -680,19 +828,19 @@ export default function BundleSettingsAdvanced() {
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        ${calculatedPrice}
+                                        ${calculatedPrice[item.id]}
                                       </div>
-                                      {defaultBasePrice && (
+                                      {defaultBasePrice[item.id] && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
                                           fontSize: `${subTitleSize}px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
-                                          {parseFloat(defaultBasePrice) !== parseFloat(calculatedPrice || "0") ? (
-                                            <s>${defaultBasePrice}</s>
+                                          {parseFloat(defaultBasePrice[item.id]) !== parseFloat(calculatedPrice[item.id] || "0") ? (
+                                            <s>${defaultBasePrice[item.id]}</s>
                                           ) : (
-                                            `$${defaultBasePrice}`
+                                            `$${defaultBasePrice[item.id]}`
                                           )}
                                         </div>
                                       )}
@@ -701,33 +849,33 @@ export default function BundleSettingsAdvanced() {
                                 </div>
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
-                                  {upsellsState.map(upsell => (
+                                  {upsellsState[item.id]?.map(upsell => (
                                     <div key={upsell.id} className="upsell-box" style={{ background: barUpsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
 
                                           <Checkbox
                                             label=""
-                                            checked={upsellChecked[upsell.id] || false}
-                                            onChange={(value) => handleUpsellValueChange(upsell.id, value)}
+                                            checked={upsellChecked[item.id]?.[upsell.id] || false}
+                                            onChange={(value) => handleUpsellValueChange(item.id, upsell.id, value)}
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
                                           <span tyle={{ color: barUpsellTextColor }}>
-                                            {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                            {barUpsellTexts[item.id]?.[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>
                                         <div className="bar-upsell-price">
-                                          <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
-                                          {addupselldefaultBasePrice[upsell.id] && (
+                                          <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[item.id]?.[upsell.id] || "20"}</div>
+                                          {addupselldefaultBasePrice[item.id]?.[upsell.id] && (
                                             <div className="bar-upsell-fullprice">
-                                              {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
-                                                parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
+                                              {parseFloat(addupselldefaultBasePrice[item.id]?.[upsell.id]) !==
+                                                parseFloat(addUpsellcalculatedPrice[item.id]?.[upsell.id] || "20")
                                                 ? (
-                                                  <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                                  <s>${addupselldefaultBasePrice[item.id]?.[upsell.id]}</s>
                                                 ) : (
-                                                  `$${addupselldefaultBasePrice[upsell.id]}`
+                                                  `$${addupselldefaultBasePrice[item.id]?.[upsell.id]}`
                                                 )
                                               }
                                             </div>
@@ -740,32 +888,31 @@ export default function BundleSettingsAdvanced() {
                               </div>
                             </div>
                           ))}
-
                           {/* {add buy x, get y free!} */}
                           {buyXGetYs.map((buyitem) => (
                             <div key={buyitem.id} className="main-buyX-getY">
                               <Box position="relative">
                                 {/* {bundle most popular} */}
-                                {xybadgeSelected === "simple" && xybagdeText && (
+                                {xybadgeSelected[buyitem.id] === "simple" && xybagdeText[buyitem.id] && (
                                   <div className="bundle_bar_most_popular">
                                     <div className="bundle_bar_most_popular_content" style={{
                                       background: barBadgebackColor,
                                       color: barBadgebackColor,
                                     }}>
                                       <span style={{ color: barBadgeTextColor, }}>
-                                        {xybagdeText}
+                                        {xybagdeText[buyitem.id] || ''}
                                       </span>
                                     </div>
                                   </div>
                                 )}
                                 {/* {bundle most popular fancy} */}
-                                {xybadgeSelected === "mostpopular" && (
+                                {xybadgeSelected[buyitem.id] === "mostpopular" && (
                                   <div className="bundle_bar_most_popular_fancy">
                                     <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -784,7 +931,7 @@ export default function BundleSettingsAdvanced() {
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
-                                          {xybarTitle}
+                                          {xybarTitle[buyitem.id] || 'Buy 3, Get 1 Free!'}
                                         </p>
                                         <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
                                           <p className="bar-label--text" style={{
@@ -793,7 +940,7 @@ export default function BundleSettingsAdvanced() {
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
-                                            {xybarLabelText}
+                                            {xybarLabelText[buyitem.id]}
                                           </p>
                                         </div>
                                       </InlineStack>
@@ -803,7 +950,7 @@ export default function BundleSettingsAdvanced() {
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        {xybarSubTitle}
+                                        {xybarSubTitle[buyitem.id]}
                                       </span>
                                     </BlockStack>
                                   </InlineStack>
@@ -815,19 +962,19 @@ export default function BundleSettingsAdvanced() {
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        ${xycalculatedPrice}
+                                        ${xycalculatedPrice[buyitem.id]}
                                       </div>
-                                      {defaultBasePrice && (
+                                      {xydefaultBasePrice[buyitem.id] && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
                                           fontSize: `${subTitleSize}px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
-                                          {parseFloat(defaultBasePrice) !== parseFloat(xycalculatedPrice || "0") ? (
-                                            <s>${defaultBasePrice}</s>
+                                          {parseFloat(xydefaultBasePrice[buyitem.id]) !== parseFloat(xycalculatedPrice[buyitem.id] || "0") ? (
+                                            <s>${xydefaultBasePrice[buyitem.id]}</s>
                                           ) : (
-                                            `$${defaultBasePrice}`
+                                            `$${xydefaultBasePrice[buyitem.id]}`
                                           )}
                                         </div>
                                       )}
@@ -836,32 +983,32 @@ export default function BundleSettingsAdvanced() {
                                 </div>
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
-                                  {upsellsState.map(upsell => (
+                                  {upsellsState[buyitem.id]?.map(upsell => (
                                     <div key={upsell.id} className="upsell-box" style={{ background: barUpsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
                                           <Checkbox
                                             label=""
-                                            checked={upsellChecked[upsell.id] || false}
-                                            onChange={(value) => handleUpsellValueChange(upsell.id, value)}
+                                            checked={xyupsellChecked[buyitem.id]?.[upsell.id] || false}
+                                            onChange={(value) => handleXyUpsellValueChange(buyitem.id, upsell.id, value)}
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
-                                          <span tyle={{ color: barUpsellTextColor }}>
-                                            {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                          <span style={{ color: barUpsellTextColor }}>
+                                            {xybarUpsellTexts[buyitem.id]?.[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>
                                         <div className="bar-upsell-price">
-                                          <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
-                                          {addupselldefaultBasePrice[upsell.id] && (
+                                          <div className="bar-upsell-discountprice"> ${xyaddUpsellcalculatedPrice[buyitem.id]?.[upsell.id] || "20"}</div>
+                                          {addupselldefaultBasePrice[buyitem.id]?.[upsell.id] && (
                                             <div className="bar-upsell-fullprice">
-                                              {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
-                                                parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
+                                              {parseFloat(xyaddupselldefaultBasePrice[buyitem.id]?.[upsell.id]) !==
+                                                parseFloat(xyaddUpsellcalculatedPrice[buyitem.id]?.[upsell.id] || "20")
                                                 ? (
-                                                  <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                                  <s>${xyaddupselldefaultBasePrice[buyitem.id]?.[upsell.id]}</s>
                                                 ) : (
-                                                  `$${addupselldefaultBasePrice[upsell.id]}`
+                                                  `$${xyaddupselldefaultBasePrice[buyitem.id]?.[upsell.id]}`
                                                 )
                                               }
                                             </div>
@@ -874,32 +1021,31 @@ export default function BundleSettingsAdvanced() {
                               </div>
                             </div>
                           ))}
-
                           {/* {main bundle Upsell} */}
                           {bundleUpsells.map((bundleItem) => (
                             <div key={bundleItem.id} className="main-bundle-upsell">
                               <Box position="relative">
                                 {/* {bundle most popular} */}
-                                {bundleUpsellbadgeSelected === "simple" && bundleUpsellBagdeText && (
+                                {bundleUpsellbadgeSelected[bundleItem.id] === "simple" && bundleUpsellBagdeText[bundleItem.id] && (
                                   <div className="bundle_bar_most_popular">
                                     <div className="bundle_bar_most_popular_content" style={{
                                       background: barBadgebackColor,
                                       color: barBadgebackColor,
                                     }}>
                                       <span style={{ color: barBadgeTextColor, }}>
-                                        {bundleUpsellBagdeText}
+                                        {bundleUpsellBagdeText[bundleItem.id]}
                                       </span>
                                     </div>
                                   </div>
                                 )}
                                 {/* {bundle most popular fancy} */}
-                                {bundleUpsellbadgeSelected === "mostpopular" && (
+                                {bundleUpsellbadgeSelected[bundleItem.id] === "mostpopular" && (
                                   <div className="bundle_bar_most_popular_fancy">
                                     <MostPopularfancy barBadgeTextColor={barBadgeTextColor} barBadgebackColor={barBadgebackColor} />
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px` }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected[bundleItem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[bundleItem.id] === "simple" && bagdeText[bundleItem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -918,7 +1064,7 @@ export default function BundleSettingsAdvanced() {
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
-                                          {bundleUpsellBarTitle}
+                                          {bundleUpsellBarTitle[bundleItem.id] || 'Complete the bundle'}
                                         </p>
                                         <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
                                           <p className="bar-label--text" style={{
@@ -927,7 +1073,7 @@ export default function BundleSettingsAdvanced() {
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
-                                            {bunldeUpsellLabelText}
+                                            {bunldeUpsellLabelText[bundleItem.id]}
                                           </p>
                                         </div>
                                       </InlineStack>
@@ -937,7 +1083,7 @@ export default function BundleSettingsAdvanced() {
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        {bundleUpsellSubTitle}
+                                        {bundleUpsellSubTitle[bundleItem.id] || 'Save $180.49!'}
                                       </span>
                                     </BlockStack>
                                   </InlineStack>
@@ -949,7 +1095,7 @@ export default function BundleSettingsAdvanced() {
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
-                                        ${xycalculatedPrice}
+                                        ${xycalculatedPrice[bundleItem.id]}
                                       </div>
                                       {defaultBasePrice && (
                                         <div className="bar-fullPrice" style={{
@@ -958,44 +1104,67 @@ export default function BundleSettingsAdvanced() {
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
-                                          {parseFloat(defaultBasePrice) !== parseFloat(xycalculatedPrice || "0") ? (
-                                            <s>${defaultBasePrice}</s>
+                                          {parseFloat(defaultBasePrice[bundleItem.id]) !== parseFloat(xycalculatedPrice[bundleItem.id] || "0") ? (
+                                            <s>${defaultBasePrice[bundleItem.id]}</s>
                                           ) : (
-                                            `$${defaultBasePrice}`
+                                            `$${defaultBasePrice[bundleItem.id]}`
                                           )}
                                         </div>
                                       )}
                                     </BlockStack>
                                   </div>
                                 </div>
+                                {/* {layout} */}
+                                <div className="main_bundles-products--container" style={{ flexDirection: 'row' }}>
+                                  {productsState[bundleItem.id]?.map((product) => (
+                                    <div key={product.id} className="bundles-products">
+                                      <div className="bundles-products__product">
+                                        <div className="bundles-products__product--image">image</div>
+                                        <div className="bundles-products__product--title">product title</div>
+                                        <div className="bundles-products__product--price">
+                                          <div className="bundles-produts_product--price-fullprice">30</div>
+                                          <div className="bundles-produts_product--price-compareprice">50</div>
+                                        </div>
+                                      </div>
+                                      <div className="bundles-products__divider">
+                                        <div className="products__divider-inline" style={{ backgroundColor: 'red' }}></div>
+                                        <div className="products__divider-icon">
+                                          <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="currentColor"></circle><path fill="#fff" d="M5 9h10v2H5z"></path><path fill="#fff" d="M11 5v10H9V5z"></path></svg>
+                                        </div>
+                                        <div className="products__divider-inline" style={{ backgroundColor: 'red' }}></div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+
                                 {/* Add Upsell */}
                                 <div className="bar-upsell-container-main">
-                                  {upsellsState.map(upsell => (
+                                  {upsellsState[bundleItem.id]?.map(upsell => (
                                     <div key={upsell.id} className="upsell-box" style={{ background: barUpsellBackColor }}>
                                       <div className="bar-upsell-container">
                                         <div className="bar-upsell-checkbox">
                                           <Checkbox
                                             label=""
-                                            checked={upsellChecked[upsell.id] || false}
-                                            onChange={(value) => handleUpsellValueChange(upsell.id, value)}
+                                            checked={bundleupsellChecked[bundleItem.id]?.[upsell.id] || false}
+                                            onChange={(value) => handleBundleUpsellValueChange(bundleItem.id, upsell.id, value)}
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
                                           <div className="bar-upsell-img"></div>
                                           <span style={{ color: barUpsellTextColor }}>
-                                            {barUpsellTexts[upsell.id] || "+ Add at 20% discounts"}
+                                            {bundleBarUpsellTexts[bundleItem.id]?.[upsell.id] || "+ Add at 20% discounts"}
                                           </span>
                                         </div>
                                         <div className="bar-upsell-price">
-                                          <div className="bar-upsell-discountprice"> ${addUpsellcalculatedPrice[upsell.id] || "20"}</div>
-                                          {addupselldefaultBasePrice[upsell.id] && (
+                                          <div className="bar-upsell-discountprice"> ${bundleAddUpsellcalculatedPrice[bundleItem.id]?.[upsell.id] || "20"}</div>
+                                          {bundleAddupselldefaultBasePrice[bundleItem.id]?.[upsell.id] && (
                                             <div className="bar-upsell-fullprice">
-                                              {parseFloat(addupselldefaultBasePrice[upsell.id]) !==
-                                                parseFloat(addUpsellcalculatedPrice[upsell.id] || "20")
+                                              {parseFloat(bundleAddupselldefaultBasePrice[bundleItem.id]?.[upsell.id]) !==
+                                                parseFloat(bundleAddUpsellcalculatedPrice[bundleItem.id]?.[upsell.id] || "20")
                                                 ? (
-                                                  <s>${addupselldefaultBasePrice[upsell.id]}</s>
+                                                  <s>${bundleAddupselldefaultBasePrice[bundleItem.id]?.[upsell.id]}</s>
                                                 ) : (
-                                                  `$${addupselldefaultBasePrice[upsell.id]}`
+                                                  `$${bundleAddupselldefaultBasePrice[bundleItem.id]?.[upsell.id]}`
                                                 )
                                               }
                                             </div>
@@ -1011,15 +1180,12 @@ export default function BundleSettingsAdvanced() {
                         </BlockStack>
                       </BlockStack>
                     </Box>
-
                     <Divider />
-
                     {/* Cart Drawer Preview */}
                     <BlockStack gap="300">
                       <Text as="h3" variant="headingSm">
                         Cart Drawer Preview
                       </Text>
-
                       <Card background="bg-surface-secondary">
                         <BlockStack gap="300">
                           {/* Timer and Progress Bar */}

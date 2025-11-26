@@ -4,7 +4,7 @@ import { PopUpover } from "./PopUpover";
 import { ImageLoad } from "./ImageLoad";
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
-export function BoxUpSellItem({ id, deleteId, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, }: { id: any, deleteId: any, upAddUpsellPriceChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void }) {
+export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const [selected, setSelected] = useState("default");
@@ -37,6 +37,7 @@ export function BoxUpSellItem({ id, deleteId, deleteSection, upBundlesBarUpsellT
     // IMPORTANT → Add upsell.id here
     if (upAddUpsellPriceChange) {
       upAddUpsellPriceChange(
+        bundleId,
         id,
         calculated.toFixed(2),
         base.toFixed(2)
@@ -66,7 +67,7 @@ export function BoxUpSellItem({ id, deleteId, deleteSection, upBundlesBarUpsellT
 
   const handlesBarUpsellTextChange = (v: string) => {
     setBarUpsellText(v);
-    upBundlesBarUpsellTextChange(id, v);
+    upBundlesBarUpsellTextChange(bundleId, id, v);
   };
 
 
@@ -82,7 +83,11 @@ export function BoxUpSellItem({ id, deleteId, deleteSection, upBundlesBarUpsellT
         <Text as="p" variant="bodyMd" fontWeight="semibold">
           Upsell
         </Text>
-        <Button variant="plain" textAlign="left" onClick={() => deleteSection(deleteId)}>
+        <Button
+          variant="plain"
+          textAlign="left"
+          onClick={() => deleteSection(bundleId, id)} // pass both
+        >
           Remove upsell
         </Button>
       </InlineStack>
