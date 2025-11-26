@@ -677,6 +677,7 @@ export default function BundleSettingsAdvanced() {
                     onAddUpsell={handelonAddUpsellChange}
                     onAddProduct={hanldeonAddProductChange}
                     onDeleteUpsell={handleonDeleteUpsellChange}
+                    loaderData={loaderData}
                   />
                 ))}
                 {showOriginal ? (

@@ -11,6 +11,8 @@ import { useLoaderData } from "@remix-run/react";
 import { SelectableImageButton } from "../common/SelectableImageButton";
 import bundleVertical from "app/asset/bundleVertical.svg";
 import bundleHorizon from "app/asset/bundleHorizon.svg";
+import { SelectProductModal } from "../common/SelectProductModal";
+import { SelectVariantModal } from "../common/SelectVariantModal";
 
 interface BoxUpSells {
   id: number;
@@ -53,6 +55,13 @@ export function GeneralBundleUpsell({
   }) {
 
   const loaderData = useLoaderData<typeof loader>();
+
+  const productArray = loaderData?.products?.map((product: any) => ({
+    title: product.title,
+    imageUrl: product.imageUrl,
+    id: product.id,
+    variants: product.variants
+  }));
   const [open, setOpen] = useState(false);
   const [showQuantityChecked, setShowQuantityChecked] = useState(false);
   const [defaultQuantityValue, setDefaultQuantityValue] = useState(1);
@@ -113,8 +122,6 @@ export function GeneralBundleUpsell({
     setProducts(prev => [...prev, newUpsell]); // local child state if needed
     onAddProduct(bundleId, newUpsell); // send bundleId + new upsell to parent
   };
-
-
 
   const addGift = () => {
     setGifts(prev => [...prev, { id: Date.now() }])
@@ -214,6 +221,13 @@ export function GeneralBundleUpsell({
     { id: "layout2", src: bundleHorizon },
   ];
   const [selectedStyle, setSelectedStyle] = useState("layout1");
+
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
+  const handleReceiveProduct = (value) => {
+    setSelectedProduct(value); // get products array from product modal
+    console.log(selectedProduct);
+  };
 
 
   return (
@@ -376,7 +390,23 @@ export function GeneralBundleUpsell({
             <Divider />
 
             {products.map((item) => (
-              <Button key={item.id} variant="primary">Selecte a product</Button>
+              <BlockStack key={item.id}>
+                {selectedProduct && (
+                  <SelectVariantModal
+                    productArray={selectedProduct}
+                    onSelect={handleReceiveProduct}
+                    title="Select products"
+                    selectionMode="singleVariant"
+                  />
+                )}
+                <SelectProductModal
+                  productArray={productArray}
+                  onSelect={handleReceiveProduct}
+                  title="Select products"
+                  selectionMode="nestedProduct"
+                  key={item.id}
+                />
+              </BlockStack>
             ))}
 
             <Divider />
