@@ -397,6 +397,7 @@ export function GeneralBundleUpsell({
                     onSelect={handleReceiveProduct}
                     title="Select products"
                     selectionMode="singleVariant"
+
                   />
                 )}
                 <SelectProductModal
