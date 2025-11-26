@@ -18,8 +18,8 @@ interface Gifts {
 
 
 export function GeneralQuentityBreack({
+  bundleId,
   id,
-  deleteId,
   deleteSection,
   heading,
   upBundlesChooseTitleChange,
@@ -33,8 +33,8 @@ export function GeneralQuentityBreack({
   upPriceChange,
   upBadgeSelectedChange }:
   {
+    bundleId: any,
     id: any,
-    deleteId: any,
     deleteSection: any
     heading: any,
     upBundlesChooseTitleChange: any,
@@ -44,17 +44,15 @@ export function GeneralQuentityBreack({
     upBundlesBarUpsellTextChange: any,
     onAddUpsell: any,
     onDeleteUpsell: any,
-    upAddUpsellPriceChange: (price: string, defaultBasePrice?: string) => void,
-    upPriceChange?: (price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
+    upAddUpsellPriceChange: (id: string, price: string, defaultBasePrice?: string) => void,
+    upPriceChange?: (id: string, price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
   }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const [open, setOpen] = useState(false);
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>(
-    (loaderData as any).barDefaultQuality
-  );
+  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>((loaderData as any).barDefaultQuality);
   // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [barDefaultPrice, setBarDefaultPrice] = useState((loaderData as any).barDefaultPrice);
@@ -68,26 +66,26 @@ export function GeneralQuentityBreack({
 
   const handleTitleChange = (v: string) => {
     setTitle(v);
-    upBundlesChooseTitleChange(v);
+    upBundlesChooseTitleChange(id, v);
   };
 
   const [subtitle, setSubtitle] = useState((loaderData as any).barSubTitle || "");
 
   const handleSubtitleChange = (v: string) => {
     setSubtitle(v);
-    upBundlesChooseSubTitleChange(v);
+    upBundlesChooseSubTitleChange(id, v);
   };
   const [bagdeText, setBagdeText] = useState((loaderData as any).bagdeText || "");
 
   const handleBadgeTextChange = (v: string) => {
     setBagdeText(v);
-    upBundlesBadgeTextChange(v);
+    upBundlesBadgeTextChange(id, v);
   };
   const [barLabelText, setBarLabelText] = useState((loaderData as any).barLabelText || "");
 
   const handlesBarLabelTextChange = (v: string) => {
     setBarLabelText(v);
-    upBunlesBarLabelTextChange(v);
+    upBunlesBarLabelTextChange(id, v);
   };
 
 
@@ -97,19 +95,24 @@ export function GeneralQuentityBreack({
 
   // { add upsellitem and delete}
   const addBoxUpSell = () => {
-    setBoxUpSells(prev => [...prev, { id: Date.now() }])
-    onAddUpsell({ id: Date.now() });
-  }
-  const deleteBoxUpsell = (id: any) => {
-    setBoxUpSells(prev => prev.filter(item => item.id !== id))
-    onDeleteUpsell(id);
-  }
+    const newId = Date.now();
+    const newUpsell = { id: newId };
+
+    setBoxUpSells(prev => [...prev, newUpsell]); // local child state if needed
+    onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
+  };
+
+  const deleteBoxUpsell = (bundleId: string | number, upsellId: any) => {
+    setBoxUpSells(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
+    onDeleteUpsell(bundleId, upsellId);
+  };
+
   const addGift = () => {
     setGifts(prev => [...prev, { id: Date.now() }])
   }
-  const deleteGift = (id: any) => {
-    setGifts(prev => prev.filter(item => item.id !== id))
-  }
+  // const deleteGift = (id: any) => {
+  //   setGifts(prev => prev.filter(item => item.id !== id))
+  // }
   const handleUpsellSelectChange = useCallback(
     (value: string) => {
       setSelected(value);
@@ -120,10 +123,10 @@ export function GeneralQuentityBreack({
     (value: string) => {
       setBadgeSelected(value);
       if (upBadgeSelectedChange) {
-        upBadgeSelectedChange(value);
+        upBadgeSelectedChange(id, value);
       }
     },
-    [upBadgeSelectedChange],
+    [upBadgeSelectedChange, id],
   );
 
   // Calculate price based on the formula: barDefaultQualityalue * barDefaultPrice * (1 - upsellValue / 100)
@@ -132,23 +135,31 @@ export function GeneralQuentityBreack({
     const basePrice = parseFloat(barDefaultPrice || "0");
     const discountPercent = parseFloat(upsellValue || "0");
 
-    let calculatedPrice = 0;
-    let defaulBasePrice = quantity * basePrice;
+    let calc = 0;
+    let base = quantity * basePrice;
 
     if (selected === 'discounted%') {
-      calculatedPrice = quantity * basePrice * (1 - discountPercent / 100);
+      calc = quantity * basePrice * (1 - discountPercent / 100);
     } else if (selected === 'discounted$') {
-      calculatedPrice = quantity * basePrice - (quantity * discountPercent);
+      calc = quantity * basePrice - quantity * discountPercent;
     } else if (selected === 'specific') {
-      calculatedPrice = parseFloat(upsellValue || "0");
+      calc = parseFloat(upsellValue || "0");
     } else {
-      calculatedPrice = quantity * basePrice;
+      calc = quantity * basePrice;
     }
 
     if (upPriceChange) {
-      upPriceChange(calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
+      upPriceChange(bundleId, calc.toFixed(2), base.toFixed(2));
     }
-  }, [barDefaultQualityalue, barDefaultPrice, upsellValue, selected, upPriceChange]);
+  }, [
+    barDefaultQualityalue,
+    barDefaultPrice,
+    upsellValue,
+    selected,
+    upPriceChange,
+    bundleId
+  ]);
+
 
   const handleChange = useCallback(
     (newValue: string) => {
@@ -213,7 +224,7 @@ export function GeneralQuentityBreack({
             <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
             <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
             <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
-            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(deleteId)} />
+            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(id)} />
           </InlineStack>
         </InlineStack>
         <Collapsible
@@ -342,14 +353,21 @@ export function GeneralQuentityBreack({
               <BlockStack gap="300">
                 {/* {Add upsell} */}
                 {boxUpSells.map((item) => (
-                  <BoxUpSellItem id={item.id} key={item.id} upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange} upAddUpsellPriceChange={upAddUpsellPriceChange} deleteId={item.id} deleteSection={deleteBoxUpsell} />
+                  <BoxUpSellItem
+                    key={item.id}
+                    id={item.id}
+                    bundleId={bundleId} // important
+                    upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
+                    upAddUpsellPriceChange={upAddUpsellPriceChange}
+                    deleteSection={deleteBoxUpsell} // calls parent's delete with bundleId + upsellId
+                  />
                 ))}
               </BlockStack>
               <BlockStack gap="300">
-                {/* {Add upsell} */}
+                {/* {Add upsell}
                 {gifts.map((item) => (
-                  <GiftItem key={item.id} deleteId={item.id} deleteSection={deleteGift} />
-                ))}
+                  <GiftItem key={item.id} id={item.id} deleteSection={deleteGift} />
+                ))} */}
               </BlockStack>
             </BlockStack>
 

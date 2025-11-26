@@ -21,7 +21,7 @@ interface Gifts {
 
 export function GeneralBundleUpsell({
   id,
-  deleteId,
+  bundleId,
   deleteSection,
   heading,
   upBundlesChooseTitleChange,
@@ -30,13 +30,14 @@ export function GeneralBundleUpsell({
   upBundlesBadgeTextChange,
   upBundlesBarUpsellTextChange,
   onAddUpsell,
+  onAddProduct,
   onDeleteUpsell,
   upAddUpsellPriceChange,
   upPriceChange,
   upBadgeSelectedChange }:
   {
     id: any,
-    deleteId: any,
+    bundleId: any,
     deleteSection: any
     heading: any,
     upBundlesChooseTitleChange: any,
@@ -45,6 +46,7 @@ export function GeneralBundleUpsell({
     upBunlesBarLabelTextChange: any,
     upBundlesBarUpsellTextChange: any,
     onAddUpsell: any,
+    onAddProduct: any,
     onDeleteUpsell: any,
     upAddUpsellPriceChange: (price: string, defaultBasePrice?: string) => void,
     upPriceChange?: (price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
@@ -71,34 +73,49 @@ export function GeneralBundleUpsell({
   const [title, setTitle] = useState((loaderData as any).bundleUpsellTitle || "");
   const handleTitleChange = (v: string) => {
     setTitle(v);
-    upBundlesChooseTitleChange(v);
+    upBundlesChooseTitleChange(id, v);
   };
   const [subtitle, setSubtitle] = useState((loaderData as any).bundleUpsellSubtitle || "");
   const handleSubtitleChange = (v: string) => {
     setSubtitle(v);
-    upBundlesChooseSubTitleChange(v);
+    upBundlesChooseSubTitleChange(id, v);
   };
   const [bagdeText, setBagdeText] = useState((loaderData as any).bundleUpsellBagdeText || "");
   const handleBadgeTextChange = (v: string) => {
     setBagdeText(v);
-    upBundlesBadgeTextChange(v);
+    upBundlesBadgeTextChange(id, v);
   };
   const [barLabelText, setBarLabelText] = useState((loaderData as any).bunldeUpsellLabelText || "");
   const handlesBarLabelTextChange = (v: string) => {
     setBarLabelText(v);
-    upBunlesBarLabelTextChange(v);
+    upBunlesBarLabelTextChange(id, v);
   };
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
   const [gifts, setGifts] = useState<Gifts[]>([]);
   // { add upsellitem and delete}
   const addBoxUpSell = () => {
-    setBoxUpSells(prev => [...prev, { id: Date.now() }])
-    onAddUpsell({ id: Date.now() });
-  }
-  const deleteBoxUpsell = (id: any) => {
-    setBoxUpSells(prev => prev.filter(item => item.id !== id))
-    onDeleteUpsell(id);
-  }
+    const newId = Date.now();
+    const newUpsell = { id: newId };
+
+    setBoxUpSells(prev => [...prev, newUpsell]); // local child state if needed
+    onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
+  };
+  const deleteBoxUpsell = (bundleId: string | number, upsellId: any) => {
+    setBoxUpSells(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
+    onDeleteUpsell(bundleId, upsellId);
+  };
+
+  // add product select button and delete product
+  const [products, setProducts] = useState<BoxUpSells[]>([]);
+  const addProduct = () => {
+    const newId = Date.now();
+    const newUpsell = { id: newId };
+    setProducts(prev => [...prev, newUpsell]); // local child state if needed
+    onAddProduct(bundleId, newUpsell); // send bundleId + new upsell to parent
+  };
+
+
+
   const addGift = () => {
     setGifts(prev => [...prev, { id: Date.now() }])
   }
@@ -115,10 +132,10 @@ export function GeneralBundleUpsell({
     (value: string) => {
       setBadgeSelected(value);
       if (upBadgeSelectedChange) {
-        upBadgeSelectedChange(value);
+        upBadgeSelectedChange(id, value);
       }
     },
-    [upBadgeSelectedChange],
+    [id, upBadgeSelectedChange],
   );
 
   // Calculate price based on the formula: barDefaultQualityalue * barDefaultPrice * (1 - upsellValue / 100)
@@ -141,9 +158,9 @@ export function GeneralBundleUpsell({
     }
 
     if (upPriceChange) {
-      upPriceChange(calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
+      upPriceChange(bundleId, calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
     }
-  }, [barDefaultQualityalue, barDefaultPrice, upsellValue, selected, upPriceChange]);
+  }, [barDefaultQualityalue, barDefaultPrice, upsellValue, selected, upPriceChange, bundleId]);
 
   const handleChange = useCallback(
     (newValue: string) => {
@@ -216,7 +233,7 @@ export function GeneralBundleUpsell({
             <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
             <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
             <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
-            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(deleteId)} />
+            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(bundleId)} />
           </InlineStack>
         </InlineStack>
         <Collapsible
@@ -358,11 +375,13 @@ export function GeneralBundleUpsell({
 
             <Divider />
 
-            <Button variant="primary">Selecte a product</Button>
+            {products.map((item) => (
+              <Button key={item.id} variant="primary">Selecte a product</Button>
+            ))}
 
             <Divider />
 
-            <Button icon={PlusIcon}>Add product</Button>
+            <Button icon={PlusIcon} onClick={addProduct}>Add product</Button>
 
             <Divider />
 
@@ -376,7 +395,7 @@ export function GeneralBundleUpsell({
               <BlockStack gap="300">
                 {/* {Add upsell} */}
                 {boxUpSells.map((item) => (
-                  <BoxUpSellItem id={item.id} key={item.id} upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange} upAddUpsellPriceChange={upAddUpsellPriceChange} deleteId={item.id} deleteSection={deleteBoxUpsell} />
+                  <BoxUpSellItem id={item.id} key={item.id} bundleId={bundleId} upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange} upAddUpsellPriceChange={upAddUpsellPriceChange} deleteSection={deleteBoxUpsell} />
                 ))}
               </BlockStack>
               <BlockStack gap="300">
@@ -386,9 +405,7 @@ export function GeneralBundleUpsell({
                 ))}
               </BlockStack>
             </BlockStack>
-
             <Divider />
-
             {/* {Show as Sold out} */}
             <BlockStack gap="300">
               <InlineStack align="space-between">
