@@ -26,30 +26,30 @@ export async function getCountdownTimer(): Promise<CountdownTimer> {
   });
   //if no result then send init result 
   if (!result) {
-    const init = {
-      id: Math.random().toString(36).substr(2, 9),
-      isCountdown: false,
-      visibility: "showFixedDuration",
-      fixedDurationTime: 0,
-      endDateTime: new Date().toISOString(),
-      msgText: "",
-      msgAlignment: 0,
-      msgBold: false,
-      msgItalic: false,
-      msgSize: 0,
-      msgBgColor: "#FF0000",////////////
-      msgTextColor: "#00FF00",////////////
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
+    const init = await db.countdownTimer.create({
+      data: {
+        id: Math.random().toString(36).substr(2, 9),
+        isCountdown: false,
+        visibility: "showFixedDuration",
+        fixedDurationTime: 0,
+        endDateTime: new Date().toISOString(),
+        msgText: "Text",
+        msgAlignment: 0,
+        msgBold: false,
+        msgItalic: false,
+        msgSize: 0,
+        msgBgColor: "#FF0000",////////////
+        msgTextColor: "#00FF00",////////////
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    });
     return init;
   };
-
   return result;
 }
 
 export async function createCountdownTimer(data: Partial<CountdownTimer>) {
-
   const result = await db.countdownTimer.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
@@ -93,10 +93,6 @@ export async function updateCountdownTimer(id: string, data: Partial<CountdownTi
       updatedAt: new Date().toISOString()
     }
   });
-  // const result = await db.countdownTimer.update({
-  //   where: { id },
-  //   data: updateData
-  // });
   return result;
 }
 

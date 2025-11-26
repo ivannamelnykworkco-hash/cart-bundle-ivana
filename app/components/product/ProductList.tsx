@@ -40,7 +40,6 @@ export function ProductList() {
 
   const handleButtonClick = () => {
     setClicked(true);
-    console.log("Button clicked!");
   };
 
   return (

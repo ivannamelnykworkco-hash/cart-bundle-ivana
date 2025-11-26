@@ -128,20 +128,20 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
      UPDATED — main click handler
   ----------------------------------------------------------- */
   const handleRowClick = (row, parentProduct = null) => {
-    if (selectionMode === "nestedTable") {
+    if (selectionMode.includes("nested")) {
       nestedTableSelect(row, parentProduct);
       return;
     }
 
     // original single & multiple logic
-    if (selectionMode === "single") {
+    if (selectionMode.includes("single")) {
       const newSelection = [row];
       setSelectedRows(newSelection);
       onSelect(newSelection);
       return;
     }
 
-    if (selectionMode === "multiple") {
+    if (selectionMode.includes("multiple")) {
       setSelectedRows((prev) => {
         const exists = prev.some((r) => r.id === row.id);
         const updated = exists ? prev.filter((r) => r.id !== row.id) : [...prev, row];
@@ -150,12 +150,10 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
         return updated;
       });
     }
-
-
   };
 
   const isSelected = (id) => selectedRows.some((r) => r.id === id);
-
+  // console.log("in Array", inputArray);
   /* ---------------------------------------------------------
      FILTERING (unchanged)
   ----------------------------------------------------------- */
@@ -191,11 +189,12 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
   }, [queryValue, searchMode, typeFilter, vendorFilter, inputArray]);
 
   /* ---------------------------------------------------------
-     RENDER PRODUCT + VARIANT ROWS (UPDATED for nestedTable)
+     RENDER PRODUCT + VARIANT ROWS (UPDATED for nestedProduct Table)
   ----------------------------------------------------------- */
   const rows = filteredProducts.flatMap((product, index) => {
     const productSelected = isSelected(product.id);
-
+    if (selectionMode.includes("Variant") && product.variants)
+      return [];
     const parentRow = (
       <IndexTable.Row
         id={product.id}
@@ -218,16 +217,15 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
               />
             </div>
           </Box>
-
           <Box width="10%">
             <Thumbnail size="Small" source={product.imageUrl || ImageIcon} alt="" />
           </Box>
-
           <Text as="p">{product.title}</Text>
         </InlineStack>
       </IndexTable.Row>
     );
 
+    //Childre variants row
     const variantRows = (product.variants ?? []).map((variant, vIndex) => {
       const v = variant.node;
       const variantSelected = isSelected(v.id);
@@ -241,7 +239,8 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
           onClick={() => handleRowClick(v, product)}   //  UPDATED
         >
           <InlineStack blockAlign="center" align="space-between">
-            <Box width="10%" paddingBlock="100" paddingInlineStart="600">
+            <Box width="10%" paddingBlock="100" paddingInlineStart={selectionMode.includes("variants") ? 0 : 600}
+            >
               <div
                 onClick={(e) => e.stopPropagation()}
               >
@@ -270,69 +269,94 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
         </IndexTable.Row >
       );
     });
-
-    return selectionMode === "nestedTable" ? [parentRow, ...variantRows] : parentRow;
+    return selectionMode.includes("nested") ? [parentRow, ...variantRows] : parentRow;
   });
 
   return (
     <Box padding="0">
-      <InlineStack gap="300" align="center" blockAlign="center">
-        <Box width="60%">
-          <TextField
-            prefix={<Icon source={SearchIcon} />}
-            placeholder={`Search by ${searchMode}`}
-            value={queryValue}
-            onChange={setQueryValue}
+      {/* Search Option */}
+      {selectionMode.includes("Product") && (
+        <InlineStack gap="300" align="center" blockAlign="center">
+          <Box width="60%">
+            <TextField
+              prefix={<Icon source={SearchIcon} />}
+              placeholder={"Search products"}
+              value={queryValue}
+              onChange={setQueryValue}
+            />
+          </Box>
+          <Box width="35%">
+            <Select options={searchModeOptions} value={searchMode} onChange={setSearchMode} />
+          </Box>
+        </InlineStack>
+      )}
+      {selectionMode.includes("Collection") && (
+        <InlineStack gap="0" align="center" blockAlign="center">
+          <Box width="100%">
+            <TextField
+              prefix={<Icon source={SearchIcon} />}
+              placeholder={"Search collections"}
+              value={queryValue}
+              onChange={setQueryValue}
+            />
+          </Box>
+        </InlineStack >
+      )}
+      {selectionMode.includes("Variant") && (
+        <InlineStack gap="0" align="center" blockAlign="center">
+          <Box width="100%">
+            <TextField
+              prefix={<Icon source={SearchIcon} />}
+              placeholder={"Search Variants"}
+              value={queryValue}
+              onChange={setQueryValue}
+            />
+          </Box>
+        </InlineStack >
+      )}
+      {selectionMode.includes("Product") && (
+        <Box>
+          <Filters
+            filters={[
+              {
+                key: "type",
+                label: "Type",
+                filter: (
+                  <Select
+                    label="Type"
+                    options={typeOptions}
+                    value={typeFilter}
+                    onChange={setTypeFilter}
+                  />
+                ),
+              },
+              {
+                key: "vendor",
+                label: "Vendor",
+                filter: (
+                  <Select
+                    label="Vendor"
+                    options={vendorOptions}
+                    value={vendorFilter}
+                    onChange={setVendorFilter}
+                  />
+                ),
+              },
+            ]}
+            appliedFilters={[]}
+            queryValue={queryValue}
+            onQueryChange={setQueryValue}
+            onQueryClear={() => setQueryValue("")}
+            onClearAll={() => {
+              setQueryValue("");
+              setTypeFilter(null);
+              setVendorFilter(null);
+              setSearchMode("all");
+            }}
+            hideQueryField
           />
         </Box>
-
-        <Box width="35%">
-          <Select options={searchModeOptions} value={searchMode} onChange={setSearchMode} />
-        </Box>
-      </InlineStack>
-
-      <Box>
-        <Filters
-          filters={[
-            {
-              key: "type",
-              label: "Type",
-              filter: (
-                <Select
-                  label="Type"
-                  options={typeOptions}
-                  value={typeFilter}
-                  onChange={setTypeFilter}
-                />
-              ),
-            },
-            {
-              key: "vendor",
-              label: "Vendor",
-              filter: (
-                <Select
-                  label="Vendor"
-                  options={vendorOptions}
-                  value={vendorFilter}
-                  onChange={setVendorFilter}
-                />
-              ),
-            },
-          ]}
-          appliedFilters={[]}
-          queryValue={queryValue}
-          onQueryChange={setQueryValue}
-          onQueryClear={() => setQueryValue("")}
-          onClearAll={() => {
-            setQueryValue("");
-            setTypeFilter(null);
-            setVendorFilter(null);
-            setSearchMode("all");
-          }}
-          hideQueryField
-        />
-      </Box>
-
+      )}
       <IndexTable itemCount={rows.length} headings={[]} selectable={false}>
         {rows}
       </IndexTable>

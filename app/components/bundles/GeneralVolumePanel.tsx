@@ -21,34 +21,63 @@ import { ColorPickerPopoverItem } from "app/components/common/ColorPickerPopover
 import { CustomModal } from "app/components/common/CustomModal";
 import { ImageLoad } from "app/components/common/ImageLoad";
 import { SwitchIcon } from "../common/SwitchIcon";
+import { SelectProductModal } from "../common/SelectProductModal";
+import { SelectCollectionModal } from "../common/SelectCollectionModal";
 
 
-export function GeneralVolumePanel() {
-
-  const thridLoaderData = {
-    eligible: "all",
+export function GeneralVolumePanel({ loaderData }) {
+  // console.log("lett", loaderData.loaderData);
+  const thirdLoaderData = {
+    eligible: "productsExcept",
     volumeButtonText: 'Choose'
   }
+
+  const productArray = loaderData?.products?.map((product: any) => ({
+    title: product.title,
+    imageUrl: product.imageUrl,
+    id: product.id,
+    variants: product.variants
+  }));
+
+  const collectionArray = loaderData?.collections?.map((collection: any) => ({
+    title: collection.title,
+    imageUrl: collection.imageUrl,
+    id: collection.id
+  }));
+
+  const bundlingColor = {
+    hue: 36,
+    saturation: 1,
+    brightness: 1,
+    alpha: 1,
+  };
+
   const [openStyle, setOpenStyle] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-
-  const [eligible, setEligible] = useState(thridLoaderData.eligible);
+  const [eligible, setEligible] = useState(thirdLoaderData.eligible);
   const [photoSize, setPhotoSize] = useState<any>(32);
   const [isProductName, setIsProductName] = useState(true)
   const [isShowPrice, setIsShowPrice] = useState(false)
-  const [volumeButtonText, setVolumeButtonText] = useState(thridLoaderData.volumeButtonText)
-
+  const [volumeButtonText, setVolumeButtonText] = useState(thirdLoaderData.volumeButtonText)
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedCollection, setSelectedCollection] = useState<any>(null);
+  const [excludedProduct, setExcludedProduct] = useState<any>(null);
 
   const handleSettingsToggle = useCallback(
     () => setOpenStyle((open) => !open),
     []
   );
 
-    const bundlingColor = {
-    hue: 36,         
-    saturation: 1,   
-    brightness: 1,   
-    alpha: 1,         
+  const handleReceiveProduct = (value) => {
+    setSelectedProduct(value); // get products array from product modal
+  };
+
+  const handleReceiveCollection = (value) => {
+    setSelectedCollection(value); // get collections array from product modal
+  };
+
+  const handleReceiveExcludedProduct = (value) => {
+    setExcludedProduct(value); // get excluded products array from product modal
   };
 
   return (
@@ -75,36 +104,36 @@ export function GeneralVolumePanel() {
               </Text>
               <BlockStack gap="100">
                 <RadioButton
-                  label="All products"
-                  checked={eligible === "all"}
-                  id="all"
-                  onChange={() => setEligible("all")}
-                />
-                <RadioButton
                   label="All products except selected"
-                  checked={eligible === "collection"}
-                  id="collection"
-                  onChange={() => setEligible("collection")}
+                  checked={eligible === "productsExcept"}
+                  id="productsExcept"
+                  onChange={() => setEligible("productsExcept")}
                 />
                 <RadioButton
-                  label="Specific selected products"
+                  label="Selected products"
                   checked={eligible === "product"}
                   id="product"
                   onChange={() => setEligible("product")}
                 />
-                {eligible === "all" && (
-                  <Button variant="primary" fullWidth>Select products</Button>
+                <RadioButton
+                  label="Products in selected collections"
+                  checked={eligible === "collection"}
+                  id="collection"
+                  onChange={() => setEligible("collection")}
+                />
+                {eligible === "productsExcept" && (
+                  <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" />
                 )
                 }
                 {
                   eligible === "collection" && (
-                    <Button variant="primary" fullWidth>Select collections</Button>
+                    <SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select Collections" selectionMode="multipleCollection" />
 
                   )
                 }
                 {
                   eligible === "product" && (
-                    <Button variant="primary" fullWidth>Select products</Button>
+                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" />
                   )
                 }
               </BlockStack>

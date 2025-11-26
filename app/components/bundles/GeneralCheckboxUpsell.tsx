@@ -4,11 +4,17 @@ import { ProductIcon } from '@shopify/polaris-icons'
 import { UpsellItem } from "../common/UpsellItem";
 import { SwitchIcon } from "../common/SwitchIcon";
 
-export function GeneralCheckboxUpsell() {
+export function GeneralCheckboxUpsell({ loaderData }) {
+
+  const productArray = loaderData?.products?.map((product: any) => ({
+    title: product.title,
+    imageUrl: product.imageUrl,
+    id: product.id,
+    variants: product.variants
+  }));
 
   const [open, setOpen] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-
   const [sections, setSections] = useState([{ id: Date.now() }]);
 
   const addSection = () => {
@@ -18,7 +24,6 @@ export function GeneralCheckboxUpsell() {
   const deleteSection = (id: any) => {
     setSections(prev => prev.filter(item => item.id !== id))
   }
-
 
   const handleSettingsToggle = useCallback(() => setOpen((open) => !open), []);
 
@@ -45,7 +50,7 @@ export function GeneralCheckboxUpsell() {
         >
           <BlockStack gap="200">
             {sections.map((section, index) => (
-              <UpsellItem number={index + 1} key={section.id} deleteId={section.id} deleteSection={deleteSection} />
+              <UpsellItem number={index + 1} key={section.id} deleteId={section.id} deleteSection={deleteSection} productArray={productArray} />
             ))}
             <Button fullWidth onClick={addSection}>Add upsell</Button>
           </BlockStack>

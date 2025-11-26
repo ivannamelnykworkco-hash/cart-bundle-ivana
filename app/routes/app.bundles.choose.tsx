@@ -170,7 +170,7 @@ export async function action({ request, params }) {
     return json({ success: true, result });
   } catch (err) {
     return json(
-      { success: false, error: error.message || err },
+      { success: false, error: err.message || err },
       { status: 500 }
     );
   }
@@ -206,7 +206,6 @@ export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
   /*recevie response from action function*/
   const actionData = useActionData();
-  console.log("---", actionData);
   useEffect(() => {
     if (actionData) {
       if (actionData.success) {
@@ -259,23 +258,8 @@ export default function BundleSettingsAdvanced() {
         data.append(key, value as string);
       }
     });
-    console.log("ididid", data.id);
-    console.log("Formdata", data.id);
 
     submit(data, { method: "post" });
-    //   const result = response.json();
-
-    //   if (response.ok) {
-    //     console.log("response-ok", response);
-    //     showToast('Countdown timer created successfully!', 'success');
-    //   } else {
-    //     showToast(`Error: ${result.error || 'Unknown error'}`, 'error');
-    //     console.log("unknow error", response);
-    //   }
-    // } catch (error) {
-    //   showToast(`Network error: ${error.message}`, 'error');
-
-    // }
   }
   /***************Database Migration Part************/
 
@@ -482,9 +466,9 @@ export default function BundleSettingsAdvanced() {
               <BlockStack gap="200">
                 <GeneralSettingsPanel loaderData={loaderData} />
                 <GeneralStylePanel styleHandlers={styleHandlers} />
-                <GeneralVolumePanel />
+                <GeneralVolumePanel loaderData={loaderData} />
                 <CountDownPanel conf={loaderData.countdownTimerConf} onChange={handleCountdownTimerChange} />
-                <GeneralCheckboxUpsell />
+                <GeneralCheckboxUpsell loaderData={loaderData} />
                 <GeneralStickyAddToCart />
                 {quantityBreaks.map((item) => (
                   <GeneralQuentityBreack

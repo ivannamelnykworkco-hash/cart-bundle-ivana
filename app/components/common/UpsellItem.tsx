@@ -1,12 +1,20 @@
 import { Button, InlineGrid, InlineStack, Select, Text, TextField } from "@shopify/polaris";
 import { useCallback, useState } from "react";
-export function UpsellItem({ number, deleteId, deleteSection }: { number: any, deleteId: any, deleteSection: (id: any) => void }) {
+import { SelectProductModal } from "./SelectProductModal";
+export function UpsellItem({ number, deleteId, deleteSection, productArray }: { number: any, deleteId: any, deleteSection: (id: any) => void, productArray: any }) {
 
   const [selected, setSelected] = useState("default");
   const [upsellTitle, setUpsellTitle] = useState("{{product}}");
   const [upsellSubTitle, setUpsellSubTitle] = useState("Save {{saved_amount}}!");
   const [value, setValue] = useState('20');
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
+  const upsellsOptions = [
+    { label: "Default", value: 'default' },
+    { label: "Discounted % (e.g, %20 off)", value: 'discounted%' },
+    { label: "Discounted $ (e.g, $10 off)", value: 'discounted$' },
+    { label: "Specific (e.g, $29)", value: 'specific' }
+  ];
 
   const handleUpsellSelectChange = useCallback(
     (value: string) => setSelected(value),
@@ -18,13 +26,11 @@ export function UpsellItem({ number, deleteId, deleteSection }: { number: any, d
     [],
   );
 
+  const handleReceiveProduct = (value) => {
+    setSelectedProduct(value); // get products array from product modal
+    console.log("checkbox", selectedProduct);
+  };
 
-  const upsellsOptions = [
-    { label: "Default", value: 'default' },
-    { label: "Discounted % (e.g, %20 off)", value: 'discounted%' },
-    { label: "Discounted $ (e.g, $10 off)", value: 'discounted$' },
-    { label: "Specific (e.g, $29)", value: 'specific' }
-  ];
   return (
     <div style={{ borderRadius: "10px", border: '1px solid lightgrey', padding: '15px', gap: "10px", display: 'flex', flexDirection: 'column' }}>
       <InlineStack align="space-between">
@@ -35,7 +41,10 @@ export function UpsellItem({ number, deleteId, deleteSection }: { number: any, d
           Remove upsell
         </Button>
       </InlineStack>
-      <Button variant="primary" fullWidth>Select a product</Button>
+      < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select products" selectionMode="nestedProduct" />
+      {selectedProduct && (
+        < SelectProductModal productArray={selectedProduct} onSelect={handleReceiveProduct} title="Select variants" selectionMode="singleVariant" />
+      )}
       {/* { price and title and subtitle} */}
       <InlineGrid columns={2} gap="200">
         <Select
@@ -98,6 +107,5 @@ export function UpsellItem({ number, deleteId, deleteSection }: { number: any, d
         />
       </InlineGrid>
     </div>
-
   )
 }

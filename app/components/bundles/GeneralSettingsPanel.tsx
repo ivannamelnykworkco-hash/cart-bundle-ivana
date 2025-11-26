@@ -131,6 +131,9 @@ export function GeneralSettingsPanel({ loaderData }) {
   const [textValue, setTextValue] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
+  const [excludedProduct, setExcludedProduct] = useState<any>(null);
+  const [excludedCollection, setExcludedCollection] = useState<any>(null);
+
 
   //FUNCTIONS
   const handleSettingsToggle = useCallback(() => setOpen((open) => !open), []);
@@ -152,11 +155,19 @@ export function GeneralSettingsPanel({ loaderData }) {
   };
 
   const handleReceiveProduct = (value) => {
-    setSelectedProduct(value); // receive → store
+    setSelectedProduct(value); // get products array from product modal
   };
 
   const handleReceiveCollection = (value) => {
-    setSelectedCollection(value); // receive → store
+    setSelectedCollection(value); // get collections array from collection modal
+  };
+
+  const handleReceiveExcludedProduct = (value) => {
+    setExcludedProduct(value); // get excluded products array from product modal
+  };
+
+  const handleReceiveExcludedCollection = (value) => {
+    setExcludedCollection(value); // get excluded collection array from collection modal
   };
 
   return (
@@ -240,18 +251,16 @@ export function GeneralSettingsPanel({ loaderData }) {
                     title={`Some of the products are in "Bundle" deal which may result in conflicting discounts`}
                     tone="warning"
                   ></Banner>
-                )
-                }
-
+                )}
                 {
                   visibility === "except" && (
                     <BlockStack gap="200">
                       <InlineStack align="space-around" gap="200" >
                         <Box width="48%">
-                          < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multiple" />
+                          < SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select excluded products" selectionMode="multipleProduct" />
                         </Box>
                         <Box width="48%">
-                          < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select collections" selectionMode="multiple" />
+                          < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveExcludedCollection} title="Select excluded collections" selectionMode="multipleCollection" />
                         </Box>
                       </InlineStack>
 
@@ -265,13 +274,13 @@ export function GeneralSettingsPanel({ loaderData }) {
 
                 {
                   visibility === "specific" && (
-                    < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="nestedTable" />
+                    < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" />
                   )
                 }
 
                 {
                   visibility === "collections" && (
-                    < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select collections" selectionMode="multiple" />
+                    < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select collections" selectionMode="multipleCollection" />
 
                   )
                 }
