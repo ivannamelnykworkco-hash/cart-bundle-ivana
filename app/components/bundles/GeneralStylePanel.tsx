@@ -20,11 +20,22 @@ import { SelectableImageButton } from "../common/SelectableImageButton";
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 import { SelectFont } from "../common/SelectFont";
 
+
+
+import Vertical from "app/asset/vertical.svg";
+import Horizon from "app/asset/Horizon.svg";
+import GridIcon from "app/asset/GridIcon.svg";
+import Plain from "app/asset/Plain.svg";
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "../product/ProductList";
+
 interface GeneralStylePanelProps {
   styleHandlers: {
     upCornerRadiusChange: (...args: any[]) => void;
     upSpacingChange: (...args: any[]) => void;
     upCardsBgColorChange: (...args: any[]) => void;
+    upSelectedBgColorChange: (...args: any[]) => void;
+    upBorderColorChange: (...args: any[]) => void;
     upBlockTitleColorChange: (...args: any[]) => void;
     upBarTitleColorChange: (...args: any[]) => void;
     upBarSubTitleColorChange: (...args: any[]) => void;
@@ -36,8 +47,9 @@ interface GeneralStylePanelProps {
     upBarBadgeTextColorChange: (...args: any[]) => void;
     upBarUpsellBackColorChange: (...args: any[]) => void;
     upBarUpsellTextColorChange: (...args: any[]) => void;
-    upBorderColorChange: (...args: any[]) => void;
 
+    upSelectedBackColorChange: (...args: any[]) => void;
+    upSelectedTextColorChange: (...args: any[]) => void;
     upBlockTitleChange: (...args: any[]) => void;
     upBlockTitleFontStyleChange: (...args: any[]) => void;
     upTitleChange: (...args: any[]) => void;
@@ -59,11 +71,23 @@ export function GeneralStylePanel({
   layoutStyleOptions,
   layoutSelectedStyle
 }: GeneralStylePanelProps) {
+  upUpsellSizeChange: (...args: any[]) => void;
+  upUpsellStyleChange: (...args: any[]) => void;
+  upUnitLabelSizeChange: (...args: any[]) => void;
+  upUnitLabelStyleChange: (...args: any[]) => void;
+};
+}
+
+export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
+  const loaderData = useLoaderData<typeof loader>();
+  const conf = loaderData.generalStyleConf;
 
   const {
     upCornerRadiusChange,
     upSpacingChange,
     upCardsBgColorChange,
+    upSelectedBgColorChange,
+    upBorderColorChange,
     upBlockTitleColorChange,
     upBarTitleColorChange,
     upBarSubTitleColorChange,
@@ -75,7 +99,8 @@ export function GeneralStylePanel({
     upBarBadgeTextColorChange,
     upBarUpsellBackColorChange,
     upBarUpsellTextColorChange,
-    upBorderColorChange,
+    upSelectedBackColorChange,
+    upSelectedTextColorChange,
     upBlockTitleChange,
     upBlockTitleFontStyleChange,
     upTitleChange,
@@ -84,12 +109,17 @@ export function GeneralStylePanel({
     upSubTitleStyleChange,
     upLabelChange,
     upLabelStyleChange,
+    upUpsellSizeChange,
+    upUpsellStyleChange,
+    upUnitLabelSizeChange,
+    upUnitLabelStyleChange
   } = styleHandlers;
 
 
   const [openStyle, setOpenStyle] = useState(false);
-  const [cornerRadius, setCornerRadius] = useState<any>(32);
-  const [spacing, setSpacing] = useState<number>(20);
+  const [selectedStyle, setSelectedStyle] = useState("layout1"); ///
+  const [cornerRadius, setCornerRadius] = useState<any>(conf.cornerRadius);
+  const [spacing, setSpacing] = useState<number>(conf.spacing);
   const [isShowCustomAlert, setIsShowCustomAlert] = useState(false);
   const [styleTabSelected, setStyleTabSelected] = useState(0);
 
@@ -110,83 +140,22 @@ export function GeneralStylePanel({
       panelID: 'accepts-marketing-content-1',
     },
   ];
-
-  const cardsBg = {
-    hue: 0,
-    saturation: 0.07,
-    brightness: 1,
-    alpha: 1,
-  };
-  const selectedBg = {
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
-  };
-  const borderColor = {
-    hue: 0,
-    saturation: 1,
-    brightness: 1,
-    alpha: 1,
-  };
-  const blockTitle = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const barTitle = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const barSubtitle = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0.33,
-    alpha: 1,
-  };
-  const barPrice = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const barFullPrice = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0.33,
-    alpha: 1,
-  };
-  const labelBack = {
-    hue: 36,
-    saturation: 0.15,
-    brightness: 1,
-    alpha: 1,
-  };
-  const labelText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const badgeBack = {
-    hue: 36,
-    saturation: 1,
-    brightness: 1,
-    alpha: 1,
-  };
-  const badgeText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
-  };
+  const cardsBgColor = JSON.parse(conf.cardsBgColor);
+  const selectedBgColor = JSON.parse(conf.selectedBgColor);
+  const borderColor = JSON.parse(conf.borderColor);
+  const blockTitle = JSON.parse(conf.blockTitleColor);
+  const barTitle = JSON.parse(conf.barTitleColor);
+  const barSubtitle = JSON.parse(conf.barSubTitleColor);
+  const barPrice = JSON.parse(conf.barPriceColor);
+  const barFullPrice = JSON.parse(conf.barFullPriceColor);
+  const labelBack = JSON.parse(conf.barLabelBackColor);
+  const labelText = JSON.parse(conf.barLabelTextColor);
+  const badgeBack = JSON.parse(conf.barBadgebackColor);
+  const badgeText = JSON.parse(conf.barBadgeTextColor);
   const giftBack = {
-    hue: 36,
-    saturation: 0.3,
-    brightness: 1,
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
     alpha: 1,
   };
   const giftText = {
@@ -197,48 +166,41 @@ export function GeneralStylePanel({
   };
   const giftSelectedBack = {
     hue: 0,
-    saturation: 1,
-    brightness: 1,
+    saturation: 0,
+    brightness: 0,
     alpha: 1,
   };
   const giftSelectedText = {
     hue: 0,
     saturation: 0,
-    brightness: 1,
+    brightness: 0,
     alpha: 1,
   };
-
   //upsell
-  const UpsellBack = {
-    hue: 36,
-    saturation: 0.3,
-    brightness: 1,
-    alpha: 1,
-  };
-  const UpsellText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const UpsellSelectedBack = {
-    hue: 36,
-    saturation: 0.2,
-    brightness: 1,
-    alpha: 1,
-  };
-  const UpsellSelectedText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
+  const UpsellBack = JSON.parse(conf.barUpsellBackColor);
+  const UpsellText = JSON.parse(conf.barUpsellTextColor);
+  const UpsellSelectedBack = JSON.parse(conf.barUpsellSelectedBackColor);
+  const UpsellSelectedText = JSON.parse(conf.barUpsellSelectedTextColor);
+  const blockTitleSize = conf.barBlocktitle;
+  const blockTitleStyle = conf.barBlocktitleFontStyle;
+  const titleSize = conf.bartitleSize;
+  const titleStyle = conf.bartitleFontStyle;
+  const subTitleSize = conf.subTitleSize;
+  const subTitleStyle = conf.subTitleStyle;
+  const labelSize = conf.labelSize;
+  const labelStyle = conf.labelStyle;
+  const upsellSize = conf.upsellSize;
+  const upsellStyle = conf.upsellStyle;
+  const unitLabelSize = conf.unitLabelSize;
+  const unitLabelStyle = conf.unitLabelStyle;
+
+  console.log("blockTitleStyle", blockTitleStyle);
+
 
   const handleSettingsToggle = useCallback(
     () => setOpenStyle((open) => !open),
     []
   );
-
 
   return (
     <Card>
@@ -353,14 +315,18 @@ export function GeneralStylePanel({
                 </Text>
                 <BlockStack>
                   <InlineGrid columns={4} gap="200">
-                    <ColorPickerPopoverItem subtitle="Cards bg" defaultColorSetting={cardsBg} colorWidth="100%" onColorChange={(hex: string) => {
+                    <ColorPickerPopoverItem subtitle="Cards bg" defaultColorSetting={cardsBgColor} colorWidth="100%" onColorChange={(hex: string) => {
                       if (upCardsBgColorChange) {
                         upCardsBgColorChange(hex);
                       }
                     }} />
-                    <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={selectedBg} colorWidth="100%" onColorChange={undefined} />
+                    <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={selectedBgColor} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upSelectedBgColor) {
+                        upSelectedBgColorChange(hex);
+                      }
+                    }} />
                     <ColorPickerPopoverItem subtitle="Border color" defaultColorSetting={borderColor} colorWidth="100%" onColorChange={(hex: string) => {
-                      if (upBorderColorChange) {
+                      if (upBorderColor) {
                         upBorderColorChange(hex);
                       }
                     }} />
@@ -468,8 +434,16 @@ export function GeneralStylePanel({
                         upBarUpsellTextColorChange(hex);
                       }
                     }} />
-                    <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={UpsellSelectedBack} colorWidth="100%" onColorChange={undefined} />
-                    <ColorPickerPopoverItem subtitle="Selected text" defaultColorSetting={UpsellSelectedText} colorWidth="100%" onColorChange={undefined} />
+                    <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={UpsellSelectedBack} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upSelectedBackColorChange) {
+                        upSelectedBackColorChange(hex);
+                      }
+                    }} />
+                    <ColorPickerPopoverItem subtitle="Selected text" defaultColorSetting={UpsellSelectedText} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upSelectedTextColorChange) {
+                        upSelectedTextColorChange(hex);
+                      }
+                    }} />
                   </InlineGrid>
                 </BlockStack>
 
@@ -486,16 +460,16 @@ export function GeneralStylePanel({
               </Text>
               <BlockStack gap="200">
                 <InlineGrid columns={2} gap="200">
-                  <SelectFont subtitle="Block title" defaultFontSize="12" defaultFontLabel="styleRegular" onSizeChange={upBlockTitleChange} onFontStytleChange={upBlockTitleFontStyleChange} />
-                  <SelectFont subtitle="Title" defaultFontSize="19" defaultFontLabel="styleBold" onSizeChange={upTitleChange} onFontStytleChange={upTitleFontStyleChange} />
+                  <SelectFont subtitle="Block title" defaultFontSize={blockTitleSize} defaultFontLabel={blockTitleStyle} onSizeChange={upBlockTitleChange} onFontStytleChange={upBlockTitleFontStyleChange} />
+                  <SelectFont subtitle="Title" defaultFontSize={titleSize} defaultFontLabel={titleStyle} onSizeChange={upTitleChange} onFontStytleChange={upTitleFontStyleChange} />
                 </InlineGrid>
 
                 <Divider />
 
                 <BlockStack>
                   <InlineGrid columns={2} gap="200">
-                    <SelectFont subtitle="Subtitle" defaultFontSize="13" defaultFontLabel="styleLightItalic" onSizeChange={upSubTitleChange} onFontStytleChange={upSubTitleStyleChange} />
-                    <SelectFont subtitle="Label" defaultFontSize="11" defaultFontLabel="styleLightItalic" onSizeChange={upLabelChange} onFontStytleChange={upLabelStyleChange} />
+                    <SelectFont subtitle="Subtitle" defaultFontSize={subTitleSize} defaultFontLabel={subTitleStyle} onSizeChange={upSubTitleChange} onFontStytleChange={upSubTitleStyleChange} />
+                    <SelectFont subtitle="Label" defaultFontSize={labelSize} defaultFontLabel={labelStyle} onSizeChange={upLabelChange} onFontStytleChange={upLabelStyleChange} />
                   </InlineGrid>
                 </BlockStack>
 
@@ -504,7 +478,7 @@ export function GeneralStylePanel({
                 <BlockStack>
                   <InlineGrid columns={2} gap="200">
                     <SelectFont subtitle="Free gift" defaultFontSize="13" defaultFontLabel="styleBold" onSizeChange={undefined} onFontStytleChange={undefined} />
-                    <SelectFont subtitle="Upsell" defaultFontSize="13" defaultFontLabel="styleBold" onSizeChange={undefined} onFontStytleChange={undefined} />
+                    <SelectFont subtitle="Upsell" defaultFontSize={upsellSize} defaultFontLabel={upsellStyle} onSizeChange={upUpsellSizeChange} onFontStytleChange={upUpsellStyleChange} />
                   </InlineGrid>
                 </BlockStack>
 
@@ -512,7 +486,7 @@ export function GeneralStylePanel({
 
                 <BlockStack>
                   <InlineGrid columns={2} gap="200">
-                    <SelectFont subtitle="Unit label" defaultFontSize="14" defaultFontLabel="styleRegular" onSizeChange={undefined} onFontStytleChange={undefined} />
+                    <SelectFont subtitle="Unit label" defaultFontSize={unitLabelSize} defaultFontLabel={unitLabelStyle} onSizeChange={upUnitLabelSizeChange} onFontStytleChange={upUnitLabelStyleChange} />
                   </InlineGrid>
 
                 </BlockStack>

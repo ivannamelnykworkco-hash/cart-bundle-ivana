@@ -1,8 +1,6 @@
 // app/models/bundle.server.ts
 import type { CountdownTimer } from "./types";
 import db from "../db.server";
-import { CountDownPanel } from "app/components/bundles/CountDownPanel";
-
 
 function parseBoolean(str) {
   return str === 'true';
@@ -14,39 +12,35 @@ function parseNumber(str) {
 // This is a placeholder for database operations
 // Replace with your actual database (Prisma, MongoDB, etc.)
 
-//export async function getCountdownTimer(id: string): Promise<CountdownTimer | null> {
 export async function getCountdownTimer(): Promise<CountdownTimer> {
-  //  export async function getGeneralSetting(id: string): Promise<GeneralSetting[]> {
-
   // TODO: Implement database query
   const result = await db.countdownTimer.findFirst({
     orderBy: {
       createdAt: 'desc',
     },
   });
-  //if no result then send init result 
-  if (!result) {
-    const init = await db.countdownTimer.create({
-      data: {
-        id: Math.random().toString(36).substr(2, 9),
-        isCountdown: false,
-        visibility: "showFixedDuration",
-        fixedDurationTime: 0,
-        endDateTime: new Date().toISOString(),
-        msgText: "Text",
-        msgAlignment: 0,
-        msgBold: false,
-        msgItalic: false,
-        msgSize: 0,
-        msgBgColor: "#FF0000",////////////
-        msgTextColor: "#00FF00",////////////
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-    });
-    return init;
-  };
-  return result;
+  if (result)
+    return result;
+  //if no result then create and send init result 
+  const init = await db.countdownTimer.create({
+    data: {
+      id: Math.random().toString(36).substr(2, 9),
+      isCountdown: false,
+      visibility: "showFixedDuration",
+      fixedDurationTime: 0,
+      endDateTime: new Date().toISOString(),
+      msgText: "Text",
+      msgAlignment: 0,
+      msgBold: false,
+      msgItalic: false,
+      msgSize: 0,
+      msgBgColor: "#FF0000",////////////
+      msgTextColor: "#00FF00",////////////
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+  });
+  return init;
 }
 
 export async function createCountdownTimer(data: Partial<CountdownTimer>) {
@@ -68,8 +62,6 @@ export async function createCountdownTimer(data: Partial<CountdownTimer>) {
       updatedAt: new Date().toISOString()
     }
   });
-
-
   return result;
 }
 
@@ -89,7 +81,7 @@ export async function updateCountdownTimer(id: string, data: Partial<CountdownTi
       msgSize: parseInt(data.textFontSize, 10),
       msgBgColor: data.msgBgColor,  ////
       msgTextColor: data.msgTextColor,  ////
-      createdAt: new Date().toISOString(),
+      createdAt: data.createdAt,
       updatedAt: new Date().toISOString()
     }
   });

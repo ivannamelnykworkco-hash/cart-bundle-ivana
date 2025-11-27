@@ -21,10 +21,13 @@ import {
 import { SettingsIcon, AlertCircleIcon, MagicIcon, ClockIcon, TextAlignCenterIcon, TextAlignLeftIcon, TextAlignRightIcon, TextItalicIcon, TextBoldIcon } from '@shopify/polaris-icons';
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 import { SwitchIcon } from "../common/SwitchIcon";
+import { loader } from "../product/ProductList";
+import { useLoaderData } from "@remix-run/react";
 
 
-export function CountDownPanel({ conf, onChange }) {
-
+export function CountDownPanel({ onChange }) {
+  const loaderData = useLoaderData<typeof loader>();
+  const conf = loaderData.countdownTimerConf;
   const [open, setOpen] = useState(false);
   const [showCountdownTimer, setShowCountdownTimer] = useState(conf.isCountdown);
   const [visibility, setVisibility] = useState(conf.visibility);

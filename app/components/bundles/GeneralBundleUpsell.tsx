@@ -401,6 +401,15 @@ export function GeneralBundleUpsell({
 
             {products.map((item) => (
               <BlockStack key={item.id}>
+                {selectedProduct && (
+                  <SelectVariantModal
+                    productArray={selectedProduct}
+                    onSelect={handleReceiveProduct}
+                    title="Select products"
+                    selectionMode="singleVariant"
+
+                  />
+                )}
                 <SelectProductModal
                   productArray={productArray}
                   onSelect={handleReceiveProduct(item.id)}
