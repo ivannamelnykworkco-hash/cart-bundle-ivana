@@ -37,7 +37,7 @@ export function SelectVariantModal({ variantArray, onSelect, title, selectionMod
   };
 
   const activator = (
-    <Button icon={EditIcon} onClick={handleOpen} fullWidth={true} variant="primary">
+    <Button onClick={handleOpen} fullWidth={true}>
       Select variant
     </Button>
   );

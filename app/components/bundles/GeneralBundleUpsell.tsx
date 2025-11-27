@@ -9,10 +9,10 @@ import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 import type { loader } from "../product/ProductList";
 import { useLoaderData } from "@remix-run/react";
 import { SelectableImageButton } from "../common/SelectableImageButton";
-import bundleVertical from "app/asset/bundleVertical.svg";
-import bundleHorizon from "app/asset/bundleHorizon.svg";
+
 import { SelectProductModal } from "../common/SelectProductModal";
 import { SelectVariantModal } from "../common/SelectVariantModal";
+import { BoxProductItem } from "../common/BoxProductItem";
 
 interface BoxUpSells {
   id: number;
@@ -31,12 +31,18 @@ export function GeneralBundleUpsell({
   upBunlesBarLabelTextChange,
   upBundlesBadgeTextChange,
   upBundlesBarUpsellTextChange,
+  upAddProductItemPriceChange,
   onAddUpsell,
   onAddProduct,
   onDeleteUpsell,
+  onDeleteProducts,
+  upSeletedProduct,
   upAddUpsellPriceChange,
   upPriceChange,
-  upBadgeSelectedChange }:
+  upBadgeSelectedChange,
+  styleOptions,
+  selectedStyle,
+  onChangeStyle, }:
   {
     id: any,
     bundleId: any,
@@ -44,14 +50,20 @@ export function GeneralBundleUpsell({
     heading: any,
     upBundlesChooseTitleChange: any,
     upBundlesChooseSubTitleChange: any,
-    upBundlesBadgeTextChange: any,
     upBunlesBarLabelTextChange: any,
     upBundlesBarUpsellTextChange: any,
+    upAddProductItemPriceChange: any,
     onAddUpsell: any,
     onAddProduct: any,
     onDeleteUpsell: any,
+    onDeleteProducts: any,
+    upSeletedProduct: any,
     upAddUpsellPriceChange: (price: string, defaultBasePrice?: string) => void,
-    upPriceChange?: (price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
+    upPriceChange?: (price: string, defaultBasePrice?: string) => void,
+    upBadgeSelectedChange?: (value: string) => void,
+    styleOptions: any,
+    selectedStyle: any,
+    onChangeStyle: any,
   }) {
 
   const loaderData = useLoaderData<typeof loader>();
@@ -113,7 +125,6 @@ export function GeneralBundleUpsell({
     setBoxUpSells(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
     onDeleteUpsell(bundleId, upsellId);
   };
-
   // add product select button and delete product
   const [products, setProducts] = useState<BoxUpSells[]>([]);
   const addProduct = () => {
@@ -121,6 +132,10 @@ export function GeneralBundleUpsell({
     const newUpsell = { id: newId };
     setProducts(prev => [...prev, newUpsell]); // local child state if needed
     onAddProduct(bundleId, newUpsell); // send bundleId + new upsell to parent
+  };
+  const deleteProduct = (bundleId: string | number, upsellId: any) => {
+    setProducts(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
+    onDeleteProducts(bundleId, upsellId);
   };
 
   const addGift = () => {
@@ -215,18 +230,13 @@ export function GeneralBundleUpsell({
   const handleColorQuantityText = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
-
-  const styleOptions = [
-    { id: "layout1", src: bundleVertical },
-    { id: "layout2", src: bundleHorizon },
-  ];
-  const [selectedStyle, setSelectedStyle] = useState("layout1");
-
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
-
-  const handleReceiveProduct = (value) => {
-    setSelectedProduct(value); // get products array from product modal
-    console.log(selectedProduct);
+  const [selectedProduct, setSelectedProduct] = useState({});
+  const handleReceiveProduct = (itemId) => (value) => {
+    setSelectedProduct(prev => ({
+      ...prev,
+      [itemId]: value,   // store product for that item
+    }));
+    upSeletedProduct(bundleId, { [itemId]: value });
   };
 
 
@@ -263,7 +273,7 @@ export function GeneralBundleUpsell({
                   key={opt.id}
                   src={opt.src}
                   selected={selectedStyle === opt.id}
-                  onClick={() => setSelectedStyle(opt.id)}
+                  onClick={() => onChangeStyle(opt.id)}
                 />
               ))}
             </InlineGrid>
@@ -391,31 +401,28 @@ export function GeneralBundleUpsell({
 
             {products.map((item) => (
               <BlockStack key={item.id}>
-                {selectedProduct && (
-                  <SelectVariantModal
-                    productArray={selectedProduct}
-                    onSelect={handleReceiveProduct}
-                    title="Select products"
-                    selectionMode="singleVariant"
-
-                  />
-                )}
                 <SelectProductModal
                   productArray={productArray}
-                  onSelect={handleReceiveProduct}
+                  onSelect={handleReceiveProduct(item.id)}
                   title="Select products"
                   selectionMode="nestedProduct"
-                  key={item.id}
                 />
+                {selectedProduct[item.id] && (
+                  <BoxProductItem
+                    id={item.id}
+                    key={item.id}
+                    bundleId={bundleId}
+                    upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
+                    upAddProductItemPriceChange={upAddProductItemPriceChange}
+                    deleteSection={deleteProduct}
+                    selectproductInfo={selectedProduct[item.id]}
+                  />
+                )}
               </BlockStack>
             ))}
-
             <Divider />
-
             <Button icon={PlusIcon} onClick={addProduct}>Add product</Button>
-
             <Divider />
-
             {/* {three button} */}
             <BlockStack gap="300">
               <InlineGrid columns={3} gap='200'>

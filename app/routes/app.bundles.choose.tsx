@@ -23,6 +23,8 @@ import {
   Frame,
 } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
+import bundleVertical from "app/asset/bundleVertical.svg";
+import bundleHorizon from "app/asset/bundleHorizon.svg";
 import { GeneralSettingsPanel } from "app/components/bundles/GeneralSettingsPanel";
 import { GeneralStylePanel } from "app/components/bundles/GeneralStylePanel";
 import { GeneralVolumePanel } from "app/components/bundles/GeneralVolumePanel";
@@ -369,6 +371,19 @@ export default function BundleSettingsAdvanced() {
   const [bunldeUpsellLabelText, setBunldeUpsellLabelText] = useState({});
   const [bundleUpsellbadgeSelected, setBundleUpsellbadgeSelected] = useState("simple");
 
+  /// set layout
+  const layoutStyleOptions = [
+    { id: "layout1", src: bundleVertical },
+    { id: "layout2", src: bundleHorizon },
+  ];
+  const [layoutSelectedStyle, setLayoutSelectedStyle] = useState("layout1");
+  // bundleupsell set layout
+  const styleOptions = [
+    { id: "layout1", src: bundleHorizon },
+    { id: "layout2", src: bundleVertical },
+  ];
+  const [selectedStyle, setSelectedStyle] = useState("layout1");
+
   // right layout add upsell and delete Upsell
   const handelonAddUpsellChange = (bundleId: string | number, item: any) => {
     setUpsellsState(prev => ({
@@ -376,6 +391,8 @@ export default function BundleSettingsAdvanced() {
       [bundleId]: [...(prev[bundleId] || []), item]
     }));
   };
+
+
 
   const handleonDeleteUpsellChange = (bundleId: string | number, upsellId: any) => {
     setUpsellsState(prev => ({
@@ -389,6 +406,14 @@ export default function BundleSettingsAdvanced() {
     setProductsState(prev => ({
       ...prev,
       [bundleId]: [...(prev[bundleId] || []), item]
+    }));
+  };
+
+  //product delete on right layout
+  const handleonDeleteProductChange = (bundleId: string | number, productId: any) => {
+    setProductsState(prev => ({
+      ...prev,
+      [bundleId]: (prev[bundleId] || []).filter(item => item.id !== productId)
     }));
   };
 
@@ -459,12 +484,28 @@ export default function BundleSettingsAdvanced() {
     }));
   };
 
+  //show product information
+  const [showSelectedProduct, setShowSelectedProduct] = useState({});
+
+  const handleSeletedProductChange = (bundleId, productObj) => {
+    setShowSelectedProduct(prev => ({
+      ...prev,
+      [bundleId]: {
+        ...prev[bundleId],
+        ...productObj, // productObj = { [productId]: { imageUrl, title, price } }
+      }
+    }));
+  };
+
   const [addUpsellcalculatedPrice, setAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
   const [addupselldefaultBasePrice, setAddupselldefaultBasePrice] = useState<Record<number, string>>({});
   const [xyaddUpsellcalculatedPrice, setXyAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
   const [xyaddupselldefaultBasePrice, setXyAddupselldefaultBasePrice] = useState<Record<number, string>>({});
   const [bundleAddUpsellcalculatedPrice, setBundleAddUpsellcalculatedPrice] = useState<Record<number, string>>({});
   const [bundleAddupselldefaultBasePrice, setBundleAddupselldefaultBasePrice] = useState<Record<number, string>>({});
+  const [bundleAddProductcalculatedPrice, setBundleAddProductcalculatedPrice] = useState<Record<number, Record<number, string>>>({});
+  const [bundleAddPorductItemdefaultBasePrice, setBundleAddPorductItemdefaultBasePrice] = useState<Record<number, Record<number, string>>>({});
+
 
   const handleAddUpsellPriceChange = (
     bundleId: number,
@@ -518,15 +559,41 @@ export default function BundleSettingsAdvanced() {
     price: string,
     defaultPrice?: string
   ) => {
-    setBundleAddUpsellcalculatedPrice(prev => ({
+    setBundleAddProductcalculatedPrice(prev => ({
       ...prev,
       [bundleId]: {
         ...(prev[bundleId] || {}),
         [upsellId]: price
       }
     }));
+
     if (defaultPrice !== undefined) {
-      setBundleAddupselldefaultBasePrice(prev => ({
+      setBundleAddProductDefaultBasePrice(prev => ({
+        ...prev,
+        [bundleId]: {
+          ...(prev[bundleId] || {}),
+          [upsellId]: defaultPrice
+        }
+      }));
+    }
+  };
+  const handleBundleAddProductItemPriceChange = (
+    bundleId: number,
+    upsellId: number,
+    price: string,
+    defaultPrice?: string
+  ) => {
+    setBundleAddUpsellcalculatedPrice(prev => ({
+      const updated = {
+        ...prev,
+        [bundleId]: {
+          ...(prev[bundleId] || {}),
+          [upsellId]: price
+        }
+      }
+    }));
+    if (defaultPrice !== undefined) {
+      setBundleAddPorductItemdefaultBasePrice(prev => ({
         ...prev,
         [bundleId]: {
           ...(prev[bundleId] || {}),
@@ -550,6 +617,7 @@ export default function BundleSettingsAdvanced() {
   const [barBadgeTextColor, setBarBadgeTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 1 }));
   const [barUpsellBackColor, setBarUpsellBackColor] = useState(hsbToHex({ hue: 0, saturation: 0.2, brightness: 1 }));
   const [barUpsellTextColor, setBarUpsellTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
+  const [barBorderColor, setBarBorderColor] = useState(hsbToHex({ hue: 0, saturation: 0.2, brightness: 0 }));
   const [barBlocktitle, setBarBlocktitle] = useState('12');
   const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState('styleRegular');
   const [bartitleSize, setBartitleSize] = useState('19');
@@ -558,6 +626,17 @@ export default function BundleSettingsAdvanced() {
   const [subTitleStyle, setSubTitleStyle] = useState('styleRegular');
   const [labelSize, setLabelSize] = useState('13');
   const [labelStyle, setLabelStyle] = useState('styleRegular');  //
+
+  const [selectedPrice, setSelectedPrice] = useState({});
+  const handlePriceVariantChange = (bundleId, productId, price) => {
+    setSelectedPrice(prev => ({
+      ...prev,
+      [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [productId]: price,
+      }
+    }));
+  };
 
   const productOptions = [
     { label: "Gift Card", value: "Gift Card" },
@@ -584,6 +663,7 @@ export default function BundleSettingsAdvanced() {
     upBarBadgeTextColorChange: setBarBadgeTextColor,
     upBarUpsellBackColorChange: setBarUpsellBackColor,
     upBarUpsellTextColorChange: setBarUpsellTextColor,
+    upBorderColorChange: setBarBorderColor,
     //text
     upBlockTitleChange: setBarBlocktitle,
     upBlockTitleFontStyleChange: setBarBlocktitleFontStyle,
@@ -617,7 +697,11 @@ export default function BundleSettingsAdvanced() {
             <Layout.Section>
               <BlockStack gap="200">
                 <GeneralSettingsPanel loaderData={loaderData} />
-                <GeneralStylePanel styleHandlers={styleHandlers} />
+                <GeneralStylePanel
+                  styleHandlers={styleHandlers}
+                  layoutStyleOptions={layoutStyleOptions}
+                  layoutSelectedStyle={layoutSelectedStyle}
+                  onChangeLayoutStyle={setLayoutSelectedStyle} />
                 <GeneralVolumePanel loaderData={loaderData} />
                 <CountDownPanel conf={loaderData.countdownTimerConf} onChange={handleCountdownTimerChange} />
                 <GeneralCheckboxUpsell loaderData={loaderData} />
@@ -640,7 +724,6 @@ export default function BundleSettingsAdvanced() {
                     onAddUpsell={handelonAddUpsellChange}
                     onDeleteUpsell={handleonDeleteUpsellChange} />
                 ))}
-
                 {buyXGetYs.map((buyitem) => (
                   <GeneralBuyXgetYfree
                     id={buyitem.id}
@@ -674,10 +757,16 @@ export default function BundleSettingsAdvanced() {
                     upBundlesBarUpsellTextChange={handlexyBundleBaraddUpsellTextChanges}
                     upBadgeSelectedChange={handleBundleUpsellSelectedChange}
                     upAddUpsellPriceChange={handleBundleAddUpsellPriceChange}
+                    upAddProductItemPriceChange={handleBundleAddProductItemPriceChange}
                     onAddUpsell={handelonAddUpsellChange}
                     onAddProduct={hanldeonAddProductChange}
                     onDeleteUpsell={handleonDeleteUpsellChange}
                     loaderData={loaderData}
+                    upSeletedProduct={handleSeletedProductChange}
+                    onDeleteProducts={handleonDeleteProductChange}
+                    styleOptions={styleOptions}
+                    selectedStyle={selectedStyle}
+                    onChangeStyle={setSelectedStyle}
                   />
                 ))}
                 {showOriginal ? (
@@ -756,7 +845,7 @@ export default function BundleSettingsAdvanced() {
                           </p>
                         </Text>
                         {/* Bundle Options */}
-                        <BlockStack gap="200">
+                        <div style={{ display: 'flex', gap: '20px', flexDirection: layoutSelectedStyle === 'layout1' ? 'column' : 'row' }}>
                           {quantityBreaks.map((item) => (
                             <div key={item.id} className="main-quantity-break">
                               <Box position="relative">
@@ -779,8 +868,8 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
-                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: barBorderColor, paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
+                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between', flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
                                       style={{
@@ -913,8 +1002,8 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
-                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: barBorderColor, paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
+                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between', flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
                                       style={{
@@ -1046,8 +1135,8 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: 'rgb(235, 149, 149)', paddingTop: badgeSelected[bundleItem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[bundleItem.id] === "simple" && bagdeText[bundleItem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor }}>
-                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: barBorderColor, paddingTop: badgeSelected[bundleItem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[bundleItem.id] === "simple" && bagdeText[bundleItem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
+                                <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between', flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
                                       style={{
@@ -1116,23 +1205,51 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 </div>
                                 {/* {layout} */}
-                                <div className="main_bundles-products--container" style={{ flexDirection: 'row' }}>
+                                <div className="main_bundles-products--container" style={{ flexDirection: selectedStyle === 'layout1' ? 'row' : 'column', borderColor: barBorderColor, borderRadius: cornerRadius }}>
                                   {productsState[bundleItem.id]?.map((product) => (
-                                    <div key={product.id} className="bundles-products">
-                                      <div className="bundles-products__product">
-                                        <div className="bundles-products__product--image">image</div>
-                                        <div className="bundles-products__product--title">product title</div>
-                                        <div className="bundles-products__product--price">
-                                          <div className="bundles-produts_product--price-fullprice">30</div>
-                                          <div className="bundles-produts_product--price-compareprice">50</div>
-                                        </div>
-                                      </div>
-                                      <div className="bundles-products__divider">
-                                        <div className="products__divider-inline" style={{ backgroundColor: 'red' }}></div>
+                                    <div key={product.id} className="bundles-products" style={{ flexDirection: selectedStyle === 'layout1' ? 'row' : 'column' }}>
+                                      <div className="bundles-products__divider" style={{ flexDirection: selectedStyle === 'layout1' ? 'column' : 'row' }}>
+                                        <div className="products__divider-inline" style={{ backgroundColor: 'red', width: selectedStyle === 'layout1' ? '1px' : '100%', height: selectedStyle === 'layout1' ? '100%' : '1px', background: barBorderColor }}></div>
                                         <div className="products__divider-icon">
                                           <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="currentColor"></circle><path fill="#fff" d="M5 9h10v2H5z"></path><path fill="#fff" d="M11 5v10H9V5z"></path></svg>
                                         </div>
-                                        <div className="products__divider-inline" style={{ backgroundColor: 'red' }}></div>
+                                        <div className="products__divider-inline" style={{ backgroundColor: 'red', width: selectedStyle === 'layout1' ? '1px' : '100%', height: selectedStyle === 'layout1' ? '100%' : '1px', background: barBorderColor }}></div>
+                                      </div>
+                                      <div className="bundles-products__product" style={{ flexDirection: selectedStyle === 'layout1' ? 'column' : 'row', justifyContent: selectedStyle === 'layout1' ? 'center' : 'space-between', padding: selectedStyle === 'layout1' ? '10px 0' : '0 10px', }}>
+
+                                        <div className="bundles-products__product--image">
+                                          <img
+                                            src={showSelectedProduct[bundleItem.id]?.[product.id]?.[0]?.imageUrl || ''}
+                                            alt=''
+                                          />
+                                        </div>
+                                        <div className="bundles-products__product--title">{showSelectedProduct[bundleItem.id]?.[product.id]?.[0]?.title || ''}</div>
+                                        <div className="bundles-products__product--price">
+                                          {selectedPrice?.[bundleItem.id]?.[product.id] ? (
+                                            <span className="selected-price-tag">
+                                              ${selectedPrice[bundleItem.id][product.id]}
+                                            </span>
+                                          ) : (
+                                            <div className="selected-price-tags">
+                                              <span className="selected-price-tag">
+                                                ${bundleAddProductcalculatedPrice?.[bundleItem.id]?.[product.id] || ''}
+                                              </span>
+                                              <span className="selected-price-tag">
+                                                ${showSelectedProduct?.[bundleItem.id]?.[product.id]?.[1]?.price}
+                                              </span>
+                                            </div>
+                                          )}
+                                          {(showSelectedProduct[bundleItem.id]?.[product.id] || [])?.length > 2 && (
+                                            <select className="variant-dropdown" onChange={(e) => handlePriceVariantChange(bundleItem.id, product.id, e.target.value)}>
+                                              {(showSelectedProduct[bundleItem.id]?.[product.id] || [])?.map((v, i) => (
+                                                <option key={i} value={v.price}>
+                                                  ${v.price}
+                                                </option>
+                                              ))}
+                                            </select>
+                                          )}
+                                          <div className="bundles-produts_product--price-compareprice">{showSelectedProduct[bundleItem.id]?.[product.id]?.[1]?.compareprice || ''}</div>
+                                        </div>
                                       </div>
                                     </div>
                                   ))}
@@ -1178,7 +1295,7 @@ export default function BundleSettingsAdvanced() {
                               </div>
                             </div>
                           ))}
-                        </BlockStack>
+                        </div>
                       </BlockStack>
                     </Box>
                     <Divider />
@@ -1339,16 +1456,18 @@ export default function BundleSettingsAdvanced() {
             </Layout.Section>
           </InlineGrid>
         </Box>
-        {toastActive && (
-          <Frame>
-            <Toast
-              content={toastContent}
-              onDismiss={handleToastDismiss}
-              error={toastError} // Optional: style as error
-            />
-          </Frame>
-        )}
-      </Layout>
-    </Page>
+        {
+          toastActive && (
+            <Frame>
+              <Toast
+                content={toastContent}
+                onDismiss={handleToastDismiss}
+                error={toastError} // Optional: style as error
+              />
+            </Frame>
+          )
+        }
+      </Layout >
+    </Page >
   );
 }

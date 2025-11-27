@@ -20,13 +20,6 @@ import { SelectableImageButton } from "../common/SelectableImageButton";
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 import { SelectFont } from "../common/SelectFont";
 
-
-
-import Vertical from "app/asset/vertical.svg";
-import Horizon from "app/asset/Horizon.svg";
-import GridIcon from "app/asset/GridIcon.svg";
-import Plain from "app/asset/Plain.svg";
-
 interface GeneralStylePanelProps {
   styleHandlers: {
     upCornerRadiusChange: (...args: any[]) => void;
@@ -43,6 +36,7 @@ interface GeneralStylePanelProps {
     upBarBadgeTextColorChange: (...args: any[]) => void;
     upBarUpsellBackColorChange: (...args: any[]) => void;
     upBarUpsellTextColorChange: (...args: any[]) => void;
+    upBorderColorChange: (...args: any[]) => void;
 
     upBlockTitleChange: (...args: any[]) => void;
     upBlockTitleFontStyleChange: (...args: any[]) => void;
@@ -52,10 +46,19 @@ interface GeneralStylePanelProps {
     upSubTitleStyleChange: (...args: any[]) => void;
     upLabelChange: (...args: any[]) => void;
     upLabelStyleChange: (...args: any[]) => void;
+
+    layoutSelectedStyle: any;
+    layoutStyleOptions: any;
+    onChangeLayoutStyle: any;
   };
 }
 
-export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
+export function GeneralStylePanel({
+  styleHandlers,
+  onChangeLayoutStyle,
+  layoutStyleOptions,
+  layoutSelectedStyle
+}: GeneralStylePanelProps) {
 
   const {
     upCornerRadiusChange,
@@ -72,7 +75,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
     upBarBadgeTextColorChange,
     upBarUpsellBackColorChange,
     upBarUpsellTextColorChange,
-
+    upBorderColorChange,
     upBlockTitleChange,
     upBlockTitleFontStyleChange,
     upTitleChange,
@@ -83,8 +86,8 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
     upLabelStyleChange,
   } = styleHandlers;
 
+
   const [openStyle, setOpenStyle] = useState(false);
-  const [selectedStyle, setSelectedStyle] = useState("layout1");
   const [cornerRadius, setCornerRadius] = useState<any>(32);
   const [spacing, setSpacing] = useState<number>(20);
   const [isShowCustomAlert, setIsShowCustomAlert] = useState(false);
@@ -93,14 +96,6 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
   const headleStyleTabchange = useCallback(
     (value: number) => setStyleTabSelected(value), []
   )
-
-
-  const styleOptions = [
-    { id: "layout1", src: Vertical },
-    { id: "layout2", src: Horizon },
-    { id: "layout3", src: GridIcon },
-    { id: "layout4", src: Plain },
-  ];
 
   const tabs = [
     {
@@ -263,16 +258,16 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
         <Collapsible open={openStyle} id="collapsible-settings" expandOnPrint>
           <BlockStack gap="400">
             <BlockStack gap="200">
-              <InlineStack gap="0" wrap={true} align="space-between">
-                {styleOptions.map((opt) => (
+              <InlineGrid columns={2}>
+                {layoutStyleOptions.map((opt) => (
                   <SelectableImageButton
                     key={opt.id}
                     src={opt.src}
-                    selected={selectedStyle === opt.id}
-                    onClick={() => setSelectedStyle(opt.id)}
+                    selected={layoutSelectedStyle === opt.id}
+                    onClick={() => onChangeLayoutStyle(opt.id)}
                   />
                 ))}
-              </InlineStack>
+              </InlineGrid>
 
               <InlineStack align="space-between" gap="0">
                 <Box width="48%">
@@ -364,7 +359,11 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                       }
                     }} />
                     <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={selectedBg} colorWidth="100%" onColorChange={undefined} />
-                    <ColorPickerPopoverItem subtitle="Border color" defaultColorSetting={borderColor} colorWidth="100%" onColorChange={undefined} />
+                    <ColorPickerPopoverItem subtitle="Border color" defaultColorSetting={borderColor} colorWidth="100%" onColorChange={(hex: string) => {
+                      if (upBorderColorChange) {
+                        upBorderColorChange(hex);
+                      }
+                    }} />
                     <ColorPickerPopoverItem subtitle="Block title" defaultColorSetting={blockTitle} colorWidth="100%" onColorChange={(hex: string) => {
                       if (upBlockTitleColorChange) {
                         upBlockTitleColorChange(hex);

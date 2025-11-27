@@ -28,7 +28,6 @@ export function UpsellItem({ number, deleteId, deleteSection, productArray }: { 
 
   const handleReceiveProduct = (value) => {
     setSelectedProduct(value); // get products array from product modal
-    console.log("checkbox", selectedProduct);
   };
 
   return (

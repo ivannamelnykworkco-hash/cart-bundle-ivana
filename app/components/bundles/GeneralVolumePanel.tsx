@@ -26,7 +26,6 @@ import { SelectCollectionModal } from "../common/SelectCollectionModal";
 
 
 export function GeneralVolumePanel({ loaderData }) {
-  // console.log("lett", loaderData.loaderData);
   const thirdLoaderData = {
     eligible: "productsExcept",
     volumeButtonText: 'Choose'
