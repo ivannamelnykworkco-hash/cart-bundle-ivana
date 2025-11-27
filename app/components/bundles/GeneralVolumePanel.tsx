@@ -23,10 +23,13 @@ import { ImageLoad } from "app/components/common/ImageLoad";
 import { SwitchIcon } from "../common/SwitchIcon";
 import { SelectProductModal } from "../common/SelectProductModal";
 import { SelectCollectionModal } from "../common/SelectCollectionModal";
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "../product/ProductList";
 
 
-export function GeneralVolumePanel({ loaderData }) {
-  // console.log("lett", loaderData.loaderData);
+export function GeneralVolumePanel() {
+  const loaderData = useLoaderData<typeof loader>();
+
   const thirdLoaderData = {
     eligible: "productsExcept",
     volumeButtonText: 'Choose'

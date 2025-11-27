@@ -3,9 +3,12 @@ import { useCallback, useState } from "react";
 import { ProductIcon } from '@shopify/polaris-icons'
 import { UpsellItem } from "../common/UpsellItem";
 import { SwitchIcon } from "../common/SwitchIcon";
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "../product/ProductList";
 
-export function GeneralCheckboxUpsell({ loaderData }) {
+export function GeneralCheckboxUpsell() {
 
+  const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData?.products?.map((product: any) => ({
     title: product.title,
     imageUrl: product.imageUrl,

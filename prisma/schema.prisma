@@ -86,6 +86,8 @@ model GeneralSetting {
   bundleName String
   discountName String
   blockTitle String
+  visibility String
+  markets    String
   excludedProducts  String
   excludedCollections String
   selectedProducts String
@@ -98,8 +100,8 @@ model GeneralSetting {
   letCustomer Boolean
   showVariant Boolean
   hideTheme   Boolean
-  colorSwatch   String
-  imageSwatch   String
+  colorSwatchArray   String
+  imageSwatchArray   String
   swatchSize    String
   swatchShape   String
   setDefaultVariant   String
@@ -134,4 +136,41 @@ model CountdownTimer {
   msgTextColor  String    
   createdAt String 
   updatedAt String
+}
+
+model GeneralStyle {
+  id    String @id @default(cuid())
+  bundleId            String
+  cornerRadius        Int
+  spacing             Int
+  cardsBgColor        String
+  selectedBgColor     String
+  borderColor         String
+  blockTitleColor     String
+  barTitleColor       String
+  barSubTitleColor    String
+  barPriceColor       String
+  barFullPriceColor   String
+  barLabelBackColor   String
+  barLabelTextColor   String
+  barBadgebackColor   String
+  barBadgeTextColor   String
+  barUpsellBackColor  String
+  barUpsellTextColor  String
+  barUpsellSelectedBackColor  String
+  barUpsellSelectedTextColor  String     
+  barBlocktitle       Int
+  barBlocktitleFontStyle    String
+  bartitleSize        Int
+  bartitleFontStyle   String
+  subTitleSize        Int
+  subTitleStyle       String
+  labelSize           Int
+  labelStyle          String
+  upsellSize          Int
+  upsellStyle         String
+  unitLabelSize       Int
+  unitLabelStyle      String
+  createdAt           String
+  updatedAt           String
 }
