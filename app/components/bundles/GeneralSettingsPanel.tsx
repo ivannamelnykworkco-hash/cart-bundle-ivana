@@ -30,8 +30,10 @@ import { ColorPickerPopover } from "../common/ColorPickerPopover";
 import { SwitchIcon } from "../common/SwitchIcon"
 import { SelectCollectionModal } from "../common/SelectCollectionModal";
 import { SelectProductModal } from "../common/SelectProductModal";
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "../product/ProductList";
 
-export function GeneralSettingsPanel({ loaderData }) {
+export function GeneralSettingsPanel() {
 
   //CONST VARIABLES
 
@@ -66,6 +68,7 @@ export function GeneralSettingsPanel({ loaderData }) {
   }
 
   // const loaderData = useContext(LoaderDataContext);
+  const loaderData = useLoaderData<typeof loader>();
 
   const productArray = loaderData?.products?.map((product: any) => ({
     title: product.title,

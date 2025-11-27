@@ -27,6 +27,7 @@ export function SelectVariantModal({ variantArray, onSelect, title, selectionMod
   // Select a Variant row
   const handleSelectVariant = (variant) => {
     setSelectedVariant(variant);
+    console.log("variant", selectedVariant);
   };
   // Save selected variant & close modal
   const handleSave = () => {
@@ -62,7 +63,7 @@ export function SelectVariantModal({ variantArray, onSelect, title, selectionMod
       footer={
         <InlineStack align="space-between" blockAlign="center">
           <Text variant="bodySm" tone="subdued">
-            {/* {selectedVariant?.length ? selectedVariant?.length : 0}/1 variants selected */}
+            {selectedVariant?.length ? selectedVariant?.length : 0}/1 variants selected
           </Text>
         </InlineStack>
       }

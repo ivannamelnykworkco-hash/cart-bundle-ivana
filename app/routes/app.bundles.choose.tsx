@@ -31,13 +31,12 @@ import { GeneralStickyAddToCart } from "app/components/bundles/GeneralStickyAddT
 import { GeneralQuentityBreack } from "app/components/bundles/GeneralQuentityBreack";
 import { CountDownPanel } from "app/components/bundles/CountDownPanel";
 import { MostPopularfancy } from "app/components/common/MostPopularfancy";
-import { createCountdownTimer, getCountdownTimer, updateCountdownTimer } from "app/models/countdownTimer.server";
-import { CountdownTimer } from "app/models/types";
+import { getCountdownTimer, updateCountdownTimer } from "app/models/countdownTimer.server";
 import { GeneralBuyXgetYfree } from "app/components/bundles/GeneralBuyXgetYfree";
 import { GeneralBundleUpsell } from "app/components/bundles/GeneralBundleUpsell";
 import { builtinModules } from "module";
-// import { getCountdownTimer } from "app/models/countdownTimer.server";
-// import { CountdownTimer } from "app/models/types";
+import { getGeneralStyle, updateGeneralStyle } from "app/models/generalStyle.server";
+
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
@@ -101,9 +100,24 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     title: node.title,
     imageUrl: node.image?.url ?? "",
   }));
-
-  //  const createPrisma = await createCountdownTimer();
-  const countdownTimerConf = await getCountdownTimer();
+  let countdownTimerConf = null;
+  let generalStyleConf = null;
+  try {
+    countdownTimerConf = await getCountdownTimer();
+  } catch (err) {
+    return json(
+      { success: false, error: err.message || err },
+      { status: 500 }
+    );
+  }
+  try {
+    generalStyleConf = await getGeneralStyle();
+  } catch (err) {
+    return json(
+      { success: false, error: err.message || err },
+      { status: 500 }
+    );
+  }
 
   return json({
     bundleName: "Bundle",
@@ -152,7 +166,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     ],
     products,
     collections,
-    countdownTimerConf
+    countdownTimerConf,
+    generalStyleConf
   });
 };
 
@@ -166,7 +181,9 @@ export async function action({ request, params }) {
   };
   let data = { ...parsedData };
   try {
-    const result = await updateCountdownTimer(data.id, data);
+    //    const result = await updateCountdownTimer(data.id, data);
+    const result = await updateGeneralStyle(data.id, data);
+
     return json({ success: true, result });
   } catch (err) {
     return json(
@@ -275,19 +292,52 @@ export default function BundleSettingsAdvanced() {
 
   function saveData() {
     const data = new FormData();
-    Object.entries(countdownTimerData).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        data.append(key, JSON.stringify(value));
-      }
-      else {
-        data.append(key, value as string);
-      }
-    });
-
+    // Object.entries(countdownTimerData).forEach(([key, value]) => {
+    //   if (typeof value === 'object' && value !== null) {
+    //     data.append(key, JSON.stringify(value));
+    //   }
+    //   else {
+    //     data.append(key, value as string);
+    //   }
+    // });
+    //    data.append("id", GeneralStyleConf.id);
+    data.append("id", GeneralStyleConf.id);
+    data.append("bundleId", GeneralStyleConf.bundleId);
+    data.append("cornerRadius", cornerRadius);
+    data.append("spacing", spacing);
+    data.append("cardsBgColor", cardsBgColor);
+    data.append("selectedBgColor", selectedBgColor);
+    data.append("borderColor", borderColor);
+    data.append("blockTitleColor", blockTitleColor);
+    data.append("barTitleColor", barTitleColor);
+    data.append("barSubTitleColor", barSubTitleColor);
+    data.append("barPriceColor", barPriceColor);
+    data.append("barFullPriceColor", barFullPriceColor);
+    data.append("barLabelBackColor", barLabelBack);
+    data.append("barLabelTextColor", barLabelTextColor);
+    data.append("barBadgebackColor", barBadgebackColor);
+    data.append("barBadgeTextColor", barBadgeTextColor);
+    data.append("barUpsellBackColor", barUpsellBackColor);
+    data.append("barUpsellTextColor", barUpsellTextColor);
+    data.append("barUpselSelectedBackColor", barUpsellSelectedBackColor);
+    data.append("barUpsellSelectedTextColor", barUpsellSelectedTextColor);
+    data.append("barBlocktitle", barBlocktitle);
+    data.append("barBlocktitleFontStyle", barBlocktitleFontStyle);
+    data.append("bartitleSize", bartitleSize);
+    data.append("bartitleFontStyle", bartitleFontStyle);
+    data.append("subTitleSize", subTitleSize);
+    data.append("subTitleStyle", subTitleStyle);
+    data.append("labelSize", labelSize);
+    data.append("labelStyle", labelStyle);
+    data.append("upsellSize", upsellSize);
+    data.append("upsellStyle", upsellStyle);
+    data.append("unitLabelSize", unitLabelSize);
+    data.append("unitLabelStyle", unitLabelStyle);
+    data.append("createdAt", GeneralStyleConf.createdAt);
     submit(data, { method: "post" });
   }
-  /***************Database Migration Part************/
 
+  /***************Database Migration Part************/
   //id: ==> upsellTexts state.,
   const [barUpsellTexts, setBarUpsellTexts] = useState({});
 
@@ -342,6 +392,7 @@ export default function BundleSettingsAdvanced() {
     setBundleUpsells(prev => prev.filter(item => item.id !== id))
   }
   // quantity break
+
   const [upsellsState, setUpsellsState] = useState<{ [bundleId: string]: any[] }>({});
   const [productsState, setProductsState] = useState<{ [bundleId: string]: any[] }>({});
   const [selectedProduct, setSelectedProduct] = useState(loaderData.selectedProduct);
@@ -536,28 +587,40 @@ export default function BundleSettingsAdvanced() {
     }
   };
   // color style and text style
-  const [cornerRadius, setCornerRadius] = useState(8);
-  const [spacing, setSpacing] = useState(20);
-  const [cardsBgColor, setCardsBgColor] = useState(hsbToHex({ hue: 0, saturation: 0.07, brightness: 1 }));
-  const [blockTitleColor, setBlockTitleColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-  const [barTitleColor, setBarTitleColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-  const [barSubTitleColor, setBarSubTitleColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0.33 }));
-  const [barPriceColor, setBarPriceColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-  const [barFullPriceColor, setBarFullPriceColor] = useState(hsbToHex({ hue: 0, saturation: 0.04, brightness: 0.53 }));
-  const [barLabelBack, setBarLabelBack] = useState(hsbToHex({ hue: 36, saturation: 0.15, brightness: 1 }));
-  const [barLabelTextColor, setBarLabelTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-  const [barBadgebackColor, setBarBadgebackColor] = useState(hsbToHex({ hue: 36, saturation: 1, brightness: 1 }));
-  const [barBadgeTextColor, setBarBadgeTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 1 }));
-  const [barUpsellBackColor, setBarUpsellBackColor] = useState(hsbToHex({ hue: 0, saturation: 0.2, brightness: 1 }));
-  const [barUpsellTextColor, setBarUpsellTextColor] = useState(hsbToHex({ hue: 0, saturation: 0, brightness: 0 }));
-  const [barBlocktitle, setBarBlocktitle] = useState('12');
-  const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState('styleRegular');
-  const [bartitleSize, setBartitleSize] = useState('19');
-  const [bartitleFontStyle, setBartitleFontStyle] = useState('stylebold');  //subtitle size
-  const [subTitleSize, setSubTitleSize] = useState('13');
-  const [subTitleStyle, setSubTitleStyle] = useState('styleRegular');
-  const [labelSize, setLabelSize] = useState('13');
-  const [labelStyle, setLabelStyle] = useState('styleRegular');  //
+  const GeneralStyleConf = loaderData.generalStyleConf;
+  console.log("cloaderdata", GeneralStyleConf);
+  const [cornerRadius, setCornerRadius] = useState(GeneralStyleConf.cornerRadius ?? null);
+  const [spacing, setSpacing] = useState(GeneralStyleConf.spacing ?? null);
+  const [cardsBgColor, setCardsBgColor] = useState(hsbToHex(GeneralStyleConf.cardsBgColor) ?? null);
+  const [selectedBgColor, setSelectedBgColor] = useState(hsbToHex(GeneralStyleConf.selectedBgColor) ?? null);
+  const [borderColor, setBorderColor] = useState(hsbToHex(GeneralStyleConf.borderColor) ?? null);
+  const [blockTitleColor, setBlockTitleColor] = useState(hsbToHex(GeneralStyleConf.blockTitleColor) ?? null);
+  const [barTitleColor, setBarTitleColor] = useState(hsbToHex(GeneralStyleConf.barTitleColor) ?? null);
+  const [barSubTitleColor, setBarSubTitleColor] = useState(hsbToHex(GeneralStyleConf.barSubTitleColor) ?? null);
+  const [barPriceColor, setBarPriceColor] = useState(hsbToHex(GeneralStyleConf.barPriceColor) ?? null);
+  const [barFullPriceColor, setBarFullPriceColor] = useState(hsbToHex(GeneralStyleConf.barFullPriceColor) ?? null);
+  const [barLabelBack, setBarLabelBack] = useState(hsbToHex(GeneralStyleConf.barFullPriceColor) ?? null);
+  const [barLabelTextColor, setBarLabelTextColor] = useState(hsbToHex(GeneralStyleConf.barLabelTextColor) ?? null);
+  const [barBadgebackColor, setBarBadgebackColor] = useState(hsbToHex(GeneralStyleConf.barBadgebackColor) ?? null);
+  const [barBadgeTextColor, setBarBadgeTextColor] = useState(hsbToHex(GeneralStyleConf.barBadgeTextColor) ?? null);
+  const [barUpsellBackColor, setBarUpsellBackColor] = useState(hsbToHex(GeneralStyleConf.barUpsellBackColor) ?? null);
+  const [barUpsellTextColor, setBarUpsellTextColor] = useState(hsbToHex(GeneralStyleConf.barUpsellTextColor) ?? null);
+  const [barUpsellSelectedBackColor, setBarUpsellSelectedBackColor] = useState(hsbToHex(GeneralStyleConf.barUpsellSelectedBackColor) ?? null);
+  const [barUpsellSelectedTextColor, setBarUpsellSelectedTextColor] = useState(hsbToHex(GeneralStyleConf.barUpsellSelectedTextColor) ?? null);
+  const [barBlocktitle, setBarBlocktitle] = useState(GeneralStyleConf.barBlocktitle ?? null);
+  const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState(GeneralStyleConf.barBlocktitleFontStyle ?? null);
+  const [bartitleSize, setBartitleSize] = useState(GeneralStyleConf.bartitleSize ?? null);
+  const [bartitleFontStyle, setBartitleFontStyle] = useState(GeneralStyleConf.bartitleFontStyle ?? null);  //subtitle size
+  const [subTitleSize, setSubTitleSize] = useState(GeneralStyleConf.subTitleSize ?? null);
+  const [subTitleStyle, setSubTitleStyle] = useState(GeneralStyleConf.subTitleStyle ?? null);
+  const [labelSize, setLabelSize] = useState(GeneralStyleConf.labelSize ?? null);
+  const [labelStyle, setLabelStyle] = useState(GeneralStyleConf.labelStyle ?? null);  //
+  const [upsellSize, setUpsellSizeChange] = useState(GeneralStyleConf.upsellSize ?? null);  //
+  const [upsellStyle, setUpsellStyleChange] = useState(GeneralStyleConf.upsellStyle ?? null);  //
+  const [unitLabelSize, setUnitLabelSizeChange] = useState(GeneralStyleConf.unitLabelSize ?? null);  //
+  const [unitLabelStyle, setUnitLabelStyleChange] = useState(GeneralStyleConf.unitLabelStyle ?? null);  //
+
+
 
   const productOptions = [
     { label: "Gift Card", value: "Gift Card" },
@@ -573,6 +636,8 @@ export default function BundleSettingsAdvanced() {
     upCornerRadiusChange: setCornerRadius,
     upSpacingChange: setSpacing,
     upCardsBgColorChange: setCardsBgColor,
+    upSelectedBgColorChange: setSelectedBgColor,
+    upBorderColorChange: setBorderColor,
     upBlockTitleColorChange: setBlockTitleColor,
     upBarTitleColorChange: setBarTitleColor,
     upBarSubTitleColorChange: setBarSubTitleColor,
@@ -584,6 +649,8 @@ export default function BundleSettingsAdvanced() {
     upBarBadgeTextColorChange: setBarBadgeTextColor,
     upBarUpsellBackColorChange: setBarUpsellBackColor,
     upBarUpsellTextColorChange: setBarUpsellTextColor,
+    upSelectedBackColorChange: setBarUpsellSelectedBackColor,
+    upSelectedTextColorChange: setBarUpsellSelectedTextColor,
     //text
     upBlockTitleChange: setBarBlocktitle,
     upBlockTitleFontStyleChange: setBarBlocktitleFontStyle,
@@ -593,6 +660,10 @@ export default function BundleSettingsAdvanced() {
     upSubTitleStyleChange: setSubTitleStyle,
     upLabelChange: setLabelSize,
     upLabelStyleChange: setLabelStyle,
+    upUpsellSizeChange: setUpsellSizeChange,
+    upUpsellStyleChange: setUpsellStyleChange,
+    upUnitLabelSizeChange: setUnitLabelSizeChange,
+    upUnitLabelStyleChange: setUnitLabelStyleChange
   };
 
   return (
@@ -616,11 +687,11 @@ export default function BundleSettingsAdvanced() {
           <InlineGrid columns={2} gap="400">
             <Layout.Section>
               <BlockStack gap="200">
-                <GeneralSettingsPanel loaderData={loaderData} />
+                <GeneralSettingsPanel />
                 <GeneralStylePanel styleHandlers={styleHandlers} />
-                <GeneralVolumePanel loaderData={loaderData} />
-                <CountDownPanel conf={loaderData.countdownTimerConf} onChange={handleCountdownTimerChange} />
-                <GeneralCheckboxUpsell loaderData={loaderData} />
+                <GeneralVolumePanel />
+                <CountDownPanel onChange={handleCountdownTimerChange} />
+                <GeneralCheckboxUpsell />
                 <GeneralStickyAddToCart />
                 {quantityBreaks.map((item) => (
                   <GeneralQuentityBreack

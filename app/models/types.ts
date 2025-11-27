@@ -64,9 +64,9 @@ export interface BundleTypeOption {
 }
 
 export interface GeneralSetting {
-  id: String;
-  bundleName: String;
-  discountName: String;
+  id: string;
+  bundleName: string;
+  discountName: string;
 
 }
 
@@ -83,6 +83,43 @@ export interface CountdownTimer {
   msgBgColor: string
   msgTextColor: string
   msgSize: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface GeneralStyle {
+  id: string
+  bundleId: string
+  cornerRadius: number
+  spacing: number
+  cardsBgColor: string
+  selectedBgColor: string
+  borderColor: string
+  blockTitleColor: string
+  barTitleColor: string
+  barSubTitleColor: string
+  barPriceColor: string
+  barFullPriceColor: string
+  barLabelBackColor: string
+  barLabelTextColor: string
+  barBadgebackColor: string
+  barBadgeTextColor: string
+  barUpsellBackColor: string
+  barUpsellTextColor: string
+  barUpsellSelectedBackColor: string
+  barUpsellSelectedTextColor: string
+  barBlocktitle: number
+  barBlocktitleFontStyle: string
+  bartitleSize: number
+  bartitleFontStyle: string
+  subTitleSize: number
+  subTitleStyle: string
+  labelSize: number
+  labelStyle: string
+  upsellSize: number
+  upsellStyle: string
+  unitLabelSize: number
+  unitLabelStyle: string
   createdAt: string
   updatedAt: string
 }

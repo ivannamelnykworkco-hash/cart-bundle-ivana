@@ -393,11 +393,10 @@ export function GeneralBundleUpsell({
               <BlockStack key={item.id}>
                 {selectedProduct && (
                   <SelectVariantModal
-                    productArray={selectedProduct}
+                    variantArray={selectedProduct}
                     onSelect={handleReceiveProduct}
                     title="Select products"
                     selectionMode="singleVariant"
-
                   />
                 )}
                 <SelectProductModal

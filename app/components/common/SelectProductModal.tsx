@@ -68,7 +68,7 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
         <InlineStack InlineStack align="space-between" blockAlign="center" >
           <Text variant="bodySm" tone="subdued">
             {/* {selectedProduct?.length ? selectedProduct?.length : 0}/{productArray?.length} products selected */}
-            {selectedProduct?.filter(obj => obj.variants).length}/{productArray?.length} products selected
+            {selectedProduct?.filter(obj => obj.variants).length ?? 0}/{productArray?.length} products selected
           </Text>
         </InlineStack >
       }
