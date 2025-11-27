@@ -65,20 +65,12 @@ interface GeneralStylePanelProps {
   };
 }
 
-export function GeneralStylePanel({
-  styleHandlers,
+
+
+export function GeneralStylePanel({ styleHandlers,
   onChangeLayoutStyle,
   layoutStyleOptions,
-  layoutSelectedStyle
-}: GeneralStylePanelProps) {
-  upUpsellSizeChange: (...args: any[]) => void;
-  upUpsellStyleChange: (...args: any[]) => void;
-  upUnitLabelSizeChange: (...args: any[]) => void;
-  upUnitLabelStyleChange: (...args: any[]) => void;
-};
-}
-
-export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
+  layoutSelectedStyle }: GeneralStylePanelProps) {
   const loaderData = useLoaderData<typeof loader>();
   const conf = loaderData.generalStyleConf;
 

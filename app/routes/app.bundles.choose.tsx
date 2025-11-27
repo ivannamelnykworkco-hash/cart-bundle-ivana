@@ -53,6 +53,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         featuredImage {
           url
         }
+        metafields(first: 5) {
+        edges {
+          node {
+            id
+            namespace
+            key
+            value
+            type
+          }
+        }
+      }
         variants(first: 10) {
           edges {
             node {
@@ -93,7 +104,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     imageUrl: node.featuredImage?.url ?? "",
     price: node.variants?.edges?.[0]?.node?.price ?? null,
     compareAtPrice: node.variants?.edges?.[0]?.node?.compareAtPrice ?? null,
-    variants: node.variants?.edges ?? null
+    variants: node.variants?.edges ?? null,
+    metafields: node.metafields?.edges ?? null
   }));
   //Collection data from backend
   const collectionEdges = body?.data?.collections.edges ?? [];
@@ -224,6 +236,7 @@ const fontStyleMap = {
 export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
   /*recevie response from action function*/
+  console.log("metafields", loaderData.products);
   const actionData = useActionData();
   useEffect(() => {
     if (actionData) {
@@ -635,12 +648,10 @@ export default function BundleSettingsAdvanced() {
     defaultPrice?: string
   ) => {
     setBundleAddUpsellcalculatedPrice(prev => ({
-      const updated = {
-        ...prev,
-        [bundleId]: {
-          ...(prev[bundleId] || {}),
-          [upsellId]: price
-        }
+      ...prev,
+      [bundleId]: {
+        ...(prev[bundleId] || {}),
+        [upsellId]: price
       }
     }));
     if (defaultPrice !== undefined) {
@@ -937,7 +948,7 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: barBorderColor, paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: borderColor, paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between', flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -1071,7 +1082,7 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: barBorderColor, paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: borderColor, paddingTop: badgeSelected ? `${spacing * 0.5 + 10}px` : badgeSelected === "simple" && bagdeText ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between', flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -1204,7 +1215,7 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 )}
                               </Box>
-                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: barBorderColor, paddingTop: badgeSelected[bundleItem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[bundleItem.id] === "simple" && bagdeText[bundleItem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
+                              <div className="barMainContainer" style={{ borderRadius: `${cornerRadius}px`, border: '2px solid ', borderColor: borderColor, paddingTop: badgeSelected[bundleItem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[bundleItem.id] === "simple" && bagdeText[bundleItem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`, backgroundColor: cardsBgColor, height: layoutSelectedStyle == 'layout2' ? '100%' : '' }}>
                                 <div style={{ padding: `${spacing * 0.5}px ${spacing}px`, backgroundColor: cardsBgColor, display: "flex", alignItems: 'center', justifyContent: 'space-between', flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row' }}>
                                   <InlineStack gap="200" blockAlign="center">
                                     <div
@@ -1274,15 +1285,15 @@ export default function BundleSettingsAdvanced() {
                                   </div>
                                 </div>
                                 {/* {layout} */}
-                                <div className="main_bundles-products--container" style={{ flexDirection: selectedStyle === 'layout1' ? 'row' : 'column', borderColor: barBorderColor, borderRadius: cornerRadius }}>
+                                <div className="main_bundles-products--container" style={{ flexDirection: selectedStyle === 'layout1' ? 'row' : 'column', borderColor: borderColor, borderRadius: cornerRadius }}>
                                   {productsState[bundleItem.id]?.map((product) => (
                                     <div key={product.id} className="bundles-products" style={{ flexDirection: selectedStyle === 'layout1' ? 'row' : 'column' }}>
                                       <div className="bundles-products__divider" style={{ flexDirection: selectedStyle === 'layout1' ? 'column' : 'row' }}>
-                                        <div className="products__divider-inline" style={{ backgroundColor: 'red', width: selectedStyle === 'layout1' ? '1px' : '100%', height: selectedStyle === 'layout1' ? '100%' : '1px', background: barBorderColor }}></div>
+                                        <div className="products__divider-inline" style={{ backgroundColor: 'red', width: selectedStyle === 'layout1' ? '1px' : '100%', height: selectedStyle === 'layout1' ? '100%' : '1px', background: borderColor }}></div>
                                         <div className="products__divider-icon">
                                           <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="10" fill="currentColor"></circle><path fill="#fff" d="M5 9h10v2H5z"></path><path fill="#fff" d="M11 5v10H9V5z"></path></svg>
                                         </div>
-                                        <div className="products__divider-inline" style={{ backgroundColor: 'red', width: selectedStyle === 'layout1' ? '1px' : '100%', height: selectedStyle === 'layout1' ? '100%' : '1px', background: barBorderColor }}></div>
+                                        <div className="products__divider-inline" style={{ backgroundColor: 'red', width: selectedStyle === 'layout1' ? '1px' : '100%', height: selectedStyle === 'layout1' ? '100%' : '1px', background: borderColor }}></div>
                                       </div>
                                       <div className="bundles-products__product" style={{ flexDirection: selectedStyle === 'layout1' ? 'column' : 'row', justifyContent: selectedStyle === 'layout1' ? 'center' : 'space-between', padding: selectedStyle === 'layout1' ? '10px 0' : '0 10px', }}>
 

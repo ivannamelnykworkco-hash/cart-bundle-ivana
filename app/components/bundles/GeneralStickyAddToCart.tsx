@@ -17,8 +17,12 @@ import { SelectFont } from '../common/SelectFont';
 import { RadioWithInput } from '../common/RadioWithInput';
 import { PopUpover } from '../common/PopUpover';
 import { SwitchIcon } from '../common/SwitchIcon';
+import { useLoaderData } from '@remix-run/react';
+import { loader } from '../product/ProductList';
 
 export function GeneralStickyAddToCart() {
+  const loaderData = useLoaderData<typeof loader>();
+  const productArray = loaderData.products;
   const [open, setOpen] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
 
@@ -36,29 +40,29 @@ export function GeneralStickyAddToCart() {
 
   const handleSettingsToggle = useCallback(() => setOpen((prev) => !prev), []);
 
-const stickyBack = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const stickyBack = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
-const stickyText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const stickyText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-const stickyButton = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
+  const stickyButton = {
+    hue: 0,
+    saturation: 0,
+    brightness: 0,
+    alpha: 1,
   };
-const stickyButtonText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
+  const stickyButtonText = {
+    hue: 0,
+    saturation: 0,
+    brightness: 1,
+    alpha: 1,
   };
 
   return (
@@ -83,7 +87,7 @@ const stickyButtonText = {
               {tabs[selected].content === 'Content' && (
                 <InlineGrid columns={2} gap="200">
                   <BlockStack>
-                    <PopUpover title='Title' defaultPopText="{{product}}" />
+                    <PopUpover title='Title' defaultPopText="{{product}}" dataArray={productArray} />
                   </BlockStack>
                   <BlockStack gap="200">
                     <Text as="p">Button</Text>
