@@ -70,10 +70,15 @@ interface GeneralStylePanelProps {
 }
 
 
+<<<<<<< HEAD
 export function GeneralStylePanel({
   styleHandlers,
   open,
   onToggle,
+=======
+
+export function GeneralStylePanel({ styleHandlers,
+>>>>>>> d7b38af59f3fd1b8b381997ce6acf791730fc92e
   onChangeLayoutStyle,
   layoutStyleOptions,
   layoutSelectedStyle }: GeneralStylePanelProps) {

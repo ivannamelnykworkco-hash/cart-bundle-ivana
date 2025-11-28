@@ -6,14 +6,16 @@ export function PopUpover({
   title,
   upPopTextChange, // ensure onTitleChange is passed as a prop
   defaultPopText,
-  badgeSelected
+  badgeSelected,
+  dataArray
 }: {
   title: string;
   upPopTextChange?: (value: string) => void; // onTitleChange should update the parent state
   defaultPopText: string;
   badgeSelected?: string;
+  dataArray: any
 }) {
-
+  // get productArray as dataArray
   const [active, setActive] = useState<string | null>(null);
   const [textValue, setTextValue] = useState(defaultPopText);
 
@@ -23,7 +25,59 @@ export function PopUpover({
 
   // Function to append variables to textValue
   const appendToTextValue = useCallback((variable: string) => {
-    const updatedText = textValue + variable;
+    const productTitle = dataArray[0].title;
+    console.log("data", dataArray[0].variants[0]);
+    const variantsProperty = dataArray[0].variants.map((variant) => ({
+      savedPercentage: (parseFloat(variant.node.compareAtPrice ?? variant.node.price) - parseFloat(variant.node.price)) * 100 / parseFloat(variant.node.compareAtPrice ?? variant.node.price),
+      savedTotal: parseFloat(variant.node.compareAtPrice ?? variant.node.price) - parseFloat(variant.node.price),
+      productTitle: productTitle,
+      compareAtPrice: variant.node.compareAtPrice ?? variant.node.price,
+      newPricePerItem: variant.node.price,
+      orginalPricePerItem: variant.node.compareAtPrice,
+      quantity: variant.node.inventoryQuantity,
+      productMetafield1: dataArray[0].metafields ? dataArray[0].metafields[0].node.value : "metafield undefined",
+      productMetafield2: dataArray[0].metafields ? dataArray[0].metafields[1].node.value : "metafield undefined",
+      productMetafield3: dataArray[0].metafields ? dataArray[0].metafields[2].node.value : "metafield undefined",
+      productMetafield4: dataArray[0].metafields ? dataArray[0].metafields[3].node.value : "metafield undefined"
+    }));
+    console.log("data", variantsProperty[0]);
+    var addString = "";
+    switch (variable) {
+      case "saved_percentage":
+        addString = variantsProperty[0].savedPercentage;
+        break;
+      case "saved_total":
+        addString = variantsProperty[0].savedTotal;
+        break;
+      case "product":
+        addString = variantsProperty[0].productTitle;
+        break;
+      case "new_price":
+        addString = variantsProperty[0].newPricePerItem;
+        break;
+      case "original_price":
+        addString = variantsProperty[0].compareAtPrice;
+        break;
+      case "quantity":
+        addString = variantsProperty[0].quantity;
+        break;
+      case "metafield":
+        addString = variantsProperty[0].productMetafield1;
+        break;
+      case "metafield2":
+        addString = variantsProperty[0].productMetafield2;
+        break;
+      case "metafield3":
+        addString = variantsProperty[0].productMetafield3;
+        break;
+      case "metafield4":
+        addString = variantsProperty[0].productMetafield4;
+        break;
+      default:
+        addString = "error";
+    }
+    const updatedText = textValue + `${addString}`;
+
     setTextValue(updatedText);
     if (typeof upPopTextChange === 'function') upPopTextChange(updatedText);   // update parent component's state
     // Also update any DOM elements that should reflect this value (e.g., preview areas)
@@ -79,36 +133,36 @@ export function PopUpover({
               {
                 title: 'Discount',
                 items: [
-                  { content: 'Saved percentage', onAction: () => appendToTextValue('{{saved_percentage}} ') },
-                  { content: 'Saved $ total', onAction: () => appendToTextValue('{{saved_total}}') },
-                  { content: 'Saved per item', onAction: () => appendToTextValue('{{saved_amount}}') },
+                  { content: 'Saved percentage', onAction: () => appendToTextValue("saved_percentage") },
+                  { content: 'Saved $ total', onAction: () => appendToTextValue("saved_total") },
+                  // { content: 'Saved per item', onAction: () => appendToTextValue('{{saved_amount}}') },
                 ],
               },
               {
                 title: 'Product',
                 items: [
-                  { content: 'Product title', onAction: () => appendToTextValue('{{product}}') },
-                  { content: 'New total price', onAction: () => appendToTextValue('{{new_total}}') },
-                  { content: 'New price per item', onAction: () => appendToTextValue('{{new_price}}') },
-                  { content: 'Original total price', onAction: () => appendToTextValue('{{original_total}}') },
-                  { content: 'Original price per item', onAction: () => appendToTextValue('{{original_price}}') },
+                  { content: 'Product title', onAction: () => appendToTextValue("product") },
+                  // { content: 'New total price', onAction: () => appendToTextValue('{{new_total}}') },
+                  { content: 'New price per item', onAction: () => appendToTextValue("new_price") },
+                  // { content: 'Original total price', onAction: () => appendToTextValue('{{original_total}}') },
+                  { content: 'Original price per item', onAction: () => appendToTextValue("original_price") },
                 ],
               },
               {
                 title: 'Quantity',
                 items: [
-                  { content: 'Quantity', onAction: () => appendToTextValue('{{quantity}}') },
-                  { content: 'Buy quantity', onAction: () => appendToTextValue('{{buy_quantity}}') },
-                  { content: 'Get quantity', onAction: () => appendToTextValue('{{get_quantity}}') },
+                  { content: 'Quantity', onAction: () => appendToTextValue("quantity") },
+                  // { content: 'Buy quantity', onAction: () => appendToTextValue('{{buy_quantity}}') },
+                  // { content: 'Get quantity', onAction: () => appendToTextValue('{{get_quantity}}') },
                 ],
               },
               {
                 title: 'Text',
                 items: [
-                  { content: 'Product metafield', onAction: () => appendToTextValue('{{metafield}}') },
-                  { content: 'Product metafield2', onAction: () => appendToTextValue('{{metafield2}}') },
-                  { content: 'Product metafield3', onAction: () => appendToTextValue('{{metafield3}}') },
-                  { content: 'Product metafield4', onAction: () => appendToTextValue('{{metafield4}}') },
+                  { content: 'Product metafield', onAction: () => appendToTextValue('metafield') },
+                  { content: 'Product metafield2', onAction: () => appendToTextValue('metafield2') },
+                  { content: 'Product metafield3', onAction: () => appendToTextValue('metafield3') },
+                  { content: 'Product metafield4', onAction: () => appendToTextValue('metafield4') },
                 ],
               },
             ]}

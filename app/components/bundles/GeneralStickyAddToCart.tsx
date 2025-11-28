@@ -17,6 +17,8 @@ import { SelectFont } from '../common/SelectFont';
 import { RadioWithInput } from '../common/RadioWithInput';
 import { PopUpover } from '../common/PopUpover';
 import { SwitchIcon } from '../common/SwitchIcon';
+import { useLoaderData } from '@remix-run/react';
+import { loader } from '../product/ProductList';
 
 export function GeneralStickyAddToCart({ open, onToggle }) {
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
@@ -60,7 +62,7 @@ export function GeneralStickyAddToCart({ open, onToggle }) {
               {tabs[selected].content === 'Content' && (
                 <InlineGrid columns={2} gap="200">
                   <BlockStack>
-                    <PopUpover title='Title' defaultPopText="{{product}}" />
+                    <PopUpover title='Title' defaultPopText="{{product}}" dataArray={productArray} />
                   </BlockStack>
                   <BlockStack gap="200">
                     <Text as="p">Button</Text>
