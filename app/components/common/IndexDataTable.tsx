@@ -153,7 +153,6 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
   };
 
   const isSelected = (id) => selectedRows.some((r) => r.id === id);
-  // console.log("in Array", inputArray);
   /* ---------------------------------------------------------
      FILTERING (unchanged)
   ----------------------------------------------------------- */

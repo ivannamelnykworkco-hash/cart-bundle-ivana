@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Card,
   BlockStack,
@@ -27,13 +27,9 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
 
-export function GeneralVolumePanel() {
+export function GeneralVolumePanel({ onDataChange }) {
   const loaderData = useLoaderData<typeof loader>();
-
-  const thirdLoaderData = {
-    eligible: "productsExcept",
-    volumeButtonText: 'Choose'
-  }
+  console.log("generalvolumeconf", loaderData);
 
   const productArray = loaderData?.products?.map((product: any) => ({
     title: product.title,
@@ -48,23 +44,23 @@ export function GeneralVolumePanel() {
     id: collection.id
   }));
 
-  const bundlingColor = {
-    hue: 36,
-    saturation: 1,
-    brightness: 1,
-    alpha: 1,
-  };
+  const conf = loaderData.generalVolumeConf;
 
   const [openStyle, setOpenStyle] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [eligible, setEligible] = useState(thirdLoaderData.eligible);
-  const [photoSize, setPhotoSize] = useState<any>(32);
-  const [isProductName, setIsProductName] = useState(true)
-  const [isShowPrice, setIsShowPrice] = useState(false)
-  const [volumeButtonText, setVolumeButtonText] = useState(thirdLoaderData.volumeButtonText)
+  const [eligible, setEligible] = useState(conf?.visibility);
+  const [photoSize, setPhotoSize] = useState<any>(conf.productPhotoSize);
+  const [isProductName, setIsProductName] = useState(conf.showProductName);
+  const [isShowPrice, setIsShowPrice] = useState(conf.showPrice);
+  const [volumeButtonText, setVolumeButtonText] = useState(conf.layoutButtonText);
+  const [layoutColor, setLayoutColor] = useState(conf.layoutColor);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [excludedProduct, setExcludedProduct] = useState<any>(null);
+  const [dataLoad, setDataLoad] = useState(null);
+  const [imageData, setImageData] = useState(conf.layoutImageUrl);
+  const id = conf.id;
+  const bundleId = conf.bundleId;
 
   const handleSettingsToggle = useCallback(
     () => setOpenStyle((open) => !open),
@@ -82,6 +78,40 @@ export function GeneralVolumePanel() {
   const handleReceiveExcludedProduct = (value) => {
     setExcludedProduct(value); // get excluded products array from product modal
   };
+
+  const handleOnSave = (dataLoad) => {
+    setDataLoad(dataLoad);
+  };
+
+  const handleImageChange = (file) => {
+    setImageData(URL.createObjectURL(file));
+  }
+
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange({
+        id,
+        bundleId,
+        eligible,
+        photoSize,
+        isProductName,
+        isShowPrice,
+        volumeButtonText,
+        layoutColor,
+        ...dataLoad,
+        imageData,
+      });
+    }
+  }, [eligible,
+    photoSize,
+    isProductName,
+    isShowPrice,
+    volumeButtonText,
+    layoutColor,
+    dataLoad,
+    imageData,
+    onDataChange
+  ]);
 
   return (
     <Card>
@@ -114,28 +144,28 @@ export function GeneralVolumePanel() {
                 />
                 <RadioButton
                   label="Selected products"
-                  checked={eligible === "product"}
-                  id="product"
-                  onChange={() => setEligible("product")}
+                  checked={eligible === "productsSelected"}
+                  id="productsSelected"
+                  onChange={() => setEligible("productsSelected")}
                 />
                 <RadioButton
                   label="Products in selected collections"
-                  checked={eligible === "collection"}
-                  id="collection"
-                  onChange={() => setEligible("collection")}
+                  checked={eligible === "collectionSelected"}
+                  id="collectionSelected"
+                  onChange={() => setEligible("collectionSelected")}
                 />
                 {eligible === "productsExcept" && (
                   <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" />
                 )
                 }
                 {
-                  eligible === "collection" && (
+                  eligible === "collectionSelected" && (
                     <SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select Collections" selectionMode="multipleCollection" />
 
                   )
                 }
                 {
-                  eligible === "product" && (
+                  eligible === "productsSelected" && (
                     <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" />
                   )
                 }
@@ -150,7 +180,7 @@ export function GeneralVolumePanel() {
               </Text>
               {/* {edit image and utton text} */}
               <InlineStack gap="100">
-                <ImageLoad />
+                <ImageLoad onChange={handleImageChange} />
                 <TextField
                   label="Button text"
                   value={volumeButtonText}
@@ -161,13 +191,13 @@ export function GeneralVolumePanel() {
 
               {/* {color and product photo size} */}
               <BlockStack gap="200">
-                <ColorPickerPopoverItem subtitle="Color" defaultColorSetting={bundlingColor} colorWidth="50px" />
+                <ColorPickerPopoverItem subtitle="Color" defaultColorSetting={layoutColor} colorWidth="50px" />
                 <BlockStack inlineAlign="stretch">
                   <Text as="p" variant="bodySm">Product photo size</Text>
                   <InlineStack gap="0" align="space-between" blockAlign="center">
                     <div style={{ width: "70%" }}>
                       <RangeSlider
-                        value={Number(photoSize)} // Make sure 'cornerRadius' is already a number
+                        value={Number(photoSize)}
                         onChange={(v: number) => setPhotoSize(v)} // The 'onChange' should expect a number
                         min={0}
                         max={40}
@@ -189,7 +219,6 @@ export function GeneralVolumePanel() {
                   </InlineStack>
                 </BlockStack>
               </BlockStack>
-
             </BlockStack>
 
             <Divider />
@@ -217,13 +246,12 @@ export function GeneralVolumePanel() {
                 </Tooltip>
               </div>
             </BlockStack>
-            <CustomModal />
+            <CustomModal onSave={handleOnSave} />
           </BlockStack>
-
 
         </Collapsible>
       </BlockStack >
     </Card >
-  )
+  );
 
 }

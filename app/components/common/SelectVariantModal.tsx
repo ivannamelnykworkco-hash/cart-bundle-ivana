@@ -27,7 +27,6 @@ export function SelectVariantModal({ variantArray, onSelect, title, selectionMod
   // Select a Variant row
   const handleSelectVariant = (variant) => {
     setSelectedVariant(variant);
-    console.log("variant", selectedVariant);
   };
   // Save selected variant & close modal
   const handleSave = () => {

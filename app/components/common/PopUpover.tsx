@@ -7,7 +7,7 @@ export function PopUpover({
   upPopTextChange, // ensure onTitleChange is passed as a prop
   defaultPopText,
   badgeSelected,
-  dataArray
+  dataArray,
 }: {
   title: string;
   upPopTextChange?: (value: string) => void; // onTitleChange should update the parent state
@@ -26,7 +26,6 @@ export function PopUpover({
   // Function to append variables to textValue
   const appendToTextValue = useCallback((variable: string) => {
     const productTitle = dataArray[0].title;
-    console.log("data", dataArray[0].variants[0]);
     const variantsProperty = dataArray[0].variants.map((variant) => ({
       savedPercentage: (parseFloat(variant.node.compareAtPrice ?? variant.node.price) - parseFloat(variant.node.price)) * 100 / parseFloat(variant.node.compareAtPrice ?? variant.node.price),
       savedTotal: parseFloat(variant.node.compareAtPrice ?? variant.node.price) - parseFloat(variant.node.price),
@@ -40,7 +39,6 @@ export function PopUpover({
       productMetafield3: dataArray[0].metafields ? dataArray[0].metafields[2].node.value : "metafield undefined",
       productMetafield4: dataArray[0].metafields ? dataArray[0].metafields[3].node.value : "metafield undefined"
     }));
-    console.log("data", variantsProperty[0]);
     var addString = "";
     switch (variable) {
       case "saved_percentage":

@@ -123,3 +123,51 @@ export interface GeneralStyle {
   createdAt: string
   updatedAt: string
 }
+
+export interface VolumeDiscount {
+  id: string
+  bundleId: string
+  visibility: string
+  layoutImageUrl: string
+  layoutButtonText: string
+  layoutColor: string
+  productPhotoSize: number
+  showProductName: boolean
+  showPrice: boolean
+  customButtonSize: number
+  customTextSize: number
+  customOverlayColor: string
+  customPriceColor: string
+  customCompareAtPriceColor: string
+  customTextColor: string
+  customButtonColor: string
+  customButtonTextColor: string
+  customHeadingText: string
+  customMessageText: string
+  customButtonText: string
+  customPhotoSize: number
+  createdAt: string
+  updatedAt: string
+}
+
+
+export interface StickyAdd {
+  id: string,
+  bundleId: string,
+  contentTitleText: string,
+  contentButtonText: string,
+  styleBgColor: string,
+  styleTitleColor: string,
+  styleButtonColor: string,
+  styleButtonTextColor: string,
+  styleTitleFontSize: number,
+  styleTitleFontStyle: string,
+  styleButtonFontSize: number,
+  styleButtonFontStyle: string,
+  stylePhotoSize: number,
+  stylePhotoCornerRadius: number,
+  styleButtonPadding: number,
+  styleButtonCornerRadius: number,
+  createdAt: string,
+  updatedAt: string
+}

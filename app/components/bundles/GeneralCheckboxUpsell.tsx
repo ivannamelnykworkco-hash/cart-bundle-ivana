@@ -18,10 +18,10 @@ export function GeneralCheckboxUpsell() {
 
   const [open, setOpen] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [sections, setSections] = useState([{ id: Date.now() }]);
+  const [sections, setSections] = useState([{ id: Math.random().toString(36).substr(2, 9) }]);
 
   const addSection = () => {
-    setSections(prev => [...prev, { id: Date.now() }])
+    setSections(prev => [...prev, { id: Math.random().toString(36).substr(2, 9) }])
   }
 
   const deleteSection = (id: any) => {

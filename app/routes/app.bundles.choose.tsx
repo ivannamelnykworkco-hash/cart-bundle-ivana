@@ -16,7 +16,6 @@ import {
   Box,
   Badge,
   InlineGrid,
-  hsbToHex,
   Checkbox,
   TextField,
   Toast,
@@ -36,8 +35,9 @@ import { MostPopularfancy } from "app/components/common/MostPopularfancy";
 import { getCountdownTimer, updateCountdownTimer } from "app/models/countdownTimer.server";
 import { GeneralBuyXgetYfree } from "app/components/bundles/GeneralBuyXgetYfree";
 import { GeneralBundleUpsell } from "app/components/bundles/GeneralBundleUpsell";
-import { builtinModules } from "module";
 import { getGeneralStyle, updateGeneralStyle } from "app/models/generalStyle.server";
+import { getVolumeDiscount, updateVolumeDiscount } from "app/models/volumeDiscount.server";
+import { getStickyAdd, updateStickyAdd } from "app/models/stickyAdd.server";
 
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -114,75 +114,38 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     title: node.title,
     imageUrl: node.image?.url ?? "",
   }));
+  // fetch data from prisma
   let countdownTimerConf = null;
   let generalStyleConf = null;
+  let generalVolumeConf = null;
+  let generalStickyAddConf = null;
   try {
-    countdownTimerConf = await getCountdownTimer();
-  } catch (err) {
+    const [countdownTimerConf, generalStyleConf, generalVolumeConf, generalStickyAddConf] = await Promise.all([
+      getCountdownTimer(),
+      getGeneralStyle(),
+      getVolumeDiscount(),
+      getStickyAdd()
+    ]);
+
+    // Handle error, but note that Promise.all rejects on first error
+    return json(
+      {
+        products,
+        collections,
+        countdownTimerConf,
+        generalStyleConf,
+        generalVolumeConf,
+        generalStickyAddConf
+      }
+    );
+  }
+  catch (err) {
+    // Handle error, but note that Promise.all rejects on first error
     return json(
       { success: false, error: err.message || err },
       { status: 500 }
     );
   }
-  try {
-    generalStyleConf = await getGeneralStyle();
-  } catch (err) {
-    return json(
-      { success: false, error: err.message || err },
-      { status: 500 }
-    );
-  }
-
-  return json({
-    bundleName: "Bundle",
-    unitLabel: '',
-    discountName: "",
-    blockTitle: "BUNDLE & SAVE",
-    visibility: "all",
-    markets: "all",
-    roundingValue: '.90',
-    updatePriceSelect: 'Price per item',
-    excludeB2B: false,
-    excludePOS: false,
-    startDate: new Date().toISOString().split("T")[0],
-    startTime: "09:09",
-    selectedProduct: "Gift Card",
-    selectedCountry: "United States",
-    showStock: 1,
-    // Design settings
-    primaryColor: "#000000",
-    secondaryColor: "#10b981",
-    borderRadius: 8,
-    fontSize: 14,
-    barTitle: 'Single',
-    barSubTitle: 'Standard price',
-    bagdeText: '',
-    barLabelText: "",
-    barDefaultQuality: '1',
-    barDefaultPrice: '702.45',
-    barAddUpsellDefaultPrice: '20',
-    barUpsellText: '+ Add at 20% discount',
-    xybarTitle: 'Buy 3, get 1 free!',
-    xybarSubTitle: '',
-    xybagdeText: '',
-    xybarLabelText: '',
-    bundleUpsellTitle: 'Complete the bundle',
-    bundleUpsellSubtitle: 'Save {{saved_amount}}!',
-    bundleUpsellBagdeText: '',
-    bunldeUpsellLabelText: '',
-    buyQualityalue: 3,
-    getQualityalue: 1,
-
-    // Upsell products
-    upsellProducts: [
-      { id: "1", title: "Product A", price: "$25.00", image: "" },
-      { id: "2", title: "Product B", price: "$35.00", image: "" },
-    ],
-    products,
-    collections,
-    countdownTimerConf,
-    generalStyleConf
-  });
 };
 
 /*********************Action to receive submit data****************/
@@ -195,9 +158,9 @@ export async function action({ request, params }) {
   };
   let data = { ...parsedData };
   try {
-    //    const result = await updateCountdownTimer(data.id, data);
     const result = await updateGeneralStyle(data.id, data);
-
+    // const result = await updateCountdownTimer(data.id, data);
+    // const result = await updateVolumeDiscount(data.id, data);
     return json({ success: true, result });
   } catch (err) {
     return json(
@@ -234,9 +197,12 @@ const fontStyleMap = {
 };
 
 export default function BundleSettingsAdvanced() {
+  console.log("~~~load");
+
   const loaderData = useLoaderData<typeof loader>();
+  console.log("~~~loaderData", loaderData);
   /*recevie response from action function*/
-  console.log("metafields", loaderData.products);
+
   const actionData = useActionData();
   useEffect(() => {
     if (actionData) {
@@ -297,59 +263,77 @@ export default function BundleSettingsAdvanced() {
     setToastActive(false);
   };
   const [countdownTimerData, setCountdownTimerData] = useState(loaderData.countdownTimerConf);
+  const [generalVolumeData, setGeneralVolumeData] = useState(null);
 
   const handleCountdownTimerChange = useCallback((updated: any) => {
     setCountdownTimerData(prev => ({ ...prev, ...updated }));
+  }, []);
+  const handleGeneralVolumeChange = useCallback((updated: any) => {
+    setGeneralVolumeData(prev => ({ ...prev, ...updated }));
   }, []);
 
   // Send data to action
   const submit = useSubmit();
 
   function saveData() {
-    const data = new FormData();
-    // Object.entries(countdownTimerData).forEach(([key, value]) => {
-    //   if (typeof value === 'object' && value !== null) {
-    //     data.append(key, JSON.stringify(value));
-    //   }
-    //   else {
-    //     data.append(key, value as string);
-    //   }
-    // });
-    //    data.append("id", GeneralStyleConf.id);
-    data.append("id", GeneralStyleConf.id);
-    data.append("bundleId", GeneralStyleConf.bundleId);
-    data.append("cornerRadius", cornerRadius);
-    data.append("spacing", spacing);
-    data.append("cardsBgColor", cardsBgColor);
-    data.append("selectedBgColor", selectedBgColor);
-    data.append("borderColor", borderColor);
-    data.append("blockTitleColor", blockTitleColor);
-    data.append("barTitleColor", barTitleColor);
-    data.append("barSubTitleColor", barSubTitleColor);
-    data.append("barPriceColor", barPriceColor);
-    data.append("barFullPriceColor", barFullPriceColor);
-    data.append("barLabelBackColor", barLabelBack);
-    data.append("barLabelTextColor", barLabelTextColor);
-    data.append("barBadgebackColor", barBadgebackColor);
-    data.append("barBadgeTextColor", barBadgeTextColor);
-    data.append("barUpsellBackColor", barUpsellBackColor);
-    data.append("barUpsellTextColor", barUpsellTextColor);
-    data.append("barUpselSelectedBackColor", barUpsellSelectedBackColor);
-    data.append("barUpsellSelectedTextColor", barUpsellSelectedTextColor);
-    data.append("barBlocktitle", barBlocktitle);
-    data.append("barBlocktitleFontStyle", barBlocktitleFontStyle);
-    data.append("bartitleSize", bartitleSize);
-    data.append("bartitleFontStyle", bartitleFontStyle);
-    data.append("subTitleSize", subTitleSize);
-    data.append("subTitleStyle", subTitleStyle);
-    data.append("labelSize", labelSize);
-    data.append("labelStyle", labelStyle);
-    data.append("upsellSize", upsellSize);
-    data.append("upsellStyle", upsellStyle);
-    data.append("unitLabelSize", unitLabelSize);
-    data.append("unitLabelStyle", unitLabelStyle);
-    data.append("createdAt", GeneralStyleConf.createdAt);
-    submit(data, { method: "post" });
+    const countdownTimerFormData = new FormData();
+    Object.entries(countdownTimerData).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        countdownTimerFormData.append(key, JSON.stringify(value));
+      }
+      else {
+        countdownTimerFormData.append(key, value as string);
+      }
+    });
+
+    const generalVolumeFormData = new FormData();
+    Object.entries(generalVolumeData).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        generalVolumeFormData.append(key, JSON.stringify(value));
+      }
+      else {
+        generalVolumeFormData.append(key, value as string);
+      }
+    });
+
+    const generalStyleFormData = new FormData();
+    generalStyleFormData.append("id", GeneralStyleConf.id);
+    generalStyleFormData.append("bundleId", GeneralStyleConf.bundleId);
+    generalStyleFormData.append("cornerRadius", cornerRadius);
+    generalStyleFormData.append("spacing", spacing);
+    generalStyleFormData.append("cardsBgColor", cardsBgColor);
+    generalStyleFormData.append("selectedBgColor", selectedBgColor);
+    generalStyleFormData.append("borderColor", borderColor);
+    generalStyleFormData.append("blockTitleColor", blockTitleColor);
+    generalStyleFormData.append("barTitleColor", barTitleColor);
+    generalStyleFormData.append("barSubTitleColor", barSubTitleColor);
+    generalStyleFormData.append("barPriceColor", barPriceColor);
+    generalStyleFormData.append("barFullPriceColor", barFullPriceColor);
+    generalStyleFormData.append("barLabelBackColor", barLabelBack);
+    generalStyleFormData.append("barLabelTextColor", barLabelTextColor);
+    generalStyleFormData.append("barBadgebackColor", barBadgebackColor);
+    generalStyleFormData.append("barBadgeTextColor", barBadgeTextColor);
+    generalStyleFormData.append("barUpsellBackColor", barUpsellBackColor);
+    generalStyleFormData.append("barUpsellTextColor", barUpsellTextColor);
+    generalStyleFormData.append("barUpselSelectedBackColor", barUpsellSelectedBackColor);
+    generalStyleFormData.append("barUpsellSelectedTextColor", barUpsellSelectedTextColor);
+    generalStyleFormData.append("barBlocktitle", barBlocktitle);
+    generalStyleFormData.append("barBlocktitleFontStyle", barBlocktitleFontStyle);
+    generalStyleFormData.append("bartitleSize", bartitleSize);
+    generalStyleFormData.append("bartitleFontStyle", bartitleFontStyle);
+    generalStyleFormData.append("subTitleSize", subTitleSize);
+    generalStyleFormData.append("subTitleStyle", subTitleStyle);
+    generalStyleFormData.append("labelSize", labelSize);
+    generalStyleFormData.append("labelStyle", labelStyle);
+    generalStyleFormData.append("upsellSize", upsellSize);
+    generalStyleFormData.append("upsellStyle", upsellStyle);
+    generalStyleFormData.append("unitLabelSize", unitLabelSize);
+    generalStyleFormData.append("unitLabelStyle", unitLabelStyle);
+    generalStyleFormData.append("createdAt", GeneralStyleConf.createdAt);
+    //    submit(countdownTimerData, { method: "post" });
+    // submit(generalVolumeFormData, { method: "post" });
+    submit(generalStyleFormData, { method: "post" });
+
   }
 
   /***************Database Migration Part************/
@@ -456,8 +440,6 @@ export default function BundleSettingsAdvanced() {
     }));
   };
 
-
-
   const handleonDeleteUpsellChange = (bundleId: string | number, upsellId: any) => {
     setUpsellsState(prev => ({
       ...prev,
@@ -526,7 +508,6 @@ export default function BundleSettingsAdvanced() {
   const handleBundleUpsellSelectedChange = (id: string | number, value: string) => {
     setBundleUpsellbadgeSelected(prev => ({ ...prev, [id]: value }));
   }
-
   const handlePriceChange = (bundleId: any, calc: any, base: any) => {
     setCalculatedPrice(prev => ({
       ...prev,
@@ -569,7 +550,6 @@ export default function BundleSettingsAdvanced() {
   const [bundleAddupselldefaultBasePrice, setBundleAddupselldefaultBasePrice] = useState<Record<number, string>>({});
   const [bundleAddProductcalculatedPrice, setBundleAddProductcalculatedPrice] = useState<Record<number, Record<number, string>>>({});
   const [bundleAddPorductItemdefaultBasePrice, setBundleAddPorductItemdefaultBasePrice] = useState<Record<number, Record<number, string>>>({});
-
 
   const handleAddUpsellPriceChange = (
     bundleId: number,
@@ -666,37 +646,36 @@ export default function BundleSettingsAdvanced() {
   };
   // color style and text style
   const GeneralStyleConf = loaderData.generalStyleConf;
-  console.log("cloaderdata", GeneralStyleConf);
   const [cornerRadius, setCornerRadius] = useState(GeneralStyleConf.cornerRadius ?? null);
-  const [spacing, setSpacing] = useState(GeneralStyleConf.spacing ?? null);
-  const [cardsBgColor, setCardsBgColor] = useState(hsbToHex(GeneralStyleConf.cardsBgColor) ?? null);
-  const [selectedBgColor, setSelectedBgColor] = useState(hsbToHex(GeneralStyleConf.selectedBgColor) ?? null);
-  const [borderColor, setBorderColor] = useState(hsbToHex(GeneralStyleConf.borderColor) ?? null);
-  const [blockTitleColor, setBlockTitleColor] = useState(hsbToHex(GeneralStyleConf.blockTitleColor) ?? null);
-  const [barTitleColor, setBarTitleColor] = useState(hsbToHex(GeneralStyleConf.barTitleColor) ?? null);
-  const [barSubTitleColor, setBarSubTitleColor] = useState(hsbToHex(GeneralStyleConf.barSubTitleColor) ?? null);
-  const [barPriceColor, setBarPriceColor] = useState(hsbToHex(GeneralStyleConf.barPriceColor) ?? null);
-  const [barFullPriceColor, setBarFullPriceColor] = useState(hsbToHex(GeneralStyleConf.barFullPriceColor) ?? null);
-  const [barLabelBack, setBarLabelBack] = useState(hsbToHex(GeneralStyleConf.barFullPriceColor) ?? null);
-  const [barLabelTextColor, setBarLabelTextColor] = useState(hsbToHex(GeneralStyleConf.barLabelTextColor) ?? null);
-  const [barBadgebackColor, setBarBadgebackColor] = useState(hsbToHex(GeneralStyleConf.barBadgebackColor) ?? null);
-  const [barBadgeTextColor, setBarBadgeTextColor] = useState(hsbToHex(GeneralStyleConf.barBadgeTextColor) ?? null);
-  const [barUpsellBackColor, setBarUpsellBackColor] = useState(hsbToHex(GeneralStyleConf.barUpsellBackColor) ?? null);
-  const [barUpsellTextColor, setBarUpsellTextColor] = useState(hsbToHex(GeneralStyleConf.barUpsellTextColor) ?? null);
-  const [barUpsellSelectedBackColor, setBarUpsellSelectedBackColor] = useState(hsbToHex(GeneralStyleConf.barUpsellSelectedBackColor) ?? null);
-  const [barUpsellSelectedTextColor, setBarUpsellSelectedTextColor] = useState(hsbToHex(GeneralStyleConf.barUpsellSelectedTextColor) ?? null);
-  const [barBlocktitle, setBarBlocktitle] = useState(GeneralStyleConf.barBlocktitle ?? null);
-  const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState(GeneralStyleConf.barBlocktitleFontStyle ?? null);
-  const [bartitleSize, setBartitleSize] = useState(GeneralStyleConf.bartitleSize ?? null);
-  const [bartitleFontStyle, setBartitleFontStyle] = useState(GeneralStyleConf.bartitleFontStyle ?? null);  //subtitle size
-  const [subTitleSize, setSubTitleSize] = useState(GeneralStyleConf.subTitleSize ?? null);
-  const [subTitleStyle, setSubTitleStyle] = useState(GeneralStyleConf.subTitleStyle ?? null);
-  const [labelSize, setLabelSize] = useState(GeneralStyleConf.labelSize ?? null);
-  const [labelStyle, setLabelStyle] = useState(GeneralStyleConf.labelStyle ?? null);  //
-  const [upsellSize, setUpsellSizeChange] = useState(GeneralStyleConf.upsellSize ?? null);  //
-  const [upsellStyle, setUpsellStyleChange] = useState(GeneralStyleConf.upsellStyle ?? null);  //
-  const [unitLabelSize, setUnitLabelSizeChange] = useState(GeneralStyleConf.unitLabelSize ?? null);  //
-  const [unitLabelStyle, setUnitLabelStyleChange] = useState(GeneralStyleConf.unitLabelStyle ?? null);  //
+  const [spacing, setSpacing] = useState(GeneralStyleConf?.spacing ?? null);
+  const [cardsBgColor, setCardsBgColor] = useState(GeneralStyleConf?.cardsBgColor) ?? null;
+  const [selectedBgColor, setSelectedBgColor] = useState(GeneralStyleConf?.selectedBgColor) ?? null;
+  const [borderColor, setBorderColor] = useState(GeneralStyleConf?.borderColor) ?? null;
+  const [blockTitleColor, setBlockTitleColor] = useState(GeneralStyleConf?.blockTitleColor) ?? null;
+  const [barTitleColor, setBarTitleColor] = useState(GeneralStyleConf?.barTitleColor) ?? null;
+  const [barSubTitleColor, setBarSubTitleColor] = useState(GeneralStyleConf?.barSubTitleColor) ?? null;
+  const [barPriceColor, setBarPriceColor] = useState(GeneralStyleConf?.barPriceColor) ?? null;
+  const [barFullPriceColor, setBarFullPriceColor] = useState(GeneralStyleConf?.barFullPriceColor) ?? null;
+  const [barLabelBack, setBarLabelBack] = useState(GeneralStyleConf?.barFullPriceColor) ?? null;
+  const [barLabelTextColor, setBarLabelTextColor] = useState(GeneralStyleConf?.barLabelTextColor) ?? null;
+  const [barBadgebackColor, setBarBadgebackColor] = useState(GeneralStyleConf?.barBadgebackColor) ?? null;
+  const [barBadgeTextColor, setBarBadgeTextColor] = useState(GeneralStyleConf?.barBadgeTextColor) ?? null;
+  const [barUpsellBackColor, setBarUpsellBackColor] = useState(GeneralStyleConf?.barUpsellBackColor) ?? null;
+  const [barUpsellTextColor, setBarUpsellTextColor] = useState(GeneralStyleConf?.barUpsellTextColor) ?? null;
+  const [barUpsellSelectedBackColor, setBarUpsellSelectedBackColor] = useState(GeneralStyleConf?.barUpsellSelectedBackColor) ?? null;
+  const [barUpsellSelectedTextColor, setBarUpsellSelectedTextColor] = useState(GeneralStyleConf?.barUpsellSelectedTextColor) ?? null;
+  const [barBlocktitle, setBarBlocktitle] = useState(GeneralStyleConf?.barBlocktitle ?? null);
+  const [barBlocktitleFontStyle, setBarBlocktitleFontStyle] = useState(GeneralStyleConf?.barBlocktitleFontStyle ?? null);
+  const [bartitleSize, setBartitleSize] = useState(GeneralStyleConf?.bartitleSize ?? null);
+  const [bartitleFontStyle, setBartitleFontStyle] = useState(GeneralStyleConf?.bartitleFontStyle ?? null);  //subtitle size
+  const [subTitleSize, setSubTitleSize] = useState(GeneralStyleConf?.subTitleSize ?? null);
+  const [subTitleStyle, setSubTitleStyle] = useState(GeneralStyleConf?.subTitleStyle ?? null);
+  const [labelSize, setLabelSize] = useState(GeneralStyleConf?.labelSize ?? null);
+  const [labelStyle, setLabelStyle] = useState(GeneralStyleConf?.labelStyle ?? null);  //
+  const [upsellSize, setUpsellSizeChange] = useState(GeneralStyleConf?.upsellSize ?? null);  //
+  const [upsellStyle, setUpsellStyleChange] = useState(GeneralStyleConf?.upsellStyle ?? null);  //
+  const [unitLabelSize, setUnitLabelSizeChange] = useState(GeneralStyleConf?.unitLabelSize ?? null);  //
+  const [unitLabelStyle, setUnitLabelStyleChange] = useState(GeneralStyleConf?.unitLabelStyle ?? null);  //
 
 
 
@@ -782,8 +761,8 @@ export default function BundleSettingsAdvanced() {
                   layoutStyleOptions={layoutStyleOptions}
                   layoutSelectedStyle={layoutSelectedStyle}
                   onChangeLayoutStyle={setLayoutSelectedStyle} />
-                <GeneralVolumePanel />
-                <CountDownPanel onChange={handleCountdownTimerChange} />
+                <GeneralVolumePanel onDataChange={handleGeneralVolumeChange} />
+                <CountDownPanel onDataChange={handleCountdownTimerChange} />
                 <GeneralCheckboxUpsell />
                 <GeneralStickyAddToCart />
                 {quantityBreaks.map((item) => (
@@ -865,7 +844,6 @@ export default function BundleSettingsAdvanced() {
                 }
               </BlockStack>
             </Layout.Section>
-
             {/* Right Panel - Preview */}
             <Layout.Section >
               <div className="rightLayout">
@@ -1483,50 +1461,12 @@ export default function BundleSettingsAdvanced() {
                           </Box>
 
                           {/* Upsell Products */}
-                          {/* <Box
-                      padding="300"
-                      background="bg-surface"
-                      borderRadius="100"
-                    >
-                      <BlockStack gap="200">
-                        <Text as="p" variant="bodyMd" fontWeight="semibold">
-                          You may also like
-                        </Text>
-                        <InlineStack gap="200">
-                          {upsellProducts.slice(0, 3).map((product) => (
-                            <Box
-                              key={product.id}
-                              padding="200"
-                              borderWidth="025"
-                              borderColor="border"
-                              borderRadius="100"
-                              minWidth="30%"
-                            >
-                              <BlockStack gap="100">
-                                <div
-                                  style={{
-                                    width: "100%",
-                                    height: "80px",
-                                    background: "#f5f5f5",
-                                    borderRadius: "8px",
-                                  }}
-                                />
-                                <Text as="p" variant="bodySm" truncate>
-                                  {product.title}
-                                </Text>
-                                <Text
-                                  as="p"
-                                  variant="bodySm"
-                                  fontWeight="semibold"
-                                >
-                                  {product.price}
-                                </Text>
-                              </BlockStack>
-                            </Box>
-                          ))}
-                        </InlineStack>
-                      </BlockStack>
-                    </Box> */}
+                          <Box
+                            padding="300"
+                            background="bg-surface"
+                            borderRadius="100"
+                          >
+                          </Box>
                         </BlockStack>
                       </Card>
                     </BlockStack>

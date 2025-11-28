@@ -23,48 +23,56 @@ import { loader } from '../product/ProductList';
 export function GeneralStickyAddToCart() {
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData.products;
+  const conf = loaderData.generalStickyAddConf;
+  console.log("conf", conf);
   const [open, setOpen] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-
   const [selected, setSelected] = useState<number>(0);
-  const [buttonContent, setButtonContent] = useState('Choose bundle');
-
-  const handleTabChange = useCallback((selectedTabIndex: number) => setSelected(selectedTabIndex), []);
-
-
-
+  const [contentButtonText, setContentButtonText] = useState(conf.contentButtonText);
+  const [contentTitleText, setContentTitleText] = useState(conf.contentTitleText);
+  const [styleBgColor, setStyleBgColor] = useState(conf.styleBgColor);
+  const [styleTitleColor, setStyleTitleColor] = useState(conf.styleTitleColor);
+  const [styleButtonColor, setStyleButtonColor] = useState(conf.styleButtonColor);
+  const [styleButtonTextColor, setStyleButtonTextColor] = useState(conf.styleButtonTextColor);
+  const [styleTitleFontSize, setStyleTitleFontSize] = useState(conf.styleTitleFontSize);
+  const [styleTitleFontStyle, setStyleTitleFontStyle] = useState(conf.styleTitleFontStyle);
+  const [styleButtonFontSize, setStyleButtonFontSize] = useState(conf.styleButtonFontSize);
+  const [styleButtonFontStyle, setStyleButtonFontStyle] = useState(conf.styleButtonFontStyle);
+  const [stylePhotoSize, setStylePhotoSize] = useState(conf.stylePhotoSize);
+  const [stylePhotoCornerRadius, setStyleButtonPadding] = useState(conf.stylePhotoCornerRadius);
+  const [styleButtonPadding, setStylePhotoCornerRadius] = useState(conf.styleButtonPadding);
+  const [styleButtonCornerRadius, setStyleButtonCornerRadius] = useState(conf.styleButtonCornerRadius);
   const tabs = [
     { id: 'content', content: 'Content', panelID: 'content-1' },
     { id: 'style', content: 'Style', panelID: 'style-1' },
   ];
-
+  const handleTabChange = useCallback((selectedTabIndex: number) => setSelected(selectedTabIndex), []);
   const handleSettingsToggle = useCallback(() => setOpen((prev) => !prev), []);
-
-  const stickyBack = {
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
+  const handleStyleBgColorChange = (data) => {
+    setStyleBgColor(data);
   };
-  const stickyText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
+  const handleStyleTitleColorChange = (data) => {
+    setStyleTitleColor(data);
   };
-  const stickyButton = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
+  const handleStyleButtonColorChange = (data) => {
+    setStyleButtonColor(data);
   };
-  const stickyButtonText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
+  const handleStyleButtonTextColorChange = (data) => {
+    setStyleButtonTextColor(data);
   };
-
+  const handleStyleTitleFontSizeChange = (data) => {
+    setStyleTitleFontSize(data);
+  };
+  const handleStyleTitleFontStyleChange = (data) => {
+    setStyleTitleFontStyle(data);
+  };
+  const handleStyleButtonFontSizeChange = (data) => {
+    setStyleButtonFontSize(data);
+  };
+  const handleStyleButtonFontStyleChange = (data) => {
+    setStyleButtonFontStyle(data);
+  };
+  handleStyleButtonFontStyleChange
   return (
     <Card>
       <BlockStack gap="400">
@@ -79,7 +87,6 @@ export function GeneralStickyAddToCart() {
             Sticky add to cart
           </Button>
           <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
-
         </InlineStack>
         <Collapsible open={open} id="collapsible-settings" expandOnPrint>
           <BlockStack>
@@ -87,14 +94,14 @@ export function GeneralStickyAddToCart() {
               {tabs[selected].content === 'Content' && (
                 <InlineGrid columns={2} gap="200">
                   <BlockStack>
-                    <PopUpover title='Title' defaultPopText="{{product}}" dataArray={productArray} />
+                    <PopUpover title='Title' defaultPopText={contentTitleText} dataArray={productArray} />
                   </BlockStack>
                   <BlockStack gap="200">
                     <Text as="p">Button</Text>
                     <TextField
                       label=""
-                      value={buttonContent}
-                      onChange={setButtonContent}
+                      value={contentButtonText}
+                      onChange={setContentButtonText}
                       autoComplete="off"
                       aria-label="Button content"
                     />
@@ -108,22 +115,20 @@ export function GeneralStickyAddToCart() {
                     Colors
                   </Text>
                   <InlineGrid columns={2} gap="100">
-                    <ColorPickerPopoverItem subtitle="Background" defaultColorSetting={stickyBack} colorWidth="100%" />
-                    <ColorPickerPopoverItem subtitle="Title" defaultColorSetting={stickyText} colorWidth="100%" />
+                    <ColorPickerPopoverItem subtitle="Background" defaultColorSetting={styleBgColor} colorWidth="100%" onColorChange={handleStyleBgColorChange} />
+                    <ColorPickerPopoverItem subtitle="Title" defaultColorSetting={styleTitleColor} colorWidth="100%" onColorChange={handleStyleTitleColorChange} />
                   </InlineGrid>
                   <InlineGrid columns={2} gap="100">
-                    <ColorPickerPopoverItem subtitle="Button" defaultColorSetting={stickyButton} colorWidth="100%" />
-                    <ColorPickerPopoverItem subtitle="Button text" defaultColorSetting={stickyButtonText} colorWidth="100%" />
+                    <ColorPickerPopoverItem subtitle="Button" defaultColorSetting={styleButtonColor} colorWidth="100%" onColorChange={handleStyleButtonColorChange} />
+                    <ColorPickerPopoverItem subtitle="Button text" defaultColorSetting={styleButtonTextColor} colorWidth="100%" onColorChange={handleStyleButtonTextColorChange} />
                   </InlineGrid>
-
                   <Divider />
-
                   <Text variant="headingMd" as="h6">
                     Typography
                   </Text>
                   <InlineGrid columns={2} gap="200">
-                    <SelectFont subtitle="Title" defaultFontSize="12" defaultFontLabel="styleRegular" />
-                    <SelectFont subtitle="Button" defaultFontSize="19" defaultFontLabel="styleLight" />
+                    <SelectFont subtitle="Title" defaultFontSize={styleTitleFontSize} defaultFontLabel={styleTitleFontStyle} onSizeChange={handleStyleTitleFontSizeChange} onFontStytleChange={handleStyleTitleFontStyleChange} />
+                    <SelectFont subtitle="Button" defaultFontSize={styleButtonFontSize} defaultFontLabel={styleButtonFontStyle} onSizeChange={handleStyleButtonFontSizeChange} onFontStytleChange={handleStyleButtonFontStyleChange} />
                   </InlineGrid>
 
                   <Divider />
@@ -132,12 +137,12 @@ export function GeneralStickyAddToCart() {
                     Other
                   </Text>
                   <InlineGrid columns={2} gap="200">
-                    <RadioWithInput title="Product photo size" defaultValue="16" />
-                    <RadioWithInput title="Button padding" defaultValue="14" />
+                    <RadioWithInput title="Product photo size" defaultValue={stylePhotoSize} />
+                    <RadioWithInput title="Button padding" defaultValue={styleButtonPadding} />
                   </InlineGrid>
                   <InlineGrid columns={2} gap="200">
-                    <RadioWithInput title="Product photo corner radius" defaultValue="10" />
-                    <RadioWithInput title="Button corner radius" defaultValue="15" />
+                    <RadioWithInput title="Product photo corner radius" defaultValue={stylePhotoCornerRadius} />
+                    <RadioWithInput title="Button corner radius" defaultValue={styleButtonCornerRadius} />
                   </InlineGrid>
                 </BlockStack>
               )}

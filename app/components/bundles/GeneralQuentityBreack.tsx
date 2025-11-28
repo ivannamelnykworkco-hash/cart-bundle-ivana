@@ -189,21 +189,11 @@ export function GeneralQuentityBreack({
     { label: "Most Popular", value: 'mostpopular' },
   ]
 
-  const QuantityBackground = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
+  const QuantityBackground = "#00FF00";
   const handleColorQuantityBackground = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
-  const QuantityText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
-  };
+  const QuantityText = "#00FF00";
   const handleColorQuantityText = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };

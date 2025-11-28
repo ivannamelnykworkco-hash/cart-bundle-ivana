@@ -174,3 +174,50 @@ model GeneralStyle {
   createdAt           String
   updatedAt           String
 }
+
+model VolumeDiscount {
+  id                  String @id @default(cuid())
+  bundleId            String
+  visibility          String
+  layoutImageUrl      String
+  layoutButtonText    String
+  layoutColor         String
+  productPhotoSize    Int
+  showProductName     Boolean
+  showPrice           Boolean
+  customButtonSize    Int
+  customTextSize      Int
+  customOverlayColor  String
+  customPriceColor    String
+  customCompareAtPriceColor  String
+  customTextColor       String
+  customButtonColor     String
+  customButtonTextColor String
+  customHeadingText     String
+  customMessageText     String
+  customButtonText      String
+  customPhotoSize       Int
+  createdAt             String
+  updatedAt             String
+}
+
+model StickyAdd {
+  id                  String @id @default(cuid())
+  bundleId            String
+  contentTitleText    String
+  contentButtonText   String
+  styleBgColor        String
+  styleTitleColor     String
+  styleButtonColor    String
+  styleButtonTextColor  String
+  styleTitleFontSize    Int
+  styleTitleFontStyle   String
+  styleButtonFontSize   Int
+  styleButtonFontStyle  String
+  stylePhotoSize        Int
+  stylePhotoCornerRadius    Int
+  styleButtonPadding    Int
+  styleButtonCornerRadius   Int
+  createdAt             String
+  updatedAt             String
+}

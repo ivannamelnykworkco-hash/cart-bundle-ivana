@@ -25,7 +25,7 @@ import { loader } from "../product/ProductList";
 import { useLoaderData } from "@remix-run/react";
 
 
-export function CountDownPanel({ onChange }) {
+export function CountDownPanel({ onDataChange }) {
   const loaderData = useLoaderData<typeof loader>();
   const conf = loaderData.countdownTimerConf;
   const [open, setOpen] = useState(false);
@@ -58,8 +58,8 @@ export function CountDownPanel({ onChange }) {
 
   // Send data to parent on any change
   useEffect(() => {
-    if (onChange) {
-      onChange(gatherStateData());
+    if (onDataChange) {
+      onDataChange(gatherStateData());
     }
   }, [
     showCountdownTimer,
@@ -72,7 +72,7 @@ export function CountDownPanel({ onChange }) {
     activeTextBoldButton,
     activeTextItalicButton,
     textFontSize,
-    onChange,
+    onDataChange,
   ]);
 
   const handleSettingsToggle = useCallback(() => setOpen((open) => !open), []);

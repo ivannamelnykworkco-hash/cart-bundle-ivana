@@ -1,16 +1,5 @@
-// app/models/bundle.server.ts
 import type { CountdownTimer } from "./types";
 import db from "../db.server";
-
-function parseBoolean(str) {
-  return str === 'true';
-}
-
-function parseNumber(str) {
-  return Number(str);
-}
-// This is a placeholder for database operations
-// Replace with your actual database (Prisma, MongoDB, etc.)
 
 export async function getCountdownTimer(): Promise<CountdownTimer> {
   // TODO: Implement database query
@@ -43,47 +32,29 @@ export async function getCountdownTimer(): Promise<CountdownTimer> {
   return init;
 }
 
-export async function createCountdownTimer(data: Partial<CountdownTimer>) {
-  const result = await db.countdownTimer.create({
-    data: {
-      id: Math.random().toString(36).substr(2, 9),
-      isCountdown: data.showCountdownTimer === "true",
-      visibility: data.visibility,
-      fixedDurationTime: parseInt(data.timeDuration, 10),
-      endDateTime: new Date(`${data.endDate}T${data.endTime}`).toISOString(),
-      msgText: data.textValue,
-      msgAlignment: parseInt(data.activeAlignmentButtonIndex, 10),
-      msgBold: data.activeTextBoldButton === "true",
-      msgItalic: data.activeTextItalicButton === "true",
-      msgSize: parseInt(data.textFontSize, 10),
-      msgBgColor: data.msgBgColor,  ////
-      msgTextColor: data.msgTextColor,  ////
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    }
-  });
-  return result;
-}
-
 export async function updateCountdownTimer(id: string, data: Partial<CountdownTimer>) {
+  const updateData: any = {
+    isCountdown: data.showCountdownTimer === "true",
+    visibility: data.visibility,
+    fixedDurationTime: parseInt(data.timeDuration, 10),
+    endDateTime: new Date(`${data.endDate}T${data.endTime}`).toISOString(),
+    msgText: data.textValue,
+    msgAlignment: parseInt(data.activeAlignmentButtonIndex, 10),
+    msgBold: data.activeTextBoldButton === "true",
+    msgItalic: data.activeTextItalicButton === "true",
+    msgSize: parseInt(data.textFontSize, 10),
+    msgBgColor: data.msgBgColor,  ////
+    msgTextColor: data.msgTextColor,  ////
+    updatedAt: new Date().toISOString()
+  };
+
+  Object.keys(updateData).forEach(
+    (key) => (updateData[key] == null) && delete updateData[key]
+  );
+
   const result = await db.countdownTimer.update({
     where: { id },
-    data: {
-      id: data.id,//Math.random().toString(36).substr(2, 9),
-      isCountdown: data.showCountdownTimer === "true",
-      visibility: data.visibility,
-      fixedDurationTime: parseInt(data.timeDuration, 10),
-      endDateTime: new Date(`${data.endDate}T${data.endTime}`).toISOString(),
-      msgText: data.textValue,
-      msgAlignment: parseInt(data.activeAlignmentButtonIndex, 10),
-      msgBold: data.activeTextBoldButton === "true",
-      msgItalic: data.activeTextItalicButton === "true",
-      msgSize: parseInt(data.textFontSize, 10),
-      msgBgColor: data.msgBgColor,  ////
-      msgTextColor: data.msgTextColor,  ////
-      createdAt: data.createdAt,
-      updatedAt: new Date().toISOString()
-    }
+    data: updateData,
   });
   return result;
 }
