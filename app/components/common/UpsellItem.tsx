@@ -1,6 +1,7 @@
-import { Button, InlineGrid, InlineStack, Select, Text, TextField } from "@shopify/polaris";
+import { Box, Button, InlineGrid, InlineStack, Select, Text, TextField, Thumbnail } from "@shopify/polaris";
 import { useCallback, useState } from "react";
 import { SelectProductModal } from "./SelectProductModal";
+import { DeleteIcon, EditIcon } from "@shopify/polaris-icons";
 export function UpsellItem({ number, deleteId, deleteSection, productArray }: { number: any, deleteId: any, deleteSection: (id: any) => void, productArray: any }) {
 
   const [selected, setSelected] = useState("default");
@@ -30,6 +31,11 @@ export function UpsellItem({ number, deleteId, deleteSection, productArray }: { 
     setSelectedProduct(value); // get products array from product modal
   };
 
+  const handleRemoveProduct = () => {
+    setSelectedProduct(null)
+  }
+
+  console.log("selectedProduct==>", selectedProduct);
   return (
     <div style={{ borderRadius: "10px", border: '1px solid lightgrey', padding: '15px', gap: "10px", display: 'flex', flexDirection: 'column' }}>
       <InlineStack align="space-between">
@@ -40,9 +46,24 @@ export function UpsellItem({ number, deleteId, deleteSection, productArray }: { 
           Remove upsell
         </Button>
       </InlineStack>
-      < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select products" selectionMode="nestedProduct" />
+
+      {!selectedProduct && (
+        <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select a product" selectionMode="nestedProduct" buttonText='Select a product' />
+      )}
       {selectedProduct && (
-        < SelectProductModal productArray={selectedProduct} onSelect={handleReceiveProduct} title="Select variants" selectionMode="singleVariant" />
+        <InlineGrid columns={2}>
+          <InlineStack gap="200" align="start" blockAlign="center">
+            <Thumbnail
+              source={selectedProduct[0].imageUrl}
+              alt="Black choker necklace"
+            />
+            <Text as='h5' fontWeight="bold">{selectedProduct[0].title}</Text>
+          </InlineStack>
+          <InlineStack gap="200" align="end" blockAlign="center">
+            <Button icon={EditIcon}>Edit image</Button>
+            <Button icon={DeleteIcon} onClick={handleRemoveProduct} />
+          </InlineStack>
+        </InlineGrid>
       )}
       {/* { price and title and subtitle} */}
       <InlineGrid columns={2} gap="200">

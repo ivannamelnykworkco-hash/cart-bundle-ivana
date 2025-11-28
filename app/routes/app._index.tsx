@@ -15,11 +15,19 @@ import {
 } from "@shopify/polaris";
 import { useState } from "react";
 import { authenticate } from "../shopify.server";
+import {
+  ChartVerticalFilledIcon,
+  DeleteIcon,
+  DuplicateIcon,
+  EditIcon,
+  ViewIcon
+} from '@shopify/polaris-icons';
 import type { Bundle, Analytics } from "../models/types";
+import { SwitchIcon } from "app/components/common/SwitchIcon";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
-  
+
   // TODO: Fetch from database
   const bundles: Bundle[] = [
     {
@@ -60,16 +68,18 @@ export default function Index() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const [showBanner, setShowBanner] = useState(true);
+  const [isShowLowAlert, setIsShowLowAlert] = useState(false);
+
 
   const tabs = [
     { id: "deals", content: "Deals" },
     { id: "archive", content: "A/B test archive" },
   ];
 
-  const rows = bundles.map((bundle) => [
+  const rows = bundles.map((bundle, index) => [
     // Deal Column
-    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-      <input type="checkbox" />
+    <div key={index} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Text as="p" fontWeight="semibold">
@@ -82,9 +92,9 @@ export default function Index() {
         </Text>
       </div>
     </div>,
-    
+
     // Stats Column
-    <div style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px" }}>
+    <div key={index} style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px" }}>
       <div style={{ minWidth: "60px" }}>
         <Text as="p" variant="bodySm" tone="subdued">
           Visitors
@@ -150,17 +160,17 @@ export default function Index() {
         </Text>
       </div>
     </div>,
-    
+
     // Actions Column
-    <div style={{ display: "flex", gap: "8px", justifyContent: "flex-start" }}>
+    <div key={index} style={{ display: "flex", gap: "8px", justifyContent: "flex-start" }}>
       {/* <Button onClick={() => navigate(`/app/bundles/${bundle.id}/test`)}>
         Run A/B test
       </Button> */}
-      <Button icon="chart" onClick={() => {}} />
-      <Button icon="edit" onClick={() => navigate(`/app/bundles/${bundle.id}`)} />
-      <Button icon="duplicate" onClick={() => {}} />
-      <Button icon="view" onClick={() => {}} />
-      <Button icon="delete" tone="critical" onClick={() => {}} />
+      <Button icon={ChartVerticalFilledIcon} onClick={() => { }} />
+      <Button icon={EditIcon} onClick={() => navigate(`/app/bundles/${bundle.id}`)} />
+      <Button icon={DuplicateIcon} onClick={() => { }} />
+      <Button icon={ViewIcon} onClick={() => { }} />
+      <Button icon={DeleteIcon} onClick={() => { }} />
     </div>,
   ]);
 
@@ -236,7 +246,7 @@ export default function Index() {
                 <Text as="p" variant="bodySm">
                   Bundles widget is visible in product pages.
                 </Text>
-                <Button variant="plain" onClick={() => {}}>
+                <Button variant="plain" onClick={() => { }}>
                   Need help?
                 </Button>
               </div>
@@ -266,7 +276,7 @@ export default function Index() {
               />
             )}
           </Card>
-          
+
           {bundles.length > 0 && showBanner && (
             <div style={{ marginTop: "16px", borderRadius: "8px", overflow: "hidden" }}>
               <Banner

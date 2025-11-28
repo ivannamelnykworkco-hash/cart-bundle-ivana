@@ -6,7 +6,7 @@ import { SwitchIcon } from "../common/SwitchIcon";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
-export function GeneralCheckboxUpsell() {
+export function GeneralCheckboxUpsell({ open, onToggle }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData?.products?.map((product: any) => ({
@@ -16,7 +16,6 @@ export function GeneralCheckboxUpsell() {
     variants: product.variants
   }));
 
-  const [open, setOpen] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [sections, setSections] = useState([{ id: Math.random().toString(36).substr(2, 9) }]);
 
@@ -28,14 +27,12 @@ export function GeneralCheckboxUpsell() {
     setSections(prev => prev.filter(item => item.id !== id))
   }
 
-  const handleSettingsToggle = useCallback(() => setOpen((open) => !open), []);
-
   return (
     < Card >
       <BlockStack gap="400">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"

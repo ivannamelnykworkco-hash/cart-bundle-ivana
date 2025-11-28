@@ -33,7 +33,7 @@ import { SelectProductModal } from "../common/SelectProductModal";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
-export function GeneralSettingsPanel() {
+export function GeneralSettingsPanel({ open, onToggle }) {
 
   //CONST VARIABLES
 
@@ -104,7 +104,6 @@ export function GeneralSettingsPanel() {
   ]
 
   //USESTATE FUNCTIONS
-  const [open, setOpen] = useState(true);
   const [bundleName, setBundleName] = useState(firstLoaderData.bundleName);
   const [discountName, setDiscountName] = useState(firstLoaderData.discountName);
   const [unitLabel, setUnitLabel] = useState(firstLoaderData.discountName);
@@ -139,8 +138,6 @@ export function GeneralSettingsPanel() {
 
 
   //FUNCTIONS
-  const handleSettingsToggle = useCallback(() => setOpen((open) => !open), []);
-
   const addCluryDobule = () => {
     setTextValue(prev => prev + "{{stack}}"); // append "abc"
   };
@@ -178,7 +175,7 @@ export function GeneralSettingsPanel() {
       <BlockStack gap="400">
         <InlineStack align="start">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"
@@ -260,7 +257,7 @@ export function GeneralSettingsPanel() {
                     <BlockStack gap="200">
                       <InlineStack align="space-around" gap="200" >
                         <Box width="48%">
-                          < SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select excluded products" selectionMode="multipleProduct" />
+                          < SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select excluded products" selectionMode="multipleProduct" buttonText='Select product' />
                         </Box>
                         <Box width="48%">
                           < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveExcludedCollection} title="Select excluded collections" selectionMode="multipleCollection" />
@@ -277,7 +274,7 @@ export function GeneralSettingsPanel() {
 
                 {
                   visibility === "specific" && (
-                    < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" />
+                    < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select products' />
                   )
                 }
 

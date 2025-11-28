@@ -4,19 +4,26 @@ import { DeleteIcon } from '@shopify/polaris-icons';
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
 import { SelectVariantModal } from "./SelectVariantModal";
+import { SelectProductModal } from "./SelectProductModal";
 export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo, upAddProductItemPriceChange, }: { selectproductInfo: any, bundleId: any, id: any, upAddProductItemPriceChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void }) {
 
-  const loaderData = useLoaderData<typeof loader>();
+  const { loaderData } = useLoaderData<typeof loader>();
   const [productQuantiyValue, setProductQuantiyValue] = useState('1');
   const [selected, setSelected] = useState("default");
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [productItemValue, setProductItemValue] = useState("20");
+  const [barAddUpsellDefaultPrice, setBarAddUpsellDefaultPrice] = useState(
+    selectproductInfo[1].price
+  );
+  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>(1);
 
   useEffect(() => {
     if (!selectproductInfo) return;
-
-    const base = Number(selectproductInfo[1].price) || 0;
+    const quantity = barDefaultQualityalue;
+    const basePrice = Number(barAddUpsellDefaultPrice) || 0;
     const value = Number(productItemValue) || 0;
+
+    let base = quantity * basePrice;
 
     let calculated = base;
 
@@ -38,7 +45,7 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
         base
       );
     }
-  }, [productItemValue, selected, upAddProductItemPriceChange]);
+  }, [barDefaultQualityalue, barAddUpsellDefaultPrice, productItemValue, selected, upAddProductItemPriceChange]);
 
   const handleChange = useCallback(
     (newValue: string) => {
@@ -81,8 +88,8 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
             <TextField
               label
               type="number"
-              value={productQuantiyValue}
-              onChange={setProductQuantiyValue}
+              value={barDefaultQualityalue}
+              onChange={setBarDefaultQualityalue}
               autoComplete="off"
             />
           </Box>
@@ -95,11 +102,12 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
         </InlineStack>
       </InlineStack>
       {/* {change pre-selectd variant} */}
-      <SelectVariantModal
-        productArray={selectedProduct}
+      <SelectProductModal
+        productArray={selectproductInfo}
         onSelect={handleReceiveProduct}
-        title="Select products"
+        title="Add variant"
         selectionMode="singleVariant"
+        buttonText="Select pre-selected variant"
       />
       {/* { price and title and subtitle} */}
       <InlineGrid columns={2} gap="200">

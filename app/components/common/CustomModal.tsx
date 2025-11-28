@@ -202,7 +202,6 @@ export function CustomModal({ onSave }) {
                     />
                   </BlockStack>
                 </InlineGrid>
-
               </BlockStack>
               {/* {product photo size} */}
               <BlockStack gap="200">

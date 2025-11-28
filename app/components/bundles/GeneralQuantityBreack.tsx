@@ -9,47 +9,46 @@ import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 import type { loader } from "../product/ProductList";
 import { useLoaderData } from "@remix-run/react";
 
-interface BoxUpSells {
-  id: number;
-}
-interface Gifts {
-  id: number;
-}
-
-
-export function GeneralQuentityBreack({
+export function GeneralQuantityBreack({
   bundleId,
   id,
   deleteSection,
   heading,
+  open,
+  onToggle,
   upBundlesChooseTitleChange,
   upBundlesChooseSubTitleChange,
   upBunlesBarLabelTextChange,
   upBundlesBadgeTextChange,
   upBundlesBarUpsellTextChange,
+  upAddUpsellImageChange,
   onAddUpsell,
   onDeleteUpsell,
   upAddUpsellPriceChange,
   upPriceChange,
-  upBadgeSelectedChange }:
+  upBadgeSelectedChange,
+  upSelectedProductChange }:
   {
     bundleId: any,
     id: any,
     deleteSection: any
+    open: any,
+    onToggle: any,
     heading: any,
     upBundlesChooseTitleChange: any,
     upBundlesChooseSubTitleChange: any,
     upBundlesBadgeTextChange: any,
     upBunlesBarLabelTextChange: any,
     upBundlesBarUpsellTextChange: any,
+    upAddUpsellImageChange: any,
     onAddUpsell: any,
     onDeleteUpsell: any,
+    upSelectedProductChange: any,
     upAddUpsellPriceChange: (id: string, price: string, defaultBasePrice?: string) => void,
     upPriceChange?: (id: string, price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
   }) {
 
   const loaderData = useLoaderData<typeof loader>();
-  const [open, setOpen] = useState(false);
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>((loaderData as any).barDefaultQuality);
@@ -168,10 +167,6 @@ export function GeneralQuentityBreack({
     [],
   );
 
-  const handleSettingsToggle = useCallback((
-
-  ) => setOpen((open) => !open),
-    []);
   const handleSizeChange = useCallback(
     (newValue: string) => setSizeValue(newValue),
     [],
@@ -193,7 +188,7 @@ export function GeneralQuentityBreack({
   const handleColorQuantityBackground = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
-  const QuantityText = "#00FF00";
+  const QuantityText = "#FF0000";
   const handleColorQuantityText = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
@@ -202,7 +197,7 @@ export function GeneralQuentityBreack({
       <BlockStack gap="400">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"
@@ -211,8 +206,8 @@ export function GeneralQuentityBreack({
             {heading}
           </Button>
           <InlineStack gap="100">
-            <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
-            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
+            {/* <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
+            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" /> */}
             <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
             <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(id)} />
           </InlineStack>
@@ -349,6 +344,8 @@ export function GeneralQuentityBreack({
                     bundleId={bundleId} // important
                     upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
                     upAddUpsellPriceChange={upAddUpsellPriceChange}
+                    upSelectedProductChange={upSelectedProductChange}
+                    upAddUpsellImageChange={upAddUpsellImageChange}
                     deleteSection={deleteBoxUpsell} // calls parent's delete with bundleId + upsellId
                   />
                 ))}

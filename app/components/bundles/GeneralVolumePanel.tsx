@@ -27,7 +27,7 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
 
-export function GeneralVolumePanel({ onDataChange }) {
+export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
   const loaderData = useLoaderData<typeof loader>();
   console.log("generalvolumeconf", loaderData);
 
@@ -47,6 +47,7 @@ export function GeneralVolumePanel({ onDataChange }) {
   const conf = loaderData.generalVolumeConf;
 
   const [openStyle, setOpenStyle] = useState(false);
+  const bundlingColor = "#FF0000";
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [eligible, setEligible] = useState(conf?.visibility);
   const [photoSize, setPhotoSize] = useState<any>(conf.productPhotoSize);
@@ -61,11 +62,6 @@ export function GeneralVolumePanel({ onDataChange }) {
   const [imageData, setImageData] = useState(conf.layoutImageUrl);
   const id = conf.id;
   const bundleId = conf.bundleId;
-
-  const handleSettingsToggle = useCallback(
-    () => setOpenStyle((open) => !open),
-    []
-  );
 
   const handleReceiveProduct = (value) => {
     setSelectedProduct(value); // get products array from product modal
@@ -118,8 +114,8 @@ export function GeneralVolumePanel({ onDataChange }) {
       <BlockStack gap="200">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
-            disclosure={openStyle ? "up" : "down"}
+            onClick={onToggle}
+            disclosure={open ? "up" : "down"}
             ariaControls="collapsible-settings"
             variant="plain"
             icon={CollectionListIcon}
@@ -128,7 +124,7 @@ export function GeneralVolumePanel({ onDataChange }) {
           </Button>
           <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
         </InlineStack>
-        <Collapsible open={openStyle} id="collapsible-settings" expandOnPrint>
+        <Collapsible open={open} id="collapsible-settings" expandOnPrint>
           <BlockStack gap="200">
             {/* {eligible layout} */}
             <BlockStack gap="200">
@@ -155,7 +151,7 @@ export function GeneralVolumePanel({ onDataChange }) {
                   onChange={() => setEligible("collectionSelected")}
                 />
                 {eligible === "productsExcept" && (
-                  <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" />
+                  <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
                 )
                 }
                 {
@@ -165,8 +161,8 @@ export function GeneralVolumePanel({ onDataChange }) {
                   )
                 }
                 {
-                  eligible === "productsSelected" && (
-                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" />
+                  eligible === "product" && (
+                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
                   )
                 }
               </BlockStack>

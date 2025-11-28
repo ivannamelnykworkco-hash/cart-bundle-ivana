@@ -18,9 +18,9 @@ import { RadioWithInput } from '../common/RadioWithInput';
 import { PopUpover } from '../common/PopUpover';
 import { SwitchIcon } from '../common/SwitchIcon';
 import { useLoaderData } from '@remix-run/react';
-import { loader } from '../product/ProductList';
+import type { loader } from '../product/ProductList';
 
-export function GeneralStickyAddToCart() {
+export function GeneralStickyAddToCart({ open, onToggle }) {
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData.products;
   const conf = loaderData.generalStickyAddConf;
@@ -78,7 +78,7 @@ export function GeneralStickyAddToCart() {
       <BlockStack gap="400">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"

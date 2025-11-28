@@ -9,7 +9,7 @@ import {
 import { EditIcon } from '@shopify/polaris-icons';
 import { IndexDataTable } from "./IndexDataTable";
 
-export function SelectProductModal({ productArray, onSelect, title, selectionMode }) {
+export function SelectProductModal({ productArray, onSelect, title, selectionMode, buttonText }) {
   //inputArray: an array of product array to input
   //onSelect: an array of product array for parents
   //title: modal title
@@ -42,7 +42,7 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
 
   const activator = (
     <Button icon={EditIcon} onClick={handleOpen} fullWidth={true} variant="primary">
-      Select product
+      {buttonText}
     </Button>
   );
 
@@ -68,7 +68,7 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
         <InlineStack InlineStack align="space-between" blockAlign="center" >
           <Text variant="bodySm" tone="subdued">
             {/* {selectedProduct?.length ? selectedProduct?.length : 0}/{productArray?.length} products selected */}
-            {selectedProduct?.filter(obj => obj.variants).length ?? 0}/{productArray?.length} products selected
+            {(selectedProduct ?? [])?.filter(obj => obj.variants).length ?? 0}/{productArray?.length} products selected
           </Text>
         </InlineStack >
       }

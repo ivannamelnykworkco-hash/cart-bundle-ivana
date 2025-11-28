@@ -25,10 +25,9 @@ import { loader } from "../product/ProductList";
 import { useLoaderData } from "@remix-run/react";
 
 
-export function CountDownPanel({ onDataChange }) {
+export function CountDownPanel({ onChange, open, onToggle }) {
   const loaderData = useLoaderData<typeof loader>();
   const conf = loaderData.countdownTimerConf;
-  const [open, setOpen] = useState(false);
   const [showCountdownTimer, setShowCountdownTimer] = useState(conf.isCountdown);
   const [visibility, setVisibility] = useState(conf.visibility);
   const [timeDuration, setTimeDuration] = useState<any>(conf.fixedDurationTime);;
@@ -75,7 +74,6 @@ export function CountDownPanel({ onDataChange }) {
     onDataChange,
   ]);
 
-  const handleSettingsToggle = useCallback(() => setOpen((open) => !open), []);
   const handleSetTimeDuration = useCallback(
     (newValue: string) => setTimeDuration(newValue),
     [],
@@ -110,7 +108,7 @@ export function CountDownPanel({ onDataChange }) {
       <BlockStack gap="400">
         <InlineStack align="space-between" blockAlign="center">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"

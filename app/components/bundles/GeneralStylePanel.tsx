@@ -58,6 +58,10 @@ interface GeneralStylePanelProps {
     upSubTitleStyleChange: (...args: any[]) => void;
     upLabelChange: (...args: any[]) => void;
     upLabelStyleChange: (...args: any[]) => void;
+    upUpsellSizeChange: (...args: any[]) => void;
+    upUpsellStyleChange: (...args: any[]) => void;
+    upUnitLabelSizeChange: (...args: any[]) => void;
+    upUnitLabelStyleChange: (...args: any[]) => void;
 
     layoutSelectedStyle: any;
     layoutStyleOptions: any;
@@ -66,8 +70,10 @@ interface GeneralStylePanelProps {
 }
 
 
-
-export function GeneralStylePanel({ styleHandlers,
+export function GeneralStylePanel({
+  styleHandlers,
+  open,
+  onToggle,
   onChangeLayoutStyle,
   layoutStyleOptions,
   layoutSelectedStyle }: GeneralStylePanelProps) {
@@ -108,7 +114,6 @@ export function GeneralStylePanel({ styleHandlers,
   } = styleHandlers;
 
 
-  const [openStyle, setOpenStyle] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState("layout1"); ///
   const [cornerRadius, setCornerRadius] = useState<any>(conf.cornerRadius);
   const [spacing, setSpacing] = useState<number>(conf.spacing);
@@ -146,6 +151,10 @@ export function GeneralStylePanel({ styleHandlers,
   const badgeText = conf.barBadgeTextColor;
   const giftBack = "#00FF00";
   const giftText = "#00FF00";
+<<<<<<< HEAD
+=======
+
+>>>>>>> d0661c7c85a5b158018b984f5f68f10ccbad6665
   const giftSelectedBack = "#00FF00";
   const giftSelectedText = "#00FF00";
   //upsell
@@ -166,18 +175,22 @@ export function GeneralStylePanel({ styleHandlers,
   const unitLabelSize = conf.unitLabelSize;
   const unitLabelStyle = conf.unitLabelStyle;
 
+<<<<<<< HEAD
   const handleSettingsToggle = useCallback(
     () => setOpenStyle((open) => !open),
     []
   );
+=======
+  console.log("blockTitleStyle", blockTitleStyle);
+>>>>>>> d0661c7c85a5b158018b984f5f68f10ccbad6665
 
   return (
     <Card>
       <BlockStack gap="200">
         <InlineStack align="start">
           <Button
-            onClick={handleSettingsToggle}
-            disclosure={openStyle ? "up" : "down"}
+            onClick={onToggle}
+            disclosure={open ? "up" : "down"}
             ariaControls="collapsible-settings"
             variant="plain"
             icon={PaintBrushFlatIcon}
@@ -186,7 +199,7 @@ export function GeneralStylePanel({ styleHandlers,
           </Button>
         </InlineStack>
 
-        <Collapsible open={openStyle} id="collapsible-settings" expandOnPrint>
+        <Collapsible open={open} id="collapsible-settings" expandOnPrint>
           <BlockStack gap="400">
             <BlockStack gap="200">
               <InlineGrid columns={2}>
@@ -290,12 +303,12 @@ export function GeneralStylePanel({ styleHandlers,
                       }
                     }} />
                     <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={selectedBgColor} colorWidth="100%" onColorChange={(hex: string) => {
-                      if (upSelectedBgColor) {
+                      if (upSelectedBgColorChange) {
                         upSelectedBgColorChange(hex);
                       }
                     }} />
                     <ColorPickerPopoverItem subtitle="Border color" defaultColorSetting={borderColor} colorWidth="100%" onColorChange={(hex: string) => {
-                      if (upBorderColor) {
+                      if (upBorderColorChange) {
                         upBorderColorChange(hex);
                       }
                     }} />
@@ -465,7 +478,7 @@ export function GeneralStylePanel({ styleHandlers,
             <Divider />
 
             {/* {custom styles} */}
-            <BlockStack>
+            {/* <BlockStack>
               <InlineStack align="space-between">
                 <Text variant="headingMd" as="h6">
                   Custom Styles
@@ -487,7 +500,7 @@ export function GeneralStylePanel({ styleHandlers,
                   </Tabs>
                 </BlockStack>
               )}
-            </BlockStack>
+            </BlockStack> */}
 
           </BlockStack>
 
