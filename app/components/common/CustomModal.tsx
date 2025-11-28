@@ -254,7 +254,7 @@ export function CustomModal({ onSave }) {
                         <div className='customStyleProduct' key={product.id}>
                           <InlineStack align='center' blockAlign='center' gap='200'>
                             <div className='productImageContainer' style={{ width: customPhotoSize, height: customPhotoSize }}>
-                              <img className='productImage' src={product.featuredImage} alt={typeof product.title === 'string' ? product.title : ''} />
+                              <img className='productImage' src={product.imageUrl} alt={typeof product.title === 'string' ? product.title : ''} />
                             </div>
                             <div className='productTitleContainer'>
                               <h2 className='porductTitle' style={{ fontSize: textSize, color: textColor }}>

@@ -47,7 +47,6 @@ interface GeneralStylePanelProps {
     upBarBadgeTextColorChange: (...args: any[]) => void;
     upBarUpsellBackColorChange: (...args: any[]) => void;
     upBarUpsellTextColorChange: (...args: any[]) => void;
-
     upSelectedBackColorChange: (...args: any[]) => void;
     upSelectedTextColorChange: (...args: any[]) => void;
     upBlockTitleChange: (...args: any[]) => void;
@@ -76,10 +75,10 @@ export function GeneralStylePanel({
   onToggle,
   onChangeLayoutStyle,
   layoutStyleOptions,
-  layoutSelectedStyle }: GeneralStylePanelProps) {
+  layoutSelectedStyle
+}) {
   const loaderData = useLoaderData<typeof loader>();
   const conf = loaderData.generalStyleConf;
-
   const {
     upCornerRadiusChange,
     upSpacingChange,
@@ -151,13 +150,8 @@ export function GeneralStylePanel({
   const badgeText = conf.barBadgeTextColor;
   const giftBack = "#00FF00";
   const giftText = "#00FF00";
-<<<<<<< HEAD
-=======
-
->>>>>>> d0661c7c85a5b158018b984f5f68f10ccbad6665
   const giftSelectedBack = "#00FF00";
   const giftSelectedText = "#00FF00";
-  //upsell
   const UpsellBack = conf.barUpsellBackColor;
   const UpsellText = conf.barUpsellTextColor;
   const UpsellSelectedBack = conf.barUpsellSelectedBackColor;
@@ -174,15 +168,6 @@ export function GeneralStylePanel({
   const upsellStyle = conf.upsellStyle;
   const unitLabelSize = conf.unitLabelSize;
   const unitLabelStyle = conf.unitLabelStyle;
-
-<<<<<<< HEAD
-  const handleSettingsToggle = useCallback(
-    () => setOpenStyle((open) => !open),
-    []
-  );
-=======
-  console.log("blockTitleStyle", blockTitleStyle);
->>>>>>> d0661c7c85a5b158018b984f5f68f10ccbad6665
 
   return (
     <Card>

@@ -25,7 +25,6 @@ export function GeneralStickyAddToCart({ open, onToggle }) {
   const productArray = loaderData.products;
   const conf = loaderData.generalStickyAddConf;
   console.log("conf", conf);
-  const [open, setOpen] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [selected, setSelected] = useState<number>(0);
   const [contentButtonText, setContentButtonText] = useState(conf.contentButtonText);

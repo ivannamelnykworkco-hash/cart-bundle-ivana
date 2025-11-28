@@ -59,9 +59,9 @@ export function GeneralBuyXgetYfree({
   const loaderData = useLoaderData<typeof loader>();
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [buyQualityalue, setBuyQualityalue] = useState<number>((loaderData as any).buyQualityalue);
-  const [getQualityalue, setGetQualityalue] = useState<number>((loaderData as any).getQualityalue);
-  const [barDefaultPrice, setBarDefaultPrice] = useState((loaderData as any).barDefaultPrice);
+  const [buyQualityalue, setBuyQualityalue] = useState<number>(3);
+  const [getQualityalue, setGetQualityalue] = useState<number>(1);
+  const [barDefaultPrice, setBarDefaultPrice] = useState(402.45);
   const [upsellValue, setUpsellValue] = useState('20');
   const [opacity, setOpacity] = useState<number>(20);
   const [sizeValue, setSizeValue] = useState('13');

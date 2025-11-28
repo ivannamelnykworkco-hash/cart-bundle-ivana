@@ -254,7 +254,7 @@ export function SetDefaultVariantsModal({ productArray }) {
                 </Box>
                 <Box width="30%">
                   <BlockStack align="start">
-                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="single" />
+                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="single" buttonText='Select a product' />
                   </BlockStack>
                 </Box>
               </InlineStack>

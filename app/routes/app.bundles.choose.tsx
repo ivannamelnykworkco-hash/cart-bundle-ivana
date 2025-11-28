@@ -116,10 +116,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     imageUrl: node.image?.url ?? "",
   }));
   // fetch data from prisma
-  let countdownTimerConf = null;
-  let generalStyleConf = null;
-  let generalVolumeConf = null;
-  let generalStickyAddConf = null;
   try {
     const [countdownTimerConf, generalStyleConf, generalVolumeConf, generalStickyAddConf] = await Promise.all([
       getCountdownTimer(),
@@ -859,9 +855,9 @@ export default function BundleSettingsAdvanced() {
                   layoutStyleOptions={layoutStyleOptions}
                   layoutSelectedStyle={layoutSelectedStyle}
                   onChangeLayoutStyle={setLayoutSelectedStyle} />
-                <GeneralVolumePanel open={openPanel === "volume"} onToggle={() => setOpenPanel(openPanel === "volume" ? null : "volume")} />
+                <GeneralVolumePanel open={openPanel === "volume"} onToggle={() => setOpenPanel(openPanel === "volume" ? null : "volume")} onDataChange={handleGeneralVolumeChange} />
                 <CountDownPanel open={openPanel === "countDown"} onToggle={() => setOpenPanel(openPanel === "countDown" ? null : "countDown")}
-                  onChange={handleCountdownTimerChange} />
+                  onDataChange={handleCountdownTimerChange} />
                 <GeneralCheckboxUpsell open={openPanel === "checkBoxUpsell"} onToggle={() => setOpenPanel(openPanel === "checkBoxUpsell" ? null : "checkBoxUpsell")} />
                 <GeneralStickyAddToCart open={openPanel === "sticky"} onToggle={() => setOpenPanel(openPanel === "sticky" ? null : "sticky")} />
                 {quantityBreaks.map((item) => (
