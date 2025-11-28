@@ -26,11 +26,15 @@ export function GeneralBundleUpsell({
   bundleId,
   deleteSection,
   heading,
+  open,
+  onToggle,
   upBundlesChooseTitleChange,
   upBundlesChooseSubTitleChange,
   upBunlesBarLabelTextChange,
   upBundlesBadgeTextChange,
   upBundlesBarUpsellTextChange,
+  upSelectedProductChange,
+  upAddUpsellImageChange,
   upAddProductItemPriceChange,
   onAddUpsell,
   onAddProduct,
@@ -48,11 +52,13 @@ export function GeneralBundleUpsell({
     bundleId: any,
     deleteSection: any
     heading: any,
+    open: any,
+    onToggle: any,
     upBundlesChooseTitleChange: any,
     upBundlesChooseSubTitleChange: any,
     upBunlesBarLabelTextChange: any,
     upBundlesBarUpsellTextChange: any,
-    upAddProductItemPriceChange: any,
+    upAddProductItemPriceChange: (id: string, price: string, defaultBasePrice?: string) => void,
     onAddUpsell: any,
     onAddProduct: any,
     onDeleteUpsell: any,
@@ -74,7 +80,6 @@ export function GeneralBundleUpsell({
     id: product.id,
     variants: product.variants
   }));
-  const [open, setOpen] = useState(false);
   const [showQuantityChecked, setShowQuantityChecked] = useState(false);
   const [defaultQuantityValue, setDefaultQuantityValue] = useState(1);
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
@@ -191,10 +196,6 @@ export function GeneralBundleUpsell({
     [],
   );
 
-  const handleSettingsToggle = useCallback((
-
-  ) => setOpen((open) => !open),
-    []);
   const handleSizeChange = useCallback(
     (newValue: string) => setSizeValue(newValue),
     [],
@@ -212,21 +213,11 @@ export function GeneralBundleUpsell({
     { label: "Most Popular", value: 'mostpopular' },
   ]
 
-  const QuantityBackground = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
+  const QuantityBackground = "#FF0000";
   const handleColorQuantityBackground = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
-  const QuantityText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
-  };
+  const QuantityText = "#FF0000";
   const handleColorQuantityText = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
@@ -245,7 +236,7 @@ export function GeneralBundleUpsell({
       <BlockStack gap="400">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"
@@ -254,8 +245,8 @@ export function GeneralBundleUpsell({
             {heading}
           </Button>
           <InlineStack gap="100">
-            <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
-            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
+            {/* <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
+            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" /> */}
             <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
             <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(bundleId)} />
           </InlineStack>
@@ -401,31 +392,25 @@ export function GeneralBundleUpsell({
 
             {products.map((item) => (
               <BlockStack key={item.id}>
-                {selectedProduct && (
-                  <SelectVariantModal
-                    productArray={selectedProduct}
-                    onSelect={handleReceiveProduct}
-                    title="Select products"
-                    selectionMode="singleVariant"
-
-                  />
-                )}
                 <SelectProductModal
                   productArray={productArray}
                   onSelect={handleReceiveProduct(item.id)}
                   title="Select products"
                   selectionMode="nestedProduct"
+                  buttonText='Select a product'
                 />
                 {selectedProduct[item.id] && (
-                  <BoxProductItem
-                    id={item.id}
-                    key={item.id}
-                    bundleId={bundleId}
-                    upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
-                    upAddProductItemPriceChange={upAddProductItemPriceChange}
-                    deleteSection={deleteProduct}
-                    selectproductInfo={selectedProduct[item.id]}
-                  />
+                  <Box>
+                    <BoxProductItem
+                      id={item.id}
+                      key={item.id}
+                      bundleId={bundleId}
+                      upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
+                      upAddProductItemPriceChange={upAddProductItemPriceChange}
+                      deleteSection={deleteProduct}
+                      selectproductInfo={selectedProduct[item.id]}
+                    />
+                  </Box>
                 )}
               </BlockStack>
             ))}
@@ -437,12 +422,18 @@ export function GeneralBundleUpsell({
               <InlineGrid columns={3} gap='200'>
                 <Button icon={ImageIcon} >Add theme</Button>
                 <Button onClick={addBoxUpSell} icon={ProductAddIcon}>Add upsell</Button>
-                <Button onClick={addGift} icon={GiftCardIcon} >Add theme</Button>
+                {/* <Button onClick={addGift} icon={GiftCardIcon} >Add theme</Button> */}
               </InlineGrid>
               <BlockStack gap="300">
                 {/* {Add upsell} */}
                 {boxUpSells.map((item) => (
-                  <BoxUpSellItem id={item.id} key={item.id} bundleId={bundleId} upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange} upAddUpsellPriceChange={upAddUpsellPriceChange} deleteSection={deleteBoxUpsell} />
+                  <BoxUpSellItem id={item.id} key={item.id}
+                    bundleId={bundleId}
+                    upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
+                    upAddUpsellPriceChange={upAddUpsellPriceChange}
+                    upSelectedProductChange={upSelectedProductChange}
+                    upAddUpsellImageChange={upAddUpsellImageChange}
+                    deleteSection={deleteBoxUpsell} />
                 ))}
               </BlockStack>
               <BlockStack gap="300">

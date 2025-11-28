@@ -11,16 +11,12 @@ function parseNumber(str) {
 }
 
 
-const defaultColorHSB = {
-  hue: 1,
-  saturation: 0,
-  brightness: 0,
-  alpha: 1,
-};
+const defaultColorHSB = "#FF0000";
 
-const defaultColor = JSON.stringify(defaultColorHSB);
+//const defaultColor = JSON.stringify(defaultColorHSB);
 
-// This is a placeholder for database operations
+const defaultColor = "#00FF00"
+// This is a placehold;er for database operations
 // Replace with your actual database (Prisma, MongoDB, etc.)
 
 export async function getGeneralStyle(): Promise<GeneralStyle> {

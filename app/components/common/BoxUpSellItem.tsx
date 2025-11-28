@@ -1,35 +1,43 @@
-import { Banner, BlockStack, Button, Checkbox, InlineGrid, InlineStack, RadioButton, Select, Text, TextField } from "@shopify/polaris";
+import { Banner, BlockStack, Box, Button, Checkbox, InlineGrid, InlineStack, RadioButton, Select, Text, TextField, Thumbnail } from "@shopify/polaris";
 import { useCallback, useEffect, useState } from "react";
 import { PopUpover } from "./PopUpover";
 import { ImageLoad } from "./ImageLoad";
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
-export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void }) {
+import { SelectProductModal } from "./SelectProductModal";
+import { DeleteIcon } from '@shopify/polaris-icons';
+export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, upSelectedProductChange, upAddUpsellImageChange }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upAddUpsellImageChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void, upSelectedProductChange: any }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const [selected, setSelected] = useState("default");
-  const [imageSizeValue, setImageSizeValue] = useState('10');
-  const [visibility, setVisibility] = useState("selectedproduct");
+  const [imageSizeValue, setImageSizeValue] = useState('50');
+  const [visibility, setVisibility] = useState("upsellSelectedproduct");
   const [isSelectedDefault, setIsSelectedDefault] = useState(true);
   const [isVisibleSelected, setIsVisibleSelected] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-  const [barAddUpsellDefaultPrice, setBarAddUpsellDefaultPrice] = useState(
-    (loaderData as any).barAddUpsellDefaultPrice
-  );
+  const productArray = loaderData?.products?.map((product: any) => ({
+    title: product.title,
+    imageUrl: product.imageUrl,
+    id: product.id,
+    variants: product.variants
+  }));
   const [upsellValue, setUpsellValue] = useState("20");
-
+  const barAddUpsellDefaultPrice = selectedProduct?.[1]?.price;
   useEffect(() => {
-    const base = Number(barAddUpsellDefaultPrice) || 0;
+    const base = Number(barAddUpsellDefaultPrice) || 10;
+    const quantity = upsellProductQuantitValue;
+    const basePrice = base * quantity;
     const value = Number(upsellValue) || 0;
 
-    let calculated = base;
+    let calculated = basePrice;
 
     if (selected === "discounted%") {
-      calculated = base * (1 - value / 100);
+      calculated = basePrice * (1 - value / 100);
     } else if (selected === "discounted$") {
-      calculated = base - value;
+      calculated = basePrice - value * quantity;
     } else if (selected === "specific") {
-      calculated = value;
+      calculated = value * quantity;
     }
 
     if (calculated < 0) calculated = 0;
@@ -40,7 +48,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
         bundleId,
         id,
         calculated.toFixed(2),
-        base.toFixed(2)
+        basePrice.toFixed(2)
       );
     }
   }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange]);
@@ -52,11 +60,10 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
     },
     [],
   );
-  const handleImageSizeChange = useCallback(
-    (newValue: string) => setImageSizeValue(newValue),
-    [],
-  );
-
+  const handleImageSizeChange = (v: number) => {
+    setImageSizeValue(v);
+    upAddUpsellImageChange(bundleId, id, v);
+  }
 
   const handleUpsellSelectChange = useCallback(
     (value: string) => setSelected(value),
@@ -64,12 +71,19 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
   );
 
   const [barUpsellText, setBarUpsellText] = useState('+ Add at 20% discount');
+  const [upsellProductQuantitValue, setUpsellProductQuantitValue] = useState(1);
 
   const handlesBarUpsellTextChange = (v: string) => {
     setBarUpsellText(v);
     upBundlesBarUpsellTextChange(bundleId, id, v);
   };
-
+  const handleReceiveProduct = (value: string) => {
+    setSelectedProduct(value);
+    upSelectedProductChange(bundleId, id, value); // get products array from product modal
+  };
+  const handleRemoveProduct = () => {
+    setSelectedProduct(null)
+  }
 
   const upsellsOptions = [
     { label: "Default", value: 'default' },
@@ -96,9 +110,9 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
       <BlockStack gap="100">
         <RadioButton
           label="Selected Product"
-          checked={visibility === "selectedproduct"}
-          id="selectedproduct"
-          onChange={() => setVisibility("selectedproduct")}
+          checked={visibility === "upsellSelectedproduct"}
+          id="upsellSelectedproduct"
+          onChange={() => setVisibility("upsellSelectedproduct")}
         />
         <RadioButton
           label="Complementary product"
@@ -106,11 +120,36 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
           id="complementaryproduct"
           onChange={() => setVisibility("complementaryproduct")}
         />
-        {visibility === "selectedproduct" && (
-          <Button variant="primary">Selecte a product</Button>
+        {visibility === "upsellSelectedproduct" && (
+          <>
+            {!selectedProduct && (
+              <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select a product" selectionMode="nestedProduct" buttonText='Select a product' />
+            )}
+            {selectedProduct && (
+              <InlineGrid columns={2}>
+                <InlineStack gap="200" align="start" blockAlign="center">
+                  <Thumbnail
+                    source={selectedProduct[0].imageUrl}
+                    alt="Black choker necklace"
+                  />
+                  <Text as='h5' fontWeight="bold">{selectedProduct[0].title}</Text>
+                </InlineStack>
+                <InlineStack gap="200" align="end" blockAlign="center">
+                  <Box width="60px">
+                    <TextField
+                      type="number"
+                      min={0}
+                      value={upsellProductQuantitValue}
+                      onChange={setUpsellProductQuantitValue}
+                      autoComplete="off" />
+                  </Box>
+                  <Button icon={DeleteIcon} onClick={handleRemoveProduct} />
+                </InlineStack>
+              </InlineGrid>
+            )}
+          </>
         )
         }
-
         {
           visibility === "complementaryproduct" && (
             <BlockStack gap="200">
@@ -201,7 +240,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
           onChange={handleImageSizeChange}
           autoComplete="off"
           min={1}
-          max={50}
+          max={70}
           suffix="px"
         />
       </InlineGrid>

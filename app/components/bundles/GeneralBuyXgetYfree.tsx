@@ -21,12 +21,16 @@ export function GeneralBuyXgetYfree({
   id,
   bundleId,
   deleteSection,
+  open,
+  onToggle,
   heading,
   upBundlesChooseTitleChange,
   upBundlesChooseSubTitleChange,
   upBunlesBarLabelTextChange,
   upBundlesBadgeTextChange,
   upBundlesBarUpsellTextChange,
+  upSelectedProductChange,
+  upAddUpsellImageChange,
   onAddUpsell,
   onDeleteUpsell,
   upAddUpsellPriceChange,
@@ -35,13 +39,17 @@ export function GeneralBuyXgetYfree({
   {
     id: any,
     bundleId: any,
-    deleteSection: any
+    deleteSection: any,
+    open: any,
+    onToggle: any,
     heading: any,
     upBundlesChooseTitleChange: any,
     upBundlesChooseSubTitleChange: any,
     upBundlesBadgeTextChange: any,
     upBunlesBarLabelTextChange: any,
     upBundlesBarUpsellTextChange: any,
+    upSelectedProductChange: any,
+    upAddUpsellImageChange: any,
     onAddUpsell: any,
     onDeleteUpsell: any,
     upAddUpsellPriceChange: (id: any, price: string, defaultBasePrice?: string) => void,
@@ -49,7 +57,6 @@ export function GeneralBuyXgetYfree({
   }) {
 
   const loaderData = useLoaderData<typeof loader>();
-  const [open, setOpen] = useState(false);
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [buyQualityalue, setBuyQualityalue] = useState<number>((loaderData as any).buyQualityalue);
@@ -134,15 +141,6 @@ export function GeneralBuyXgetYfree({
     }
   }, [barDefaultPrice, buyQualityalue, getQualityalue, upPriceChange, bundleId]);
 
-  // const handleChange = useCallback(
-  //   (newValue: string) => {
-  //     setUpsellValue(newValue);
-  //   },
-  //   [],
-  // );
-  const handleSettingsToggle = useCallback((
-  ) => setOpen((open) => !open),
-    []);
   const handleSizeChange = useCallback(
     (newValue: string) => setSizeValue(newValue),
     [],
@@ -159,21 +157,11 @@ export function GeneralBuyXgetYfree({
     { label: "Most Popular", value: 'mostpopular' },
   ]
 
-  const QuantityBackground = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
+  const QuantityBackground = "#FF0000";
   const handleColorQuantityBackground = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
-  const QuantityText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 1,
-    alpha: 1,
-  };
+  const QuantityText = "#FF0000";
   const handleColorQuantityText = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
@@ -182,7 +170,7 @@ export function GeneralBuyXgetYfree({
       <BlockStack gap="400">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"
@@ -191,8 +179,8 @@ export function GeneralBuyXgetYfree({
             {heading}
           </Button>
           <InlineStack gap="100">
-            <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
-            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
+            {/* <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
+            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" /> */}
             <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
             <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(id)} />
           </InlineStack>
@@ -321,6 +309,8 @@ export function GeneralBuyXgetYfree({
                     bundleId={bundleId} // important
                     upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
                     upAddUpsellPriceChange={upAddUpsellPriceChange}
+                    upSelectedProductChange={upSelectedProductChange}
+                    upAddUpsellImageChange={upAddUpsellImageChange}
                     deleteSection={deleteBoxUpsell} // calls parent's delete with bundleId + upsellId
                   />
                 ))}

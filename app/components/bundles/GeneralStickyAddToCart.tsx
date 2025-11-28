@@ -18,8 +18,7 @@ import { RadioWithInput } from '../common/RadioWithInput';
 import { PopUpover } from '../common/PopUpover';
 import { SwitchIcon } from '../common/SwitchIcon';
 
-export function GeneralStickyAddToCart() {
-  const [open, setOpen] = useState(false);
+export function GeneralStickyAddToCart({ open, onToggle }) {
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
 
   const [selected, setSelected] = useState<number>(0);
@@ -34,39 +33,17 @@ export function GeneralStickyAddToCart() {
     { id: 'style', content: 'Style', panelID: 'style-1' },
   ];
 
-  const handleSettingsToggle = useCallback(() => setOpen((prev) => !prev), []);
-
-const stickyBack = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
-  };
-const stickyText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
-  };
-const stickyButton = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 0,   
-    alpha: 1,         
-  };
-const stickyButtonText = {
-    hue: 0,         
-    saturation: 0,   
-    brightness: 1,   
-    alpha: 1,         
-  };
+  const stickyBack = "#FF0000";
+  const stickyText = "#FF0000";
+  const stickyButton = "#FF0000";
+  const stickyButtonText = "#FF0000";
 
   return (
     <Card>
       <BlockStack gap="400">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
+            onClick={onToggle}
             disclosure={open ? 'up' : 'down'}
             ariaControls="collapsible-settings"
             variant="plain"

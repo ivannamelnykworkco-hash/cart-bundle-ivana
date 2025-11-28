@@ -206,7 +206,8 @@
 }
 
 .rightLayout {
-  position: fixed;
+  position: sticky;
+  top: 0;
 }
 
 .Polaris-DropZone--sizeMedium {
@@ -324,7 +325,7 @@
 }
 .bundle_bar_most_popular_fancy {
   position: absolute;
-  top: -30px;
+  top: -35px;
   right: -15px;
 } 
 
@@ -376,6 +377,8 @@
   display: flex;
   align-items: center;
   text-align: center;
+  flex: 1;
+
 }
 .bundles-products__product--placeholder {
   justify-content: center;
@@ -405,6 +408,7 @@
 }
 .bundles-products:first-child .bundles-products__divider {
   visibility: hidden;
+  display: none;
 }
 .bundles-products__product--image,
 .bundles-products__product--image img {
@@ -415,4 +419,21 @@
 .bundles-products__product--price {
   display: flex;
   flex-direction: column;
+}
+.products__divider-inline {
+  background: #000;
+}
+.selected-price-tags {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.preview-main {
+  display: flex;
+  gap: 20px;
+}
+.bar-upsell-checkbox-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }

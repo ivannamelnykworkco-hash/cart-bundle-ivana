@@ -58,6 +58,10 @@ interface GeneralStylePanelProps {
     upSubTitleStyleChange: (...args: any[]) => void;
     upLabelChange: (...args: any[]) => void;
     upLabelStyleChange: (...args: any[]) => void;
+    upUpsellSizeChange: (...args: any[]) => void;
+    upUpsellStyleChange: (...args: any[]) => void;
+    upUnitLabelSizeChange: (...args: any[]) => void;
+    upUnitLabelStyleChange: (...args: any[]) => void;
 
     layoutSelectedStyle: any;
     layoutStyleOptions: any;
@@ -65,20 +69,14 @@ interface GeneralStylePanelProps {
   };
 }
 
+
 export function GeneralStylePanel({
   styleHandlers,
+  open,
+  onToggle,
   onChangeLayoutStyle,
   layoutStyleOptions,
-  layoutSelectedStyle
-}: GeneralStylePanelProps) {
-  upUpsellSizeChange: (...args: any[]) => void;
-  upUpsellStyleChange: (...args: any[]) => void;
-  upUnitLabelSizeChange: (...args: any[]) => void;
-  upUnitLabelStyleChange: (...args: any[]) => void;
-};
-}
-
-export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
+  layoutSelectedStyle }: GeneralStylePanelProps) {
   const loaderData = useLoaderData<typeof loader>();
   const conf = loaderData.generalStyleConf;
 
@@ -116,7 +114,6 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
   } = styleHandlers;
 
 
-  const [openStyle, setOpenStyle] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState("layout1"); ///
   const [cornerRadius, setCornerRadius] = useState<any>(conf.cornerRadius);
   const [spacing, setSpacing] = useState<number>(conf.spacing);
@@ -140,47 +137,28 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
       panelID: 'accepts-marketing-content-1',
     },
   ];
-  const cardsBgColor = JSON.parse(conf.cardsBgColor);
-  const selectedBgColor = JSON.parse(conf.selectedBgColor);
-  const borderColor = JSON.parse(conf.borderColor);
-  const blockTitle = JSON.parse(conf.blockTitleColor);
-  const barTitle = JSON.parse(conf.barTitleColor);
-  const barSubtitle = JSON.parse(conf.barSubTitleColor);
-  const barPrice = JSON.parse(conf.barPriceColor);
-  const barFullPrice = JSON.parse(conf.barFullPriceColor);
-  const labelBack = JSON.parse(conf.barLabelBackColor);
-  const labelText = JSON.parse(conf.barLabelTextColor);
-  const badgeBack = JSON.parse(conf.barBadgebackColor);
-  const badgeText = JSON.parse(conf.barBadgeTextColor);
-  const giftBack = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const giftText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const giftSelectedBack = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
-  const giftSelectedText = {
-    hue: 0,
-    saturation: 0,
-    brightness: 0,
-    alpha: 1,
-  };
+  const cardsBgColor = conf.cardsBgColor;
+  const selectedBgColor = conf.selectedBgColor;
+  const borderColor = conf.borderColor;
+  const blockTitle = conf.blockTitleColor;
+  const barTitle = conf.barTitleColor;
+  const barSubtitle = conf.barSubTitleColor;
+  const barPrice = conf.barPriceColor;
+  const barFullPrice = conf.barFullPriceColor;
+  const labelBack = conf.barLabelBackColor;
+  const labelText = conf.barLabelTextColor;
+  const badgeBack = conf.barBadgebackColor;
+  const badgeText = conf.barBadgeTextColor;
+  const giftBack = "#00FF00";
+  const giftText = "#00FF00";
+
+  const giftSelectedBack = "#00FF00";
+  const giftSelectedText = "#00FF00";
   //upsell
-  const UpsellBack = JSON.parse(conf.barUpsellBackColor);
-  const UpsellText = JSON.parse(conf.barUpsellTextColor);
-  const UpsellSelectedBack = JSON.parse(conf.barUpsellSelectedBackColor);
-  const UpsellSelectedText = JSON.parse(conf.barUpsellSelectedTextColor);
+  const UpsellBack = conf.barUpsellBackColor;
+  const UpsellText = conf.barUpsellTextColor;
+  const UpsellSelectedBack = conf.barUpsellSelectedBackColor;
+  const UpsellSelectedText = conf.barUpsellSelectedTextColor;
   const blockTitleSize = conf.barBlocktitle;
   const blockTitleStyle = conf.barBlocktitleFontStyle;
   const titleSize = conf.bartitleSize;
@@ -196,19 +174,13 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
 
   console.log("blockTitleStyle", blockTitleStyle);
 
-
-  const handleSettingsToggle = useCallback(
-    () => setOpenStyle((open) => !open),
-    []
-  );
-
   return (
     <Card>
       <BlockStack gap="200">
         <InlineStack align="start">
           <Button
-            onClick={handleSettingsToggle}
-            disclosure={openStyle ? "up" : "down"}
+            onClick={onToggle}
+            disclosure={open ? "up" : "down"}
             ariaControls="collapsible-settings"
             variant="plain"
             icon={PaintBrushFlatIcon}
@@ -217,7 +189,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
           </Button>
         </InlineStack>
 
-        <Collapsible open={openStyle} id="collapsible-settings" expandOnPrint>
+        <Collapsible open={open} id="collapsible-settings" expandOnPrint>
           <BlockStack gap="400">
             <BlockStack gap="200">
               <InlineGrid columns={2}>
@@ -321,12 +293,12 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                       }
                     }} />
                     <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={selectedBgColor} colorWidth="100%" onColorChange={(hex: string) => {
-                      if (upSelectedBgColor) {
+                      if (upSelectedBgColorChange) {
                         upSelectedBgColorChange(hex);
                       }
                     }} />
                     <ColorPickerPopoverItem subtitle="Border color" defaultColorSetting={borderColor} colorWidth="100%" onColorChange={(hex: string) => {
-                      if (upBorderColor) {
+                      if (upBorderColorChange) {
                         upBorderColorChange(hex);
                       }
                     }} />
@@ -496,7 +468,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
             <Divider />
 
             {/* {custom styles} */}
-            <BlockStack>
+            {/* <BlockStack>
               <InlineStack align="space-between">
                 <Text variant="headingMd" as="h6">
                   Custom Styles
@@ -518,7 +490,7 @@ export function GeneralStylePanel({ styleHandlers }: GeneralStylePanelProps) {
                   </Tabs>
                 </BlockStack>
               )}
-            </BlockStack>
+            </BlockStack> */}
 
           </BlockStack>
 

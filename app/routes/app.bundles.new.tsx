@@ -360,7 +360,7 @@ export default function NewBundle() {
                 Quantity breaks for different products
               </Text>
             </div>
-            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/new/bogo")} >
+            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/choose")} >
               Choose
             </Button>
           </div>
@@ -495,7 +495,7 @@ export default function NewBundle() {
                 Quantity breaks for different products
               </Text>
             </div>
-            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/new/quantity-breaks")} >
+            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/choose")} >
               Choose
             </Button>
           </div>
@@ -665,7 +665,7 @@ export default function NewBundle() {
                 Complete the bundle
               </Text>
             </div>
-            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/new/complete")}>
+            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/choose")}>
               Choose
             </Button>
           </div>
@@ -814,7 +814,7 @@ export default function NewBundle() {
                 Subscription
               </Text>
             </div>
-            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/new/subscription")} >
+            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/choose")} >
               Choose
             </Button>
           </div>
@@ -1044,7 +1044,7 @@ export default function NewBundle() {
                 Progressive gifts
               </Text>
             </div>
-            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/new/multi-pack")} >
+            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/choose")} >
               Choose
             </Button>
           </div>

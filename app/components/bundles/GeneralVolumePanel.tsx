@@ -27,7 +27,7 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
 
-export function GeneralVolumePanel() {
+export function GeneralVolumePanel({ open, onToggle }) {
   const loaderData = useLoaderData<typeof loader>();
 
   const thirdLoaderData = {
@@ -48,14 +48,7 @@ export function GeneralVolumePanel() {
     id: collection.id
   }));
 
-  const bundlingColor = {
-    hue: 36,
-    saturation: 1,
-    brightness: 1,
-    alpha: 1,
-  };
-
-  const [openStyle, setOpenStyle] = useState(false);
+  const bundlingColor = "#FF0000";
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [eligible, setEligible] = useState(thirdLoaderData.eligible);
   const [photoSize, setPhotoSize] = useState<any>(32);
@@ -65,11 +58,6 @@ export function GeneralVolumePanel() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [excludedProduct, setExcludedProduct] = useState<any>(null);
-
-  const handleSettingsToggle = useCallback(
-    () => setOpenStyle((open) => !open),
-    []
-  );
 
   const handleReceiveProduct = (value) => {
     setSelectedProduct(value); // get products array from product modal
@@ -88,8 +76,8 @@ export function GeneralVolumePanel() {
       <BlockStack gap="200">
         <InlineStack align="space-between">
           <Button
-            onClick={handleSettingsToggle}
-            disclosure={openStyle ? "up" : "down"}
+            onClick={onToggle}
+            disclosure={open ? "up" : "down"}
             ariaControls="collapsible-settings"
             variant="plain"
             icon={CollectionListIcon}
@@ -98,7 +86,7 @@ export function GeneralVolumePanel() {
           </Button>
           <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
         </InlineStack>
-        <Collapsible open={openStyle} id="collapsible-settings" expandOnPrint>
+        <Collapsible open={open} id="collapsible-settings" expandOnPrint>
           <BlockStack gap="200">
             {/* {eligible layout} */}
             <BlockStack gap="200">
@@ -125,7 +113,7 @@ export function GeneralVolumePanel() {
                   onChange={() => setEligible("collection")}
                 />
                 {eligible === "productsExcept" && (
-                  <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" />
+                  <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
                 )
                 }
                 {
@@ -136,7 +124,7 @@ export function GeneralVolumePanel() {
                 }
                 {
                   eligible === "product" && (
-                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" />
+                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
                   )
                 }
               </BlockStack>
