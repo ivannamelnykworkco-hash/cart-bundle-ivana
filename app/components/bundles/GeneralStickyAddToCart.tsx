@@ -18,9 +18,12 @@ import { RadioWithInput } from '../common/RadioWithInput';
 import { PopUpover } from '../common/PopUpover';
 import { SwitchIcon } from '../common/SwitchIcon';
 import { useLoaderData } from '@remix-run/react';
-import { loader } from '../product/ProductList';
+import type { loader } from '../product/ProductList';
 
 export function GeneralStickyAddToCart({ open, onToggle }) {
+  const loaderData = useLoaderData<typeof loader>();
+  const productArray = loaderData.products;
+
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
 
   const [selected, setSelected] = useState<number>(0);
