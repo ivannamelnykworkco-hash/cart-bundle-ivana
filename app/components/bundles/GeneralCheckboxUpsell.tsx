@@ -1,12 +1,12 @@
 import { BlockStack, Button, Card, Collapsible, InlineStack } from "@shopify/polaris";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ProductIcon } from '@shopify/polaris-icons'
 import { UpsellItem } from "../common/UpsellItem";
 import { SwitchIcon } from "../common/SwitchIcon";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
-export function GeneralCheckboxUpsell({ open, onToggle }) {
+export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData?.products?.map((product: any) => ({
@@ -15,17 +15,63 @@ export function GeneralCheckboxUpsell({ open, onToggle }) {
     id: product.id,
     variants: product.variants
   }));
-
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [sections, setSections] = useState([{ id: Math.random().toString(36).substr(2, 9) }]);
+  const initialUpsellData = (() => {
+    try {
+      return JSON.parse(loaderData?.checkboxUpsellConf?.upsellData);
+    } catch (e) {
+      return [];
+    }
+  })();
+  const [upsellData, setUpsellData] = useState(initialUpsellData);
+  const sectionsId = upsellData.map(item => ({ id: item.deleteId }));
+  const [sections, setSections] = useState(sectionsId);
 
   const addSection = () => {
-    setSections(prev => [...prev, { id: Math.random().toString(36).substr(2, 9) }])
+    const id = Math.random().toString(36).substr(2, 9);
+    setSections(prev => ([...prev, { id: id }]));
+    setUpsellData(prevData => ([...prevData, {
+      deleteId: id,
+      title: "",
+      selected: "discounted %",
+      upsellTitle: "{{product}}",
+      upsellSubTitle: "Save {{saved_amount}}!",
+      value: "20",
+    }]));
+    return;
   }
 
-  const deleteSection = (id: any) => {
-    setSections(prev => prev.filter(item => item.id !== id))
+  const deleteSection = (id: string) => {
+    //    setSections(prev => prev.filter(item => item.id !== id));
+    setSections(prevSections => {
+      const index = prevSections.findIndex(item => item.id === id);
+
+      if (index === -1) {
+        return prevSections;
+      }
+      // 1. Remove the section (UI component)
+      const newSections = prevSections.filter(item => item.id !== id);
+      // 2. Remove the corresponding upsellData entry
+      setUpsellData(prevData => prevData.filter((_, i) => i !== index));
+
+      return newSections;
+    });
   }
+
+  const handleOnChange = useCallback((index, data) => {
+    setUpsellData(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], ...data };
+      return updated;
+    });
+  }, []);
+
+  useEffect(() => {
+    onUpsellChange(upsellData);
+  }, [
+    upsellData,
+    onUpsellChange
+  ]);
 
   return (
     < Card >
@@ -49,9 +95,13 @@ export function GeneralCheckboxUpsell({ open, onToggle }) {
           expandOnPrint
         >
           <BlockStack gap="200">
-            {sections.map((section, index) => (
-              <UpsellItem number={index + 1} key={section.id} deleteId={section.id} deleteSection={deleteSection} productArray={productArray} />
+            {upsellData.map((upsellItem, index) => (
+              <UpsellItem index={index} key={upsellItem.deleteId} upsellData={upsellData} deleteId={upsellItem.deleteId} deleteSection={deleteSection} productArray={productArray} onChange={handleOnChange} />
             ))}
+
+            {/* {sections.map((section, index) => (
+              <UpsellItem index={index} number={index + 1} key={section.id} deleteId={section.id} deleteSection={deleteSection} productArray={productArray} onChange={handleOnChange} />
+            ))} */}
             <Button fullWidth onClick={addSection}>Add upsell</Button>
           </BlockStack>
 

@@ -82,7 +82,8 @@ model BundlePurchase {
 }
 
 model GeneralSetting {
-  id String @id
+  id String @id @default(cuid())
+  bundleId String
   bundleName String
   discountName String
   blockTitle String
@@ -102,7 +103,9 @@ model GeneralSetting {
   hideTheme   Boolean
   colorSwatchArray   String
   imageSwatchArray   String
-  swatchSize    String
+  swatchOption String
+  swatchType String
+  swatchSize    Int
   swatchShape   String
   setDefaultVariant   String
   showPrices  Boolean
@@ -110,15 +113,17 @@ model GeneralSetting {
   unitLabel   String
   useProductCompare Boolean
   showPricesWithout Boolean
+  showPriceRounding Boolean
   priceRounding     String
-  updateTheme       String
+  updateTheme       Boolean
+  priceSelect       String
   skipCart    Boolean
+  showAlert Boolean
   showWhenStock     Int
   msgText     String
   msgColor    String
   createdAt String
   updatedAt     String
-
 }
 
 model CountdownTimer {
@@ -218,6 +223,14 @@ model StickyAdd {
   stylePhotoCornerRadius    Int
   styleButtonPadding    Int
   styleButtonCornerRadius   Int
+  createdAt             String
+  updatedAt             String
+}
+
+model CheckboxUpsell {
+  id                  String @id
+  bundleId            String
+  upsellData          Json
   createdAt             String
   updatedAt             String
 }

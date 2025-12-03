@@ -1,13 +1,18 @@
 import { Box, Button, InlineGrid, InlineStack, Select, Text, TextField, Thumbnail } from "@shopify/polaris";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SelectProductModal } from "./SelectProductModal";
 import { DeleteIcon, EditIcon } from "@shopify/polaris-icons";
-export function UpsellItem({ number, deleteId, deleteSection, productArray }: { number: any, deleteId: any, deleteSection: (id: any) => void, productArray: any }) {
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "../product/ProductList";
 
-  const [selected, setSelected] = useState("default");
-  const [upsellTitle, setUpsellTitle] = useState("{{product}}");
-  const [upsellSubTitle, setUpsellSubTitle] = useState("Save {{saved_amount}}!");
-  const [value, setValue] = useState('20');
+export function UpsellItem({ index, upsellData, deleteId, deleteSection, productArray, onChange }: { index: number, number: any, upsellData: any, deleteId: any, deleteSection: (id: any) => void, productArray: any }) {
+  const loaderData = useLoaderData<typeof loader>();
+  // const upsellData = JSON.parse(loaderData?.checkboxUpsellConf?.upsellData);
+  const upsellItem = upsellData.find(obj => obj.deleteId === deleteId);
+  const [selected, setSelected] = useState(upsellItem.selected);
+  const [upsellTitle, setUpsellTitle] = useState(upsellItem.upsellTitle);
+  const [upsellSubTitle, setUpsellSubTitle] = useState(upsellItem.upsellSubTitle);
+  const [value, setValue] = useState(upsellItem.value);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   const upsellsOptions = [
@@ -35,12 +40,33 @@ export function UpsellItem({ number, deleteId, deleteSection, productArray }: { 
     setSelectedProduct(null)
   }
 
-  console.log("selectedProduct==>", selectedProduct);
+  const upsellItemData = () => ({
+    index,
+    deleteId,
+    selected,
+    value,
+    upsellTitle,
+    upsellSubTitle
+  });
+
+  useEffect(() => {
+    if (upsellItemData) {
+      onChange(index, upsellItemData());
+    }
+  }, [
+    selected,
+    value,
+    upsellTitle,
+    upsellSubTitle,
+    deleteId
+  ]);
+
+
   return (
     <div style={{ borderRadius: "10px", border: '1px solid lightgrey', padding: '15px', gap: "10px", display: 'flex', flexDirection: 'column' }}>
       <InlineStack align="space-between">
         <Text as="p" variant="bodyMd" fontWeight="semibold">
-          Upsell # {number}
+          Upsell # {index + 1}
         </Text>
         <Button variant="plain" textAlign="left" onClick={() => deleteSection(deleteId)}>
           Remove upsell

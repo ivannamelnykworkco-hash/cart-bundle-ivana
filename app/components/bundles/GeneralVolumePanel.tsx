@@ -29,7 +29,6 @@ import { loader } from "../product/ProductList";
 
 export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
   const loaderData = useLoaderData<typeof loader>();
-  console.log("generalvolumeconf", loaderData);
 
   const productArray = loaderData?.products?.map((product: any) => ({
     title: product.title,
@@ -58,10 +57,24 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [excludedProduct, setExcludedProduct] = useState<any>(null);
-  const [dataLoad, setDataLoad] = useState(null);
   const [imageData, setImageData] = useState(conf.layoutImageUrl);
   const id = conf.id;
   const bundleId = conf.bundleId;
+  const initDataLoad = {
+    heading: conf.customHeadingText,
+    buttonText: conf.customButtonText,
+    primaryButtonSize: conf.customButtonSize,
+    textSize: conf.customTextSize,
+    customPhotoSize: conf.customPhotoSize,
+    customMessageText: conf.customMessageText,
+    overlayColor: conf.customOverlayColor,
+    priceColor: conf.customPriceColor,
+    compareAtPriceColor: conf.customCompareAtPriceColor,
+    textColor: conf.customTextColor,
+    buttonColor: conf.customButtonColor,
+    buttonTextColor: conf.customButtonTextColor
+  };
+  const [dataLoad, setDataLoad] = useState(initDataLoad);
 
   const handleReceiveProduct = (value) => {
     setSelectedProduct(value); // get products array from product modal
@@ -82,6 +95,11 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
   const handleImageChange = (file) => {
     setImageData(URL.createObjectURL(file));
   }
+  const handleColorChange = (data) => {
+    //////////////////////////
+    // ///////////////    // setStyleTitleColor(data);
+  };
+
 
   useEffect(() => {
     if (onDataChange) {
@@ -98,7 +116,8 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
         imageData,
       });
     }
-  }, [eligible,
+  }, [
+    eligible,
     photoSize,
     isProductName,
     isShowPrice,
@@ -161,7 +180,7 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
                   )
                 }
                 {
-                  eligible === "product" && (
+                  eligible === "productsSelected" && (
                     <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
                   )
                 }
@@ -187,7 +206,7 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
 
               {/* {color and product photo size} */}
               <BlockStack gap="200">
-                <ColorPickerPopoverItem subtitle="Color" defaultColorSetting={layoutColor} colorWidth="50px" />
+                <ColorPickerPopoverItem subtitle="Color" defaultColorSetting={layoutColor} colorWidth="50px" onColorChange={handleColorChange} />
                 <BlockStack inlineAlign="stretch">
                   <Text as="p" variant="bodySm">Product photo size</Text>
                   <InlineStack gap="0" align="space-between" blockAlign="center">

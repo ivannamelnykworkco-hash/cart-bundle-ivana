@@ -38,8 +38,8 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
   const [activeTextBoldButton, setActiveTextBoldButton] = useState(conf.msgBold);
   const [activeTextItalicButton, setActiveItalicBoldButton] = useState(conf.msgItalic);
   const [textFontSize, setTextFontSize] = useState<any>(conf.msgSize);
-  const defaultBgColor = conf.msgBgColor;
-  const defaultTextColor = conf.msgTextColor;
+  const [msgBgColor, setMsgBgColor] = useState<any>(conf.msgBgColor);
+  const [msgTextColor, setMsgTextColor] = useState<any>(conf.msgTextColor);
   const [active, setActive] = useState<any>(null);
 
   const gatherStateData = () => ({
@@ -53,6 +53,8 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
     activeTextBoldButton,
     activeTextItalicButton,
     textFontSize,
+    msgBgColor,
+    msgTextColor
   });
 
   // Send data to parent on any change
@@ -71,6 +73,8 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
     activeTextBoldButton,
     activeTextItalicButton,
     textFontSize,
+    msgBgColor,
+    msgTextColor,
     onDataChange,
   ]);
 
@@ -101,7 +105,12 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
     (newValue: string) => setTextFontSize(newValue),
     [],
   );
-
+  const handleBgColorChange = (value) => {
+    setMsgBgColor(value);
+  }
+  const handleTextColorChange = (value) => {
+    setMsgTextColor(value);
+  }
 
   return (
     < Card >
@@ -274,11 +283,11 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
             <InlineStack align="space-around" blockAlign="end">
               <Box width="20%">
                 <Text as="p" variant="bodySm">Background</Text>
-                <ColorPickerPopoverItem subtitle="" defaultColorSetting="#000" colorWidth="100%" />
+                <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgBgColor} colorWidth="100%" onColorChange={handleBgColorChange} />
               </Box>
               <Box>
                 <Text as="p" variant="bodySm">Text</Text>
-                <ColorPickerPopoverItem subtitle="" defaultColorSetting="#AAA" colorWidth="100%" />
+                <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgTextColor} colorWidth="100%" onColorChange={handleTextColorChange} />
               </Box>
               <Box>
                 <Text as="p" variant="bodySm">Alignment</Text>
