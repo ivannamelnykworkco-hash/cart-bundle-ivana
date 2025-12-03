@@ -1,0 +1,137 @@
+<link rel="stylesheet" href="https://{{ shop.domain }}/apps/cart-drawer-settings">
+
+{{ 'cartdrawer-bundle.css' | asset_url | stylesheet_tag }}
+{{ 'cartdrawer-bundle-app.css' | asset_url | stylesheet_tag }}
+
+<script
+  src="{{ 'cartdrawer-bundle.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+<div id="xcart-overlay" class="xcart-overlay" aria-hidden="true" hidden>
+</div>
+  {{ shop.permanent_domain |  url_encode }}
+<aside
+  id="xcart-drawer"
+  class="xcart-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Shopping cart"
+  tabindex="-1"
+  aria-hidden="true"
+  data-xcart-currency="{{ shop.currency }}"
+>
+  <header class="xcart-drawer__header">
+    <h2 class="xcart-drawer__title">Your cart</h2>
+    <button
+      id="xcart-close"
+      class="xcart-icon-btn"
+      type="button"
+      aria-label="Your cart"
+      title="Close"
+      data-xcart-close
+    >
+      <!-- Close SVG -->
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.9 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.9a1 1 0 0 0 1.41-1.41L13.41 12l4.9-4.89a1 1 0 0 0-.01-1.4Z"></path>
+      </svg>
+    </button>
+  </header>
+
+  <section class="xcart-drawer__body">
+    <div class="xcart-line-items-with-bundle">
+      <div id="xcart-line-items" class="xcart-line-items" role="list"></div>
+      <div id="xcart-bundle-app">
+        <div class="xcart-bundle-app--header">
+          <span>BUNDLE & SAVE</span>
+        </div>
+        <div class="xcart-main-quantity-break">
+          <div class="xcart-main-quantity-break--container">
+            <div class="xcart-bundle_bar_most_popular">
+              <div class="xcart-bundle_bar_most_popular_content">
+                <span>BageText</span>
+              </div>
+              <div class="xcart-bundle_bar_most_popular_fancy">
+                {%- render 'cart-badge' -%}
+              </div>
+            </div>
+          </div>          
+          <div class="xcart-main-section--container">
+            <div class="xcart-main-section--wrapper">
+              <div class="xcart-bundle-checkbox-wrapper">
+                <div class="xcart-bundle-checkbox-body">
+                </div>
+              </div>  
+              <div class="xcart-bundle-content">
+                <div class="xcart-bundle-text">
+                  <div class="xcart-bundle-title-with-label">
+                    <p class="xcart-bundle-title">Buy 1, get 1 free</p>
+                    <p class="xcart-bundle-label">save 50%</p>
+                  </div>
+                  <div class="xcart-bundle-subtitle">
+                    <p>subtitle</p>
+                  </div>
+                </div>        
+                <div class="xcart--bundle-price">
+                  <div class="xcart-bundle-discounted-price">
+                    $729.95
+                  </div>
+                  <div class="xcart-bundle-full-price">
+                    <s>1,459.90</s>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+           <div class="xcart-add-upsell--wrapper">
+              <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+              <img src="" alt="">
+              <span class="xcart-add-upsell-text">+ Add at 20% discount</span>
+              <div class="xcart-add-upsell-price">
+                <div class="xcart-add-upsell-discounted-price">$8.00</div>
+                <div class="xcart-add-upsell-full-price"><s>$8.00</s></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="xcart-drawer__actions">
+      <div class="xcart-discount">
+        <label for="xcart-discount-input" class="xcart-label">Discount code</label>
+        <div class="xcart-discount__row">
+          <input id="xcart-discount-input" class="xcart-input" type="text" autocomplete="off" placeholder="Enter code" />
+          <button id="xcart-apply-discount" class="xcart-btn xcart-btn--ghost" type="button">Apply</button>
+        </div>
+      </div>
+
+      <div class="xcart-summary">
+        <div class="xcart-summary__row">
+          <span>Subtotal</span>
+          <span id="xcart-subtotal">$0.00</span>
+        </div>
+        <p class="xcart-note">Taxes and shipping calculated at checkout.</p>
+      </div>
+
+      <div class="xcart-cta">
+        <a href="/cart" class="xcart-btn xcart-btn--secondary" data-xcart-view-cart>View cart</a>
+        <a href="/checkout" id="xcart-checkout" class="xcart-btn xcart-btn--primary">Checkout</a>
+      </div>
+    </div>
+
+    <div id="xcart-bundle-app" class="xcart-bundle">
+      <h3 class="xcart-bundle__title">Special bundle offers</h3>
+      <div class="xcart-bundle__content"><!-- Mount your app here --></div>
+    </div>
+  </section>
+</aside>
+
+
+{% schema %}
+  {
+    "name": "Cart Bundle",
+    "target": "body",
+    "settings": []
+  }
+{% endschema %}

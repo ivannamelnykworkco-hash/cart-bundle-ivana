@@ -6,11 +6,11 @@ import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
 import { SelectProductModal } from "./SelectProductModal";
 import { DeleteIcon } from '@shopify/polaris-icons';
-export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, upSelectedProductChange, upAddUpsellImageChange }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upAddUpsellImageChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void, upSelectedProductChange: any }) {
+export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, upSelectedProductChange, upAddUpsellImageChange }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upAddUpsellImageChange: any, upBundlesBarUpsellTextChange: any, deleteSection: any, upSelectedProductChange: any }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const [selected, setSelected] = useState("default");
-  const [imageSizeValue, setImageSizeValue] = useState('50');
+  const [imageSizeValue, setImageSizeValue] = useState<any>(50);
   const [visibility, setVisibility] = useState("upsellSelectedproduct");
   const [isSelectedDefault, setIsSelectedDefault] = useState(true);
   const [isVisibleSelected, setIsVisibleSelected] = useState(false);
@@ -22,11 +22,12 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
     id: product.id,
     variants: product.variants
   }));
+
   const [upsellValue, setUpsellValue] = useState("20");
   const barAddUpsellDefaultPrice = selectedProduct?.[1]?.price;
   useEffect(() => {
     const base = Number(barAddUpsellDefaultPrice) || 10;
-    const quantity = upsellProductQuantitValue;
+    const quantity = Number(upsellProductQuantitValue);
     const basePrice = base * quantity;
     const value = Number(upsellValue) || 0;
 
@@ -51,7 +52,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
         basePrice.toFixed(2)
       );
     }
-  }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange]);
+  }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange, bundleId, id]);
 
 
   const handleChange = useCallback(
@@ -60,7 +61,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
     },
     [],
   );
-  const handleImageSizeChange = (v: number) => {
+  const handleImageSizeChange = (v: any) => {
     setImageSizeValue(v);
     upAddUpsellImageChange(bundleId, id, v);
   }
@@ -71,7 +72,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
   );
 
   const [barUpsellText, setBarUpsellText] = useState('+ Add at 20% discount');
-  const [upsellProductQuantitValue, setUpsellProductQuantitValue] = useState(1);
+  const [upsellProductQuantitValue, setUpsellProductQuantitValue] = useState<any>(1);
 
   const handlesBarUpsellTextChange = (v: string) => {
     setBarUpsellText(v);
@@ -137,8 +138,10 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
                 <InlineStack gap="200" align="end" blockAlign="center">
                   <Box width="60px">
                     <TextField
+                      label
                       type="number"
                       min={0}
+                      max={100}
                       value={upsellProductQuantitValue}
                       onChange={setUpsellProductQuantitValue}
                       autoComplete="off" />
@@ -228,7 +231,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
         )}
       </InlineGrid>
       {/* {Text} */}
-      <PopUpover title='Text' defaultPopText={barUpsellText} upPopTextChange={handlesBarUpsellTextChange} badgeSelected={""} />
+      <PopUpover title='Text' defaultPopText={barUpsellText} upPopTextChange={handlesBarUpsellTextChange} badgeSelected={""} dataArray={undefined} />
 
       {/* {Imageload and image size} */}
       <InlineGrid columns={2}>

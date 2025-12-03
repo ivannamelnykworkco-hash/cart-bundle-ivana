@@ -17,3 +17,8 @@ scopes = "write_discounts,write_products"
 
 [auth]
 redirect_urls = [ "https://example.com/api/auth" ]
+
+[app_proxy]
+url = "/cart-drawer-settings"
+subpath = "cart-drawer-settings"
+prefix = "apps"
