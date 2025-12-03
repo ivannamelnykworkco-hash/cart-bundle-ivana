@@ -10,7 +10,7 @@ import {
   Text,
   TextField,
 } from '@shopify/polaris';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SettingsIcon } from '@shopify/polaris-icons';
 import { ColorPickerPopoverItem } from '../common/ColorPickerPopoverItem';
 import { SelectFont } from '../common/SelectFont';
@@ -20,11 +20,10 @@ import { SwitchIcon } from '../common/SwitchIcon';
 import { useLoaderData } from '@remix-run/react';
 import type { loader } from '../product/ProductList';
 
-export function GeneralStickyAddToCart({ open, onToggle }) {
+export function GeneralStickyAddToCart({ open, onToggle, onDataChange }) {
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData.products;
   const conf = loaderData.generalStickyAddConf;
-  console.log("conf", conf);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [selected, setSelected] = useState<number>(0);
   const [contentButtonText, setContentButtonText] = useState(conf.contentButtonText);
@@ -71,7 +70,61 @@ export function GeneralStickyAddToCart({ open, onToggle }) {
   const handleStyleButtonFontStyleChange = (data) => {
     setStyleButtonFontStyle(data);
   };
-  handleStyleButtonFontStyleChange
+  const handleStylePhotoSizeChange = (data) => {
+    setStylePhotoSize(data);
+  };
+  const handleStyleButtonPaddingChange = (data) => {
+    setStyleButtonPadding(data);
+  };
+  const handleStylePhotoCornerRadiusChange = (data) => {
+    setStylePhotoCornerRadius(data);
+  };
+  const handleStyleButtonCornerRadiusChange = (data) => {
+    setStyleButtonCornerRadius(data);
+  };
+
+
+  const id = conf.id;
+  const bundleId = conf.bundleId;
+  useEffect(() => {
+    if (onDataChange) {
+      onDataChange({
+        id,
+        bundleId,
+        contentTitleText,
+        contentButtonText,
+        styleBgColor,
+        styleTitleColor,
+        styleButtonColor,
+        styleButtonTextColor,
+        styleTitleFontSize,
+        styleTitleFontStyle,
+        styleButtonFontSize,
+        styleButtonFontStyle,
+        stylePhotoSize,
+        stylePhotoCornerRadius,
+        styleButtonPadding,
+        styleButtonCornerRadius,
+      });
+    }
+  }, [
+    contentTitleText,
+    contentButtonText,
+    styleBgColor,
+    styleTitleColor,
+    styleButtonColor,
+    styleButtonTextColor,
+    styleTitleFontSize,
+    styleTitleFontStyle,
+    styleButtonFontSize,
+    styleButtonFontStyle,
+    stylePhotoSize,
+    stylePhotoCornerRadius,
+    styleButtonPadding,
+    styleButtonCornerRadius,
+    onDataChange
+  ]);
+
   return (
     <Card>
       <BlockStack gap="400">
@@ -136,12 +189,12 @@ export function GeneralStickyAddToCart({ open, onToggle }) {
                     Other
                   </Text>
                   <InlineGrid columns={2} gap="200">
-                    <RadioWithInput title="Product photo size" defaultValue={stylePhotoSize} />
-                    <RadioWithInput title="Button padding" defaultValue={styleButtonPadding} />
+                    <RadioWithInput title="Product photo size" defaultValue={stylePhotoSize} onChange={handleStylePhotoSizeChange} />
+                    <RadioWithInput title="Button padding" defaultValue={styleButtonPadding} onChange={handleStyleButtonPaddingChange} />
                   </InlineGrid>
                   <InlineGrid columns={2} gap="200">
-                    <RadioWithInput title="Product photo corner radius" defaultValue={stylePhotoCornerRadius} />
-                    <RadioWithInput title="Button corner radius" defaultValue={styleButtonCornerRadius} />
+                    <RadioWithInput title="Product photo corner radius" defaultValue={stylePhotoCornerRadius} onChange={handleStylePhotoCornerRadiusChange} />
+                    <RadioWithInput title="Button corner radius" defaultValue={styleButtonCornerRadius} onChange={handleStyleButtonCornerRadiusChange} />
                   </InlineGrid>
                 </BlockStack>
               )}

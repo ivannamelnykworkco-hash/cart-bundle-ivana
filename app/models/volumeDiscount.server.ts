@@ -2,7 +2,7 @@
 import type { VolumeDiscount } from "./types";
 import db from "../db.server";
 
-const defaultColor = "#0000FF"
+const defaultColor = "#00DDDD"
 
 export async function getVolumeDiscount(): Promise<VolumeDiscount> {
   const result = await db.volumeDiscount.findFirst({

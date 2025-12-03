@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   BlockStack,
   Box,
@@ -17,7 +17,7 @@ import { ImageIcon, VariantIcon } from '@shopify/polaris-icons';
 import { ColorPickerPopoverItem } from "./ColorPickerPopoverItem";
 import { ImageUploader } from "./ImageUploder";
 
-export function AddSwatchesModal() {
+export function AddSwatchesModal({ onSaveSwatch }) {
 
   const solidBlack = "2px solid #000";
   const swatchOption = [
@@ -43,18 +43,27 @@ export function AddSwatchesModal() {
   ];
 
   const colorTableRows = [
-    ['$25', <ColorPickerPopoverItem subtitle="" defaultColorSetting="red" colorWidth="100%" />],
-    ['$50', <ColorPickerPopoverItem subtitle="" defaultColorSetting="red" colorWidth="100%" />],
-    ['$100', <ColorPickerPopoverItem subtitle="" defaultColorSetting="red" colorWidth="100%" />],
-    ['$10', <ColorPickerPopoverItem subtitle="" defaultColorSetting="red" colorWidth="100%" />],
-
+    { price: '$25', color: 'red' },
+    { price: '$50', color: 'blue' },
+    { price: '$100', color: 'green' },
+    { price: '$10', color: 'yellow' },
   ];
 
-  const imageTableColumn = ["$50", "$50", "$100", "$10"];
+  const handleOnColorChange = () => {
+  }
 
+  const colorPickerItems = colorTableRows.map((row, index) => (
+    <ColorPickerPopoverItem
+      key={index}
+      subtitle=""
+      defaultColorSetting={row.color}
+      colorWidth="100%"
+      onColorChange={handleOnColorChange()}
+    />
+  ));
+  const imageTableColumn = ["$50", "$50", "$100", "$10"];
   const [file, setFile] = useState<File>();
   const [images, setImages] = useState([null, null, null, null]); // example: 3 uploaders
-
   const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
 
   // const fileUpload = !file && <DropZone.FileUpload />;
@@ -87,7 +96,6 @@ export function AddSwatchesModal() {
     />
   ]);
 
-
   // const imageTableRows = [
   //   ['$50',
   //     <ImageUploader
@@ -116,7 +124,20 @@ export function AddSwatchesModal() {
   const [swatchTypeSelected, setSwatchTypeSelected] = useState(swatchType[0].value);
   const [swatchShapeSelected, setSwatchShapeSelected] = useState(swatchShape[0].value);
   const [swatchSize, setSwatchSize] = useState<number>(100);
-
+  const swatchData = () => ({
+    swatchOptionSelected,
+    swatchTypeSelected,
+    swatchShapeSelected,
+    swatchSize,
+    images
+  });
+  const handleApply = () => handleShowAddSwatches();
+  //to be repaired part 
+  // useEffect(() => {
+  //   if (swatchData()) {
+  //     onSaveSwatch(swatchData());
+  //   }
+  // }, [handleApply]);
   const handleShowAddSwatches = useCallback(() => setActiveModalAddSwatches(!activeModalAddSwatches), [activeModalAddSwatches]);
   const modalAddSwatchActivator = <Button icon={VariantIcon} onClick={handleShowAddSwatches}>Add swatches</Button>;
 
@@ -137,7 +158,6 @@ export function AddSwatchesModal() {
     [],
   );
 
-
   return (
     <Modal
       activator={modalAddSwatchActivator}
@@ -147,7 +167,7 @@ export function AddSwatchesModal() {
       size="large"
       primaryAction={{
         content: 'Apply',
-        onAction: handleShowAddSwatches,
+        onAction: handleApply,
       }}
       secondaryActions={
         [
@@ -195,15 +215,8 @@ export function AddSwatchesModal() {
                       '',
                     ]}
                     rows={colorTableRows}
-
-                  // rows={colorTableRows.map((row) => [
-                  //   <div style={{ width: '250px' }}>{row[0]}</div>,
-                  //   <div style={{ width: '50px', height: '50px', display: 'flex', alignItems: 'center' }}>{row[1]}</div>,
-                  //   <div style={{ width: '150px' }}>{row[2]}</div>,
-                  // ])}
                   />
                 )}
-
                 {(swatchTypeSelected === "isImageSwatch" || swatchTypeSelected === "isImageSwatchDropdown") && (
                   <DataTable
                     columnContentTypes={[

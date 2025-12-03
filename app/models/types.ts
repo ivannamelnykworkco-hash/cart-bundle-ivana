@@ -65,9 +65,47 @@ export interface BundleTypeOption {
 
 export interface GeneralSetting {
   id: string;
-  bundleName: string;
-  discountName: string;
-
+  bundleId: string;
+  bundleName: string;//
+  discountName: string;//
+  blockTitle: string;//
+  visibility: string;//
+  markets: string;//
+  excludedProducts: string;
+  excludedCollections: string;
+  selectedProducts: string;
+  selectedCollections: string;
+  excludeB2B: boolean;//
+  excludePOS: boolean;
+  startDateTime: string;//
+  setEndDate: boolean;//
+  endDateTime: string;//
+  letCustomer: boolean;//
+  showVariant: boolean;//
+  hideTheme: boolean;//
+  colorSwatchArray: string;
+  imageSwatchArray: string;
+  swatchOption: string;
+  swatchType: string;
+  swatchSize: number;
+  swatchShape: string;
+  setDefaultVariant: string;
+  showPrices: boolean;//
+  showBothPrices: boolean;//
+  unitLabel: string;//
+  useProductCompare: boolean;//
+  showPricesWithout: boolean;//
+  showPriceRounding: boolean;//
+  priceRounding: string;//
+  updateTheme: boolean;//
+  priceSelect: string;//
+  skipCart: boolean;//
+  showAlert: boolean;//
+  showWhenStock: number;//
+  msgText: string;//
+  msgColor: string;//
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CountdownTimer {
@@ -150,7 +188,6 @@ export interface VolumeDiscount {
   updatedAt: string
 }
 
-
 export interface StickyAdd {
   id: string,
   bundleId: string,
@@ -171,3 +208,12 @@ export interface StickyAdd {
   createdAt: string,
   updatedAt: string
 }
+
+export interface CheckboxUpsell {
+  id: string,
+  bundleId: string,
+  upsellData: string,
+  createdAt: string,
+  updatedAt: string
+}
+

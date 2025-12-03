@@ -1,8 +1,13 @@
 import { BlockStack, Box, InlineStack, RangeSlider, Text, TextField } from "@shopify/polaris";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export function RadioWithInput({ defaultValue, title }: { defaultValue: any, title: any }) {
+export function RadioWithInput({ defaultValue, title, onChange }: { defaultValue: any, title: any }) {
   const [generalRadius, setGeneralRadius] = useState<any>(defaultValue);
+  useEffect(() => {
+    if (onChange) {
+      onChange(generalRadius);
+    }
+  }, [generalRadius, onChange]);
 
   return (
     <Box>

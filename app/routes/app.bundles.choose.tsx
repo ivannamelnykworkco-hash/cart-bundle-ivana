@@ -39,7 +39,8 @@ import { GeneralBundleUpsell } from "app/components/bundles/GeneralBundleUpsell"
 import { getGeneralStyle, updateGeneralStyle } from "app/models/generalStyle.server";
 import { getVolumeDiscount, updateVolumeDiscount } from "app/models/volumeDiscount.server";
 import { getStickyAdd, updateStickyAdd } from "app/models/stickyAdd.server";
-
+import { getCheckboxUpsell, updateCheckboxUpsell } from "app/models/checkboxUpsell.server";
+import { getGeneralSetting, updateGeneralSetting } from "app/models/generalSetting.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
@@ -117,11 +118,20 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }));
   // fetch data from prisma
   try {
-    const [countdownTimerConf, generalStyleConf, generalVolumeConf, generalStickyAddConf] = await Promise.all([
+    const [
+      countdownTimerConf,
+      generalStyleConf,
+      generalVolumeConf,
+      generalStickyAddConf,
+      checkboxUpsellConf,
+      generalSettingConf
+    ] = await Promise.all([
       getCountdownTimer(),
       getGeneralStyle(),
       getVolumeDiscount(),
-      getStickyAdd()
+      getStickyAdd(),
+      getCheckboxUpsell(),
+      getGeneralSetting()
     ]);
 
     // Handle error, but note that Promise.all rejects on first error
@@ -132,7 +142,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         countdownTimerConf,
         generalStyleConf,
         generalVolumeConf,
-        generalStickyAddConf
+        generalStickyAddConf,
+        checkboxUpsellConf,
+        generalSettingConf
       }
     );
   }
@@ -153,25 +165,39 @@ export async function action({ request, params }) {
     ...Object.fromEntries(await request.formData()),
     params
   };
-  let data = { ...parsedData };
+  let form = { ...parsedData };
+  const countdownTimer = JSON.parse(form.countdownTimer);
+  const volumeDiscount = JSON.parse(form.volumeDiscount);
+  const stickyAdd = JSON.parse(form.stickyAdd);
+  const checkboxUpsell = JSON.parse(form.checkboxUpsell);
+  const generalSetting = JSON.parse(form.generalSetting);
+  const generalStyle = JSON.parse(form.generalStyle);
   try {
-    const result = await updateGeneralStyle(data.id, data);
-    // const result = await updateCountdownTimer(data.id, data);
-    // const result = await updateVolumeDiscount(data.id, data);
-    return json({ success: true, result });
+    // Parse each JSON string
+    await Promise.all([
+      updateCountdownTimer(String(countdownTimer.id), countdownTimer),
+      updateVolumeDiscount(volumeDiscount.id, volumeDiscount),
+      updateStickyAdd(stickyAdd.id, stickyAdd),
+      updateCheckboxUpsell(checkboxUpsell.id, checkboxUpsell),
+      updateGeneralSetting(generalSetting.id, generalSetting),
+      updateGeneralStyle(generalStyle.id, generalStyle)
+    ]);
+    return json({ success: true });
+
   } catch (err) {
     return json(
-      { success: false, error: err.message || err },
+      { success: false, error: err.message || "Data update failed" },
       { status: 500 }
     );
   }
 }
 
+
 /**************************************************************/
 
 interface BoxQuantity {
   id: number;
-}
+};
 
 const fontWeightMap = {
   styleLight: '200',
@@ -194,24 +220,21 @@ const fontStyleMap = {
 };
 
 export default function BundleSettingsAdvanced() {
-  console.log("~~~load");
-
   const loaderData = useLoaderData<typeof loader>();
-  console.log("~~~loaderData", loaderData);
+  const checkboxUpsellConf = loaderData.checkboxUpsellConf;
   /*recevie response from action function*/
-
   const actionData = useActionData();
   useEffect(() => {
     if (actionData) {
       if (actionData.success) {
-        showToast("Countdown timer setting updated successfully!", "success");
+        showToast("Data updated successfully!", "success");
       } else {
         showToast(`Error: ${actionData.error}`, "error");
+        console.log("error", actionData.error);
       }
     }
   }, [actionData]);
-
-  //id: ==> upsellchecked state
+  console.log("actiondata<<<", actionData);
   const [upsellChecked, setUpsellChecked] = useState({});
   const handleUpsellValueChange = (bundlId: string | number, upsellId: boolean, value: boolean | undefined) => {
     setUpsellChecked(prev => ({
@@ -261,6 +284,9 @@ export default function BundleSettingsAdvanced() {
   };
   const [countdownTimerData, setCountdownTimerData] = useState(loaderData.countdownTimerConf);
   const [generalVolumeData, setGeneralVolumeData] = useState(null);
+  const [checkboxUpsellData, setCheckboxUpsellData] = useState(null);
+  const [generalStickyAddData, setGeneralStickyAddData] = useState(null);
+  const [generalSettingData, setGeneralSettingData] = useState(null);
 
   const handleCountdownTimerChange = useCallback((updated: any) => {
     setCountdownTimerData(prev => ({ ...prev, ...updated }));
@@ -268,12 +294,25 @@ export default function BundleSettingsAdvanced() {
   const handleGeneralVolumeChange = useCallback((updated: any) => {
     setGeneralVolumeData(prev => ({ ...prev, ...updated }));
   }, []);
-
+  const handleCheckboxUpsellChange = useCallback((updated: any) => {
+    setCheckboxUpsellData(updated);
+  }, []);
+  const handleGeneralStickyAddChange = useCallback((updated: any) => {
+    setGeneralStickyAddData(prev => ({ ...prev, ...updated }));
+  }, []);
+  const handleGeneralSetting = useCallback((updated: any) => {
+    setGeneralSettingData(prev => ({ ...prev, ...updated }));
+  }, []);
   // Send data to action
   const submit = useSubmit();
 
+  function formDataToObject(fd) {
+    return Object.fromEntries(fd.entries());
+  }
+
   function saveData() {
     const countdownTimerFormData = new FormData();
+    countdownTimerFormData.append('actionType', 'countdownTimer');
     Object.entries(countdownTimerData).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
         countdownTimerFormData.append(key, JSON.stringify(value));
@@ -284,6 +323,7 @@ export default function BundleSettingsAdvanced() {
     });
 
     const generalVolumeFormData = new FormData();
+    generalVolumeFormData.append('actionType', 'volumeDiscount');
     Object.entries(generalVolumeData).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
         generalVolumeFormData.append(key, JSON.stringify(value));
@@ -292,8 +332,42 @@ export default function BundleSettingsAdvanced() {
         generalVolumeFormData.append(key, value as string);
       }
     });
-
+    console.log("volume<<", generalVolumeData);
+    console.log("setting<<", generalSettingData);
+    console.log("sticky<<", generalStickyAddData);
+    console.log("checkbox<<", checkboxUpsellData);
+    console.log("count<<", countdownTimerData);
+    //Save Sticky add to cart data
+    const generalStickyAddFormData = new FormData();
+    generalStickyAddFormData.append('actionType', 'stickyAdd');
+    Object.entries(generalStickyAddData).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        generalStickyAddFormData.append(key, JSON.stringify(value));
+      }
+      else {
+        generalStickyAddFormData.append(key, value as string);
+      }
+    });
+    //Save General setting data
+    const generalSettingFormData = new FormData();
+    generalSettingFormData.append('actionType', 'generalSetting');
+    Object.entries(generalSettingData).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        generalSettingFormData.append(key, JSON.stringify(value));
+      }
+      else {
+        generalSettingFormData.append(key, value as string);
+      }
+    });
+    //Save Checkbox upsell data
+    const checkboxUpsellFormData = new FormData();
+    checkboxUpsellFormData.append('actionType', 'checkboxUpsell');
+    checkboxUpsellFormData.append("id", checkboxUpsellConf.id);
+    checkboxUpsellFormData.append("bundleId", checkboxUpsellConf.bundleId);
+    checkboxUpsellFormData.append("upsellData", JSON.stringify(checkboxUpsellData));
+    //Save General style setting data
     const generalStyleFormData = new FormData();
+    generalStyleFormData.append('actionType', 'generalStyle');
     generalStyleFormData.append("id", GeneralStyleConf.id);
     generalStyleFormData.append("bundleId", GeneralStyleConf.bundleId);
     generalStyleFormData.append("cornerRadius", cornerRadius);
@@ -327,10 +401,15 @@ export default function BundleSettingsAdvanced() {
     generalStyleFormData.append("unitLabelSize", unitLabelSize);
     generalStyleFormData.append("unitLabelStyle", unitLabelStyle);
     generalStyleFormData.append("createdAt", GeneralStyleConf.createdAt);
-    //    submit(countdownTimerData, { method: "post" });
-    // submit(generalVolumeFormData, { method: "post" });
-    submit(generalStyleFormData, { method: "post" });
 
+    const fd = new FormData();
+    fd.append("countdownTimer", JSON.stringify(formDataToObject(countdownTimerFormData)));
+    fd.append("volumeDiscount", JSON.stringify(formDataToObject(generalVolumeFormData)));
+    fd.append("stickyAdd", JSON.stringify(formDataToObject(generalStickyAddFormData)));
+    fd.append("checkboxUpsell", JSON.stringify(formDataToObject(checkboxUpsellFormData)));
+    fd.append("generalSetting", JSON.stringify(formDataToObject(generalSettingFormData)));
+    fd.append("generalStyle", JSON.stringify(formDataToObject(generalStyleFormData)));
+    submit(fd, { method: "post" });
   }
 
   /***************Database Migration Part************/
@@ -397,7 +476,7 @@ export default function BundleSettingsAdvanced() {
   };
 
   useEffect(() => {
-    console.log('addupsellImage:', addupsellImage);
+
   }, [addupsellImage]);
 
   const [barUpsellTexts, setBarUpsellTexts] = useState({});
@@ -849,17 +928,32 @@ export default function BundleSettingsAdvanced() {
           <InlineGrid columns={2} gap="400">
             <Layout.Section>
               <BlockStack gap="200">
-                <GeneralSettingsPanel open={openPanel === "settings"} onToggle={() => setOpenPanel(openPanel === "settings" ? null : "settings")} />
-                <GeneralStylePanel open={openPanel === "style"} onToggle={() => setOpenPanel(openPanel === "style" ? null : "style")}
+                <GeneralSettingsPanel
+                  open={openPanel === "settings"}
+                  onToggle={() => setOpenPanel(openPanel === "settings" ? null : "settings")}
+                  onDataChange={handleGeneralSetting} />
+                <GeneralStylePanel
+                  open={openPanel === "style"}
+                  onToggle={() => setOpenPanel(openPanel === "style" ? null : "style")}
                   styleHandlers={styleHandlers}
                   layoutStyleOptions={layoutStyleOptions}
                   layoutSelectedStyle={layoutSelectedStyle}
                   onChangeLayoutStyle={setLayoutSelectedStyle} />
-                <GeneralVolumePanel open={openPanel === "volume"} onToggle={() => setOpenPanel(openPanel === "volume" ? null : "volume")} onDataChange={handleGeneralVolumeChange} />
-                <CountDownPanel open={openPanel === "countDown"} onToggle={() => setOpenPanel(openPanel === "countDown" ? null : "countDown")}
+                <GeneralVolumePanel
+                  open={openPanel === "volume"}
+                  onToggle={() => setOpenPanel(openPanel === "volume" ? null : "volume")}
+                  onDataChange={handleGeneralVolumeChange} />
+                <CountDownPanel
+                  open={openPanel === "countDown"} onToggle={() => setOpenPanel(openPanel === "countDown" ? null : "countDown")}
                   onDataChange={handleCountdownTimerChange} />
-                <GeneralCheckboxUpsell open={openPanel === "checkBoxUpsell"} onToggle={() => setOpenPanel(openPanel === "checkBoxUpsell" ? null : "checkBoxUpsell")} />
-                <GeneralStickyAddToCart open={openPanel === "sticky"} onToggle={() => setOpenPanel(openPanel === "sticky" ? null : "sticky")} />
+                <GeneralCheckboxUpsell
+                  open={openPanel === "checkBoxUpsell"}
+                  onToggle={() => setOpenPanel(openPanel === "checkBoxUpsell" ? null : "checkBoxUpsell")}
+                  onUpsellChange={handleCheckboxUpsellChange} />
+                <GeneralStickyAddToCart
+                  open={openPanel === "sticky"}
+                  onToggle={() => setOpenPanel(openPanel === "sticky" ? null : "sticky")}
+                  onDataChange={handleGeneralStickyAddChange} />
                 {quantityBreaks.map((item) => (
                   <GeneralQuantityBreack
                     id={item.id}

@@ -2,71 +2,103 @@
 import type { GeneralSetting } from "./types";
 import db from "../db.server";
 
-// This is a placeholder for database operations
-// Replace with your actual database (Prisma, MongoDB, etc.)
-
-export async function getGeneralSetting(id: string): Promise<GeneralSetting> {
-  //  export async function getGeneralSetting(id: string): Promise<GeneralSetting[]> {
+export async function getGeneralSetting(): Promise<GeneralSetting> {
 
   // TODO: Implement database query
-  const result = await db.generalSetting.findFirst({ where: { id } });
+  const result = await db.generalSetting.findFirst();
 
   if (result) {
     return result;
   }
 
-  return { id: '', bundleName: '', discountName: '' }
+  //if no result then send init result
+  const init = await db.generalSetting.create({
+    data: {
+      id: Math.random().toString(36).substr(2, 9),
+      bundleId: Math.random().toString(36).substr(2, 9),
+      bundleName: "",
+      discountName: "",
+      blockTitle: "",
+      visibility: "all",
+      markets: "all",
+      excludedProducts: "",
+      excludedCollections: "",
+      selectedProducts: "",
+      selectedCollections: "",
+      excludeB2B: false,
+      excludePOS: false,
+      startDateTime: new Date().toISOString(),
+      setEndDate: false,
+      endDateTime: new Date().toISOString(),
+      letCustomer: false,
+      showVariant: false,
+      hideTheme: false,
+      colorSwatchArray: "",
+      imageSwatchArray: "",
+      swatchOption: "isDenomination",
+      swatchType: "isDefaultDropdown",
+      swatchSize: 10,
+      swatchShape: "isCircle",
+      setDefaultVariant: "",
+      showPrices: false,
+      showBothPrices: false,
+      unitLabel: "",
+      useProductCompare: false,
+      showPricesWithout: false,
+      showPriceRounding: false,//
+      priceRounding: ".99",
+      updateTheme: false,
+      priceSelect: "pi",//
+      skipCart: false,
+      showAlert: false,
+      showWhenStock: 5,
+      msgText: "Only {{stock}} left",
+      msgColor: "#000000",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+  });
+  return init;
 }
 
-
-export async function createGeneralSetting(data: Partial<GeneralSetting>): Promise<GeneralSetting> {
-  // data: Partial<GeneralSetting>, i: string): Promise<GeneralSetting> {
-  // TODO: Implement database insert
-  //  await db.generalSetting.create({ data: generalSetting })
-  const sample: GeneralSetting = {
-    id: Math.random().toString(36).substr(2, 9),
-    bundleName: data.bundleName || "New Bundle",
-    discountName: data.discountName || "New Discount",
-    // selectedProducts: "draft",
-    // products: data.products || [],
-    // discountType: data.discountType || "percentage",
-    // discountValue: data.discountValue || 0,
-    // stats: {
-    //   visitors: 0,
-    //   conversionRate: 0,
-    //   bundlesRate: 0,
-    //   aov: 0,
-    //   addedRevenue: 0,
-    //   totalRevenue: 0,
-    //   revenuePerVisitor: 0,
-    //   profitPerVisitor: 0,
-    // },
-    // createdAt: new Date().toISOString(),
-    // updatedAt: new Date().toISOString(),
-    // settings: data.settings || {},
+export async function updateGeneralSetting(id: string, data: Partial<GeneralSetting>) {
+  const updateData: any = {
+    bundleName: data.bundleName,
+    discountName: data.discountName,
+    blockTitle: data.blockTitle,
+    visibility: data.visibility,
+    markets: data.markets,
+    excludeB2B: data.excludeB2B === "true",
+    startDateTime: new Date(`${data.startDate}T${data.startTime}`).toISOString(),
+    setEndDate: data.endStateDate === "true",
+    endDateTime: new Date(`${data.endDate}T${data.endTime}`).toISOString(),
+    letCustomer: data.variant === "true",
+    showVariant: data.variantSingle === "true",
+    hideTheme: data.hidnPicker === "true",
+    showPrices: data.showPricesItem === "true",
+    showBothPrices: data.showBothPrices === "true",
+    unitLabel: data.unitLabel,
+    useProductCompare: data.compareAtPrice === "true",
+    showPricesWithout: data.showPriceDecimal === "true",
+    showPriceRounding: data.priceRounding === "true",
+    priceRounding: data.roundingValue,
+    updateTheme: data.updatePrice === "true",
+    priceSelect: data.updatePriceSelect,
+    skipCart: data.isGoCheckout === "true",
+    showAlert: data.isShowLowAlert === "true",
+    // showWhenStock: parseInt(data.showStock, 10),
+    msgText: data.textValue,
+    msgColor: data.textColor,
+    updatedAt: new Date().toISOString()
   };
 
-  return sample;
+  Object.keys(updateData).forEach(
+    (key) => (updateData[key] == null) && delete updateData[key]
+  );
+
+  const result = await db.generalSetting.update({
+    where: { id },
+    data: updateData,
+  });
+  return result;
 }
-
-// export async function updateBundle(id: string, data: Partial<Bundle>, shopId: string): Promise<Bundle> {
-//   // TODO: Implement database update
-//   const bundle = await getBundleById(id, shopId);
-//   if (!bundle) {
-//     throw new Error("Bundle not found");
-//   }
-
-//   return {
-//     ...bundle,
-//     ...data,
-//     updatedAt: new Date().toISOString(),
-//   };
-// }
-
-// export async function deleteBundle(id: string, shopId: string): Promise<void> {
-//   // TODO: Implement database delete
-// }
-
-// export async function updateBundleStats(id: string, stats: Partial<Bundle["stats"]>, shopId: string): Promise<void> {
-//   // TODO: Implement stats update
-// }

@@ -1,4 +1,4 @@
-import { useState, useCallback, useContext } from "react";
+import { useState, useCallback, useContext, useEffect } from "react";
 
 import {
   Card,
@@ -32,143 +32,172 @@ import { SelectCollectionModal } from "../common/SelectCollectionModal";
 import { SelectProductModal } from "../common/SelectProductModal";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
+import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 
-export function GeneralSettingsPanel({ open, onToggle }) {
-
-  //CONST VARIABLES
-
-  const firstLoaderData = {
-    bundleName: "Bundle",
-    unitLabel: '',
-    discountName: "",
-    blockTitle: "BUNDLE & SAVE",
-    visibility: "all",
-    markets: "all",
-    roundingValue: '.90',
-    updatePriceSelect: 'Price per item',
-    excludeB2B: false,
-    excludePOS: false,
-    startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date().toISOString().split("T")[0],
-    startTime: "09:00",
-    endTime: "09:00",
-    selectedProduct: "Gift Card",
-    selectedCountry: "United States",
-    showStock: 1,
-    // Design settings
-    primaryColor: "#000000",
-    secondaryColor: "#10b981",
-    borderRadius: 8,
-    fontSize: 14,
-    // Upsell products
-    upsellProducts: [
-      { id: "1", title: "Product A", price: "$25.00", image: "" },
-      { id: "2", title: "Product B", price: "$35.00", image: "" },
-    ],
-  }
-
+export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   // const loaderData = useContext(LoaderDataContext);
   const loaderData = useLoaderData<typeof loader>();
-
   const productArray = loaderData?.products?.map((product: any) => ({
     title: product.title,
     imageUrl: product.imageUrl,
     id: product.id,
     variants: product.variants
   }));
-
   const collectionArray = loaderData?.collections?.map((collection: any) => ({
     title: collection.title,
     imageUrl: collection.imageUrl,
     id: collection.id
   }));
-
+  const conf = loaderData?.generalSettingConf;
   const marketOptions = [
     { label: "All", value: "all" },
     { label: "United States", value: "us" },
     { label: "Europe", value: "eu" },
   ];
-
   const roundingValueOption = [
     { label: ".99", value: ".99" },
     { label: ".95", value: ".95" },
     { label: ".90", value: ".90" },
-    { label: ".*9", value: ".*9" },
-    { label: ".*0", value: ".*0" },
+    { label: ".x9", value: ".x9" },
+    { label: ".x0", value: ".x0" },
     { label: ".00", value: ".00" },
   ];
-
   const updatePriceSelectOption = [
     { label: "Price per tiem", value: 'pi' },
     { label: "Bundle price", value: 'bp' },
   ]
 
   //USESTATE FUNCTIONS
-  const [bundleName, setBundleName] = useState(firstLoaderData.bundleName);
-  const [discountName, setDiscountName] = useState(firstLoaderData.discountName);
-  const [unitLabel, setUnitLabel] = useState(firstLoaderData.discountName);
-  const [roundingValue, setRoundingValue] = useState(firstLoaderData.roundingValue);
-  const [updatePriceSelect, setUpdatePriceSelect] = useState(firstLoaderData.updatePriceSelect);
-  const [blockTitle, setBlockTitle] = useState(firstLoaderData.blockTitle);
-  const [visibility, setVisibility] = useState(firstLoaderData.visibility);
-  const [markets, setMarkets] = useState(firstLoaderData.markets);
-  const [excludeB2B, setExcludeB2B] = useState(firstLoaderData.excludeB2B);
-  const [startDate, setStartDate] = useState(firstLoaderData.startDate);
-  const [endDate, setEndDate] = useState(firstLoaderData.endDate);
-  const [startTime, setStartTime] = useState(firstLoaderData.startTime);
-  const [endTime, setEndTime] = useState(firstLoaderData.endTime);
-  const [endStateDate, setEndStateDate] = useState(false);
-  const [variant, setVariant] = useState(false);
-  const [hidnPicker, setHidnPicker] = useState(false);
-  const [variantSingle, setVariantSingle] = useState(true);
-  const [showPricesItem, setShowPricesItem] = useState(false);
-  const [compareAtPrice, setCompareAtPrice] = useState(true);
-  const [showPriceDecimal, setShowPriceDecimal] = useState(true);
-  const [priceRounding, setPriceRounding] = useState(false);
-  const [updatePrice, setUpdatePrice] = useState(false);
-  const [showBothPrices, setShowBothPrices] = useState(false);
-  const [isGoCheckout, setIsGoCheckout] = useState(false);
-  const [showStock, setShowStock] = useState<any>(firstLoaderData.showStock);
-  const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [textValue, setTextValue] = useState('');
+  const [bundleName, setBundleName] = useState(conf.bundleName);///
+  const [discountName, setDiscountName] = useState(conf.discountName);///
+  const [unitLabel, setUnitLabel] = useState(conf.unitLabel);///
+  const [roundingValue, setRoundingValue] = useState(conf.priceRounding);///
+  const [updatePriceSelect, setUpdatePriceSelect] = useState(conf.priceSelect);///
+  const [blockTitle, setBlockTitle] = useState(conf.blockTitle);///
+  const [visibility, setVisibility] = useState(conf.visibility);
+  const [markets, setMarkets] = useState(conf.markets); ///
+  const [excludeB2B, setExcludeB2B] = useState(conf.excludeB2B);///
+  const [startDate, setStartDate] = useState(conf.startDateTime.split('T')[0]);///
+  const [startTime, setStartTime] = useState(conf.startDateTime.split('T')[1].split('Z')[0]);///
+  const [endDate, setEndDate] = useState(conf.endDateTime.split('T')[0]);///
+  const [endTime, setEndTime] = useState(conf.endDateTime.split('T')[1].split('Z')[0]);///
+  const [endStateDate, setEndStateDate] = useState(conf.setEndDate);///
+  const [variant, setVariant] = useState(conf.letCustomer);///
+  const [hidnPicker, setHidnPicker] = useState(conf.hideTheme);///
+  const [variantSingle, setVariantSingle] = useState(conf.showVariant);///
+  const [showPricesItem, setShowPricesItem] = useState(conf.showPrices);///
+  const [compareAtPrice, setCompareAtPrice] = useState(conf.useProductCompare);///
+  const [showPriceDecimal, setShowPriceDecimal] = useState(conf.showPricesWithout);///
+  const [priceRounding, setPriceRounding] = useState(conf.showPriceRoundig);///
+  const [updatePrice, setUpdatePrice] = useState(conf.updateTheme);///
+  const [showBothPrices, setShowBothPrices] = useState(conf.showBothPrices);///
+  const [isGoCheckout, setIsGoCheckout] = useState(conf.skipCart);///
+  const [showStock, setShowStock] = useState<any>(conf.showWhenStock);///
+  const [isShowLowAlert, setIsShowLowAlert] = useState(conf.showAlert);///
+  const [textValue, setTextValue] = useState(conf.msgText);///
+  const [textColor, setTextColor] = useState(conf.msgColor);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [excludedProduct, setExcludedProduct] = useState<any>(null);
   const [excludedCollection, setExcludedCollection] = useState<any>(null);
-
-
+  const [swatchData, setSwatchData] = useState<any>(null);
+  const id = conf.id;
   //FUNCTIONS
   const addCluryDobule = () => {
     setTextValue(prev => prev + "{{stack}}"); // append "abc"
   };
-
-
   const handleChangeShowStock = useCallback(
     (newValue: string) => setShowStock(newValue),
     [],
   );
-
   const [active, setActive] = useState<any>(null);
-
   const toggleActive = (id: string) => () => {
     setActive((activeId: string) => (activeId !== id ? id : null));
   };
-
   const handleReceiveProduct = (value) => {
     setSelectedProduct(value); // get products array from product modal
   };
-
   const handleReceiveCollection = (value) => {
     setSelectedCollection(value); // get collections array from collection modal
   };
-
   const handleReceiveExcludedProduct = (value) => {
     setExcludedProduct(value); // get excluded products array from product modal
   };
-
   const handleReceiveExcludedCollection = (value) => {
     setExcludedCollection(value); // get excluded collection array from collection modal
   };
+  const handleOnSaveSwatch = (swatchData) => {
+    setSwatchData(swatchData);
+  }
+  const handleColorChange = (value) => {
+    setTextColor(value);
+  }
+  const settingData = () => ({
+    id,
+    bundleName,
+    discountName,
+    blockTitle,
+    visibility,
+    markets,
+    excludeB2B,
+    startDate,
+    startTime,
+    endStateDate,
+    endDate,
+    endTime,
+    variant,
+    variantSingle,
+    hidnPicker,
+    showPricesItem,
+    showBothPrices,
+    unitLabel,
+    compareAtPrice,
+    showPriceDecimal,
+    priceRounding,
+    roundingValue,
+    updatePrice,
+    updatePriceSelect,
+    isGoCheckout,
+    isShowLowAlert,
+    showStock,
+    textColor,
+    textValue,
+  });
+
+  useEffect(() => {
+    if (onDataChange)
+      onDataChange(settingData());
+  }, [
+    bundleName,
+    discountName,
+    blockTitle,
+    visibility,
+    markets,
+    excludeB2B,
+    startDate,
+    startTime,
+    endStateDate,
+    endDate,
+    endTime,
+    variant,
+    variantSingle,
+    hidnPicker,
+    showPricesItem,
+    showBothPrices,
+    unitLabel,
+    compareAtPrice,
+    showPriceDecimal,
+    priceRounding,
+    roundingValue,
+    updatePrice,
+    updatePriceSelect,
+    isGoCheckout,
+    isShowLowAlert,
+    showStock,
+    textValue,
+    textColor,
+    onDataChange
+  ]);
 
   return (
     < Card >
@@ -205,16 +234,13 @@ export function GeneralSettingsPanel({ open, onToggle }) {
                 placeholder="e.g., Bundle Discount"
               />
             </BlockStack>
-
             <Divider />
-
             <TextField
               label="Block title"
               value={blockTitle}
               onChange={setBlockTitle}
               autoComplete="off"
             />
-
             <Divider />
 
             <BlockStack gap="200">
@@ -297,7 +323,6 @@ export function GeneralSettingsPanel({ open, onToggle }) {
                 onChange={setExcludeB2B}
               />
             </BlockStack>
-
             <Divider />
 
             <BlockStack gap="300">
@@ -354,9 +379,7 @@ export function GeneralSettingsPanel({ open, onToggle }) {
                 </InlineStack>
               )}
             </BlockStack>
-
             <Divider />
-
             <BlockStack gap="200">
               <Text as="p" variant="bodyMd" fontWeight="semibold">
                 Variants
@@ -381,14 +404,13 @@ export function GeneralSettingsPanel({ open, onToggle }) {
                   onChange={setHidnPicker}
                 />
                 <ButtonGroup fullWidth>
-                  <AddSwatchesModal />
-                  < SetDefaultVariantsModal productArray={productArray} />
+                  <AddSwatchesModal onSaveSwatch={handleOnSaveSwatch} />
+                  <SetDefaultVariantsModal productArray={productArray} />
                 </ButtonGroup>
               </BlockStack>
             </BlockStack>
 
             <Divider />
-
             <BlockStack gap="200">
               <Text as="p" variant="bodyMd" fontWeight="semibold">
                 Pricing
@@ -469,9 +491,7 @@ export function GeneralSettingsPanel({ open, onToggle }) {
                 </InlineStack>
               </BlockStack>
             </BlockStack>
-
             <Divider />
-
             <BlockStack gap="200">
               <Text as="p" variant="bodyMd" fontWeight="semibold">
                 Cart
@@ -482,18 +502,14 @@ export function GeneralSettingsPanel({ open, onToggle }) {
                 onChange={setIsGoCheckout}
               />
             </BlockStack>
-
             <Divider />
-
             <BlockStack gap="200">
-
               <InlineStack align="space-between">
                 <Text as="p" variant="bodyMd" fontWeight="semibold">
                   Low stock alert
                 </Text>
                 <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
               </InlineStack>
-              {/* SHOW STOCK ALERT */}
               {isShowLowAlert && (
                 <BlockStack gap="200">
                   <InlineStack gap="300" blockAlign="center">
@@ -562,7 +578,7 @@ export function GeneralSettingsPanel({ open, onToggle }) {
                     <Box width="15%">
                       <BlockStack gap="200">
                         <Text as='p'>Color</Text>
-                        <ColorPickerPopover defaultColor="red" />
+                        <ColorPickerPopoverItem defaultColorSetting={textColor} subtitle="" colorWidth="100%" onColorChange={handleColorChange} />
                       </BlockStack>
                     </Box>
                   </InlineStack>
