@@ -218,25 +218,13 @@ export async function action({ request, params }) {
       }
     }
   }`;
-  // const mutationQuery = `
-  // {
-  //   shopifyFunctions(first: 10) {
-  //   edges {
-  //     node {
-  //         id
-  //         apiType
-  //         title
-  //       }
-  //     }
-  //   }
-  // } `;
 
   const variables = {
     automaticAppDiscount: {
-      title: "sdfsdfsdsfd93f",
-      functionId: "019ab4d1-2584-7967-8b14-020d019454d8",
-      startsAt: "2025-12-02T17:09:21Z",
-      endsAt: "2026-02-02T17:09:21Z",
+      title: discountData.discountTitle,
+      functionId: discountData.functionId,
+      startsAt: discountData.startsAt,
+      endsAt: discountData.endsAt,
       combinesWith: {
         orderDiscounts: true,
         productDiscounts: true,
@@ -249,14 +237,7 @@ export async function action({ request, params }) {
   const graphqlResult = await admin.graphql(mutationQuery, { variables });
   const body = await graphqlResult.json();
   const automaticAppDiscount = body?.data?.discountAutomaticAppCreate;//?.automaticAppDiscount ?? null;
-  // const automaticAppDiscountId = automaticAppDiscount.discountId;
-  // const shopifyFunctionsEdges = body?.data?.shopifyFunctions?.edges ?? [];
-  // const shopifyFunctions = shopifyFunctionsEdges.map(({ node }) => ({
-  //   id: node.id,
-  //   title: node.title,
-  //   apiType: node.apiType
-  // }));
-  // const title = shopifyFunctions.title;
+
   try {
     // Parse each JSON string
     await Promise.all([
@@ -369,10 +350,10 @@ export default function BundleSettingsAdvanced() {
     setToastActive(false);
   };
   const [countdownTimerData, setCountdownTimerData] = useState(loaderData.countdownTimerConf);
-  const [generalVolumeData, setGeneralVolumeData] = useState(null);
-  const [checkboxUpsellData, setCheckboxUpsellData] = useState(null);
-  const [generalStickyAddData, setGeneralStickyAddData] = useState(null);
-  const [generalSettingData, setGeneralSettingData] = useState(null);
+  const [generalVolumeData, setGeneralVolumeData] = useState(loaderData.generalVolumeConf);
+  const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
+  const [generalStickyAddData, setGeneralStickyAddData] = useState(loaderData.generalStickyAddConf);
+  const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf);
 
   const handleCountdownTimerChange = useCallback((updated: any) => {
     setCountdownTimerData(prev => ({ ...prev, ...updated }));
@@ -485,11 +466,15 @@ export default function BundleSettingsAdvanced() {
     // Create discount automatic app 
     const functionId = shopifyFunctions.find((f) => f.title === "bundle-discount").id;
     const discountFormData = new FormData();
-    const suffix = new Date().toISOString();
-    const discountTitle = `${functionId}_${suffix} `;
+    const discountTitle = generalSettingData.discountName;
+    const startsAt = new Date(`${generalSettingData.startDate}T${generalSettingData.startTime}`).toISOString();
+    const endsAt = new Date(`${generalSettingData.endDate}T${generalSettingData.endTime}`).toISOString();
     discountFormData.append("actionType", "discountData");
     discountFormData.append("discountTitle", discountTitle);
     discountFormData.append("functionId", functionId);
+    discountFormData.append("startsAt", startsAt);
+    discountFormData.append("endsAt", endsAt);
+
     //    discountFormData.append("metafieldValue", metafieldValue);
 
     const fd = new FormData();
@@ -499,7 +484,7 @@ export default function BundleSettingsAdvanced() {
     fd.append("checkboxUpsell", JSON.stringify(formDataToObject(checkboxUpsellFormData)));
     fd.append("generalSetting", JSON.stringify(formDataToObject(generalSettingFormData)));
     fd.append("generalStyle", JSON.stringify(formDataToObject(generalStyleFormData)));
-    fd.append("discountData", JSON.stringify(discountFormData));
+    fd.append("discountData", JSON.stringify(formDataToObject(discountFormData)));
     submit(fd, { method: "post" });
   }
   /***************Database Migration Part************/
