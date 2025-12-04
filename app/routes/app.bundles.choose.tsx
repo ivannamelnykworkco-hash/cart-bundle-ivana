@@ -983,7 +983,7 @@ export default function BundleSettingsAdvanced() {
 
   return (
     <Page
-      title="Kaching Bundles"
+      title="Carting Bundles"
       backAction={{ content: "Back", url: "/app" }}
       primaryAction={{
         content: "Save",
@@ -1181,6 +1181,30 @@ export default function BundleSettingsAdvanced() {
                         </Text>
                         {/* Bundle Options */}
                         <div className="preview-main" style={{ flexDirection: layoutSelectedStyle === 'layout1' ? 'column' : 'row', overflow: layoutSelectedStyle === 'layout1' ? '' : 'auto' }} >
+
+                          {/* { coundownTimerData right} */}
+                          {countdownTimerData.showCountdownTimer && (
+                            <div className="countdown-timer" style={{ background: countdownTimerData.msgBgColor, borderRadius: `${cornerRadius}px` }}>
+                              <div
+                                className="countdown-timer-container"
+                                style={{
+                                  textAlign:
+                                    countdownTimerData.activeAlignmentButtonIndex === 0
+                                      ? "left"
+                                      : countdownTimerData.activeAlignmentButtonIndex === 1
+                                        ? "center"
+                                        : "right",
+                                }}
+                              >
+                                <span style={{ color: countdownTimerData.msgTextColor, fontWeight: countdownTimerData.activeTextBoldButton ? "bold" : "normal", fontStyle: countdownTimerData.activeTextItalicButton ? "italic" : 'normal', fontSize: `${countdownTimerData.textFontSize}px` }}>
+                                  {(countdownTimerData.textValue || "").split("{{timer}}").join(
+                                    countdownTimerData.formatted ?? "--:--"
+                                  )}{" "}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
                           {quantityBreaks.map((item) => (
                             <div key={item.id} className="main-quantity-break" onClick={() => setSelectedId(item.id)}>
                               <Box position="relative">
