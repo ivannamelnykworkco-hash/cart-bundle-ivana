@@ -8,10 +8,38 @@
   type="module"
   fetchpriority="low"
 ></script>
+<script>
+fetch('/apps/cart-drawer-settings', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+  .then(response => {return response.json();})
+  .then(products => {console.log(products);
+  products.map((product) => {
+    if(product.id === "gid://shopify/Product/7769186762830") {
+      document.querySelector('.xcart-bundle-subtitle p').textContent = product.title;
+      document.querySelector('.xcart-bundle-discounted-price').textContent = `$${product.price}`;
+      document.querySelector('.xcart-bundle-full-price s').textContent = `$${product.compareAtPrice}`;
+    }
+    if(product.id === "gid://shopify/Product/7769222676558") {
+      document.querySelector('.xcart-add-upsell-discounted-price').textContent = `$${product.price}`;
+      document.querySelector('.xcart-add-upsell-full-price s').textContent = `$${product.compareAtPrice}`;
+      document.querySelector('.xcart-add-upsell-product--img').innerHTML =  `
+        <img src="${product.imageUrl}" alt="${product.title || ''}">
+      `;
+    }
+  })
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
+</script>
 
 <div id="xcart-overlay" class="xcart-overlay" aria-hidden="true" hidden>
 </div>
-  {{ shop.permanent_domain |  url_encode }}
+
 <aside
   id="xcart-drawer"
   class="xcart-drawer"
@@ -22,7 +50,7 @@
   aria-hidden="true"
   data-xcart-currency="{{ shop.currency }}"
 >
-  <header class="xcart-drawer__header">
+<header class="xcart-drawer__header">
     <h2 class="xcart-drawer__title">Your cart</h2>
     <button
       id="xcart-close"
@@ -32,7 +60,6 @@
       title="Close"
       data-xcart-close
     >
-      <!-- Close SVG -->
       <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
         <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.9 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.9a1 1 0 0 0 1.41-1.41L13.41 12l4.9-4.89a1 1 0 0 0-.01-1.4Z"></path>
       </svg>
@@ -42,27 +69,31 @@
   <section class="xcart-drawer__body">
     <div class="xcart-line-items-with-bundle">
       <div id="xcart-line-items" class="xcart-line-items" role="list"></div>
+
       <div id="xcart-bundle-app">
         <div class="xcart-bundle-app--header">
-          <span>BUNDLE & SAVE</span>
+          <span>BUNDLE &amp; SAVE</span>
         </div>
         <div class="xcart-main-quantity-break">
           <div class="xcart-main-quantity-break--container">
             <div class="xcart-bundle_bar_most_popular">
               <div class="xcart-bundle_bar_most_popular_content">
-                <span>BageText</span>
+                <span>BadgeText</span>
               </div>
               <div class="xcart-bundle_bar_most_popular_fancy">
                 {%- render 'cart-badge' -%}
               </div>
             </div>
-          </div>          
+          </div>
+
           <div class="xcart-main-section--container">
             <div class="xcart-main-section--wrapper">
               <div class="xcart-bundle-checkbox-wrapper">
                 <div class="xcart-bundle-checkbox-body">
+                  <!-- checkbox / selection UI goes here -->
                 </div>
-              </div>  
+              </div>
+
               <div class="xcart-bundle-content">
                 <div class="xcart-bundle-text">
                   <div class="xcart-bundle-title-with-label">
@@ -72,7 +103,8 @@
                   <div class="xcart-bundle-subtitle">
                     <p>subtitle</p>
                   </div>
-                </div>        
+                </div>
+
                 <div class="xcart--bundle-price">
                   <div class="xcart-bundle-discounted-price">
                     $729.95
@@ -84,10 +116,12 @@
               </div>
             </div>
 
-           <div class="xcart-add-upsell--wrapper">
-              <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
-              <img src="" alt="">
-              <span class="xcart-add-upsell-text">+ Add at 20% discount</span>
+            <div class="xcart-add-upsell--wrapper">
+              <div class="xcart-upsell-checkbox-with-product--info">
+                <input type="checkbox" id="xcart-upsell-1" name="xcart-upsell-1" value="Bike">
+                <div class="xcart-add-upsell-product--img"></div>
+                <span class="xcart-add-upsell-text">+ Add at 20% discount</span>
+              </div>
               <div class="xcart-add-upsell-price">
                 <div class="xcart-add-upsell-discounted-price">$8.00</div>
                 <div class="xcart-add-upsell-full-price"><s>$8.00</s></div>
@@ -97,6 +131,7 @@
         </div>
       </div>
     </div>
+
     <div class="xcart-drawer__actions">
       <div class="xcart-discount">
         <label for="xcart-discount-input" class="xcart-label">Discount code</label>
@@ -120,7 +155,10 @@
       </div>
     </div>
 
-    <div id="xcart-bundle-app" class="xcart-bundle">
+    {%- comment -%}
+      If you really need a second bundle block, give it a different ID.
+    {%- endcomment -%}
+    <div id="xcart-bundle-app-secondary" class="xcart-bundle">
       <h3 class="xcart-bundle__title">Special bundle offers</h3>
       <div class="xcart-bundle__content"><!-- Mount your app here --></div>
     </div>
@@ -128,10 +166,11 @@
 </aside>
 
 
+
 {% schema %}
-  {
-    "name": "Cart Bundle",
-    "target": "body",
-    "settings": []
-  }
+{
+  "name": "Cart Bundle",
+  "target": "body",
+  "settings": []
+}
 {% endschema %}
