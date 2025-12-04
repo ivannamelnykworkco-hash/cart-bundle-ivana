@@ -96,7 +96,7 @@ export default function BOGOBundle() {
               </Text>
               
               <FormLayout>
-                <Text as="p" variant="headingMd">
+                <Text as="span" variant="headingMd">
                   Select Offer Type
                 </Text>
 
@@ -120,17 +120,17 @@ export default function BOGOBundle() {
                             onChange={() => setSelectedOffer(offer.id)}
                           />
                           <div>
-                            <Text as="p" variant="bodyMd" fontWeight="semibold">
+                            <Text as="span" variant="bodyMd" fontWeight="semibold">
                               {offer.title}
                             </Text>
                             <Badge tone="success">{offer.savings}</Badge>
                           </div>
                         </InlineStack>
                         <div style={{ textAlign: "right" }}>
-                          <Text as="p" variant="headingMd">
+                          <Text as="span" variant="headingMd">
                             ${offer.price}
                           </Text>
-                          <Text as="p" variant="bodySm" tone="subdued">
+                          <Text as="span" variant="bodySm" tone="subdued">
                             <s>${offer.originalPrice}</s>
                           </Text>
                         </div>
@@ -169,7 +169,7 @@ export default function BOGOBundle() {
                 padding: "16px",
                 backgroundColor: "#fff"
               }}>
-                <Text as="p" variant="headingMd" fontWeight="bold">
+                <Text as="span" variant="headingMd" fontWeight="bold">
                   Buy X, get Y free (BOGO) deal
                 </Text>
                 
@@ -186,16 +186,16 @@ export default function BOGOBundle() {
                     >
                       <InlineStack align="space-between">
                         <div>
-                          <Text as="p" variant="bodySm" fontWeight="semibold">
+                          <Text as="span" variant="bodySm" fontWeight="semibold">
                             {offer.title}
                           </Text>
                           <Badge tone="success" size="small">{offer.savings}</Badge>
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <Text as="p" variant="bodyMd" fontWeight="bold">
+                          <Text as="span" variant="bodyMd" fontWeight="bold">
                             ${offer.price}
                           </Text>
-                          <Text as="p" variant="bodySm" tone="subdued">
+                          <Text as="span" variant="bodySm" tone="subdued">
                             <s>${offer.originalPrice}</s>
                           </Text>
                         </div>
@@ -211,7 +211,7 @@ export default function BOGOBundle() {
                     backgroundColor: "#f3f4f6",
                     borderRadius: "8px"
                   }}>
-                    <Text as="p" variant="bodySm" fontWeight="semibold">
+                    <Text as="span" variant="bodySm" fontWeight="semibold">
                       + FREE special gift!
                     </Text>
                   </div>

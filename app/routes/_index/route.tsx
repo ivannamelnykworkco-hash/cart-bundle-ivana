@@ -23,9 +23,9 @@ export default function App() {
     <div className={styles.index}>
       <div className={styles.content}>
         <h1 className={styles.heading}>A short heading about [your app]</h1>
-        <p className={styles.text}>
+        <span className={styles.text}>
           A tagline about [your app] that describes your value proposition.
-        </p>
+        </span>
         {showForm && (
           <Form className={styles.form} method="post" action="/auth/login">
             <label className={styles.label}>

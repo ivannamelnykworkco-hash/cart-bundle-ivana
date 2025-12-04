@@ -19,13 +19,13 @@ fetch('/apps/cart-drawer-settings', {
   .then(products => {console.log(products);
   products.map((product) => {
     if(product.id === "gid://shopify/Product/7769186762830") {
-      document.querySelector('.xcart-bundle-subtitle p').textContent = product.title;
+      document.querySelector('.xcart-bundle-subtitle').textContent = product.title;
       document.querySelector('.xcart-bundle-discounted-price').textContent = `$${product.price}`;
-      document.querySelector('.xcart-bundle-full-price s').textContent = `$${product.compareAtPrice}`;
+      document.querySelector('.xcart-bundle-full-price').textContent = `$${product.compareAtPrice}`;
     }
     if(product.id === "gid://shopify/Product/7769222676558") {
       document.querySelector('.xcart-add-upsell-discounted-price').textContent = `$${product.price}`;
-      document.querySelector('.xcart-add-upsell-full-price s').textContent = `$${product.compareAtPrice}`;
+      document.querySelector('.xcart-add-upsell-full-price').textContent = `$${product.compareAtPrice}`;
       document.querySelector('.xcart-add-upsell-product--img').innerHTML =  `
         <img src="${product.imageUrl}" alt="${product.title || ''}">
       `;
@@ -97,11 +97,11 @@ fetch('/apps/cart-drawer-settings', {
               <div class="xcart-bundle-content">
                 <div class="xcart-bundle-text">
                   <div class="xcart-bundle-title-with-label">
-                    <p class="xcart-bundle-title">Buy 1, get 1 free</p>
-                    <p class="xcart-bundle-label">save 50%</p>
+                    <span class="xcart-bundle-title">Buy 1, get 1 free</span>
+                    <span class="xcart-bundle-label">save 50%</span>
                   </div>
                   <div class="xcart-bundle-subtitle">
-                    <p>subtitle</p>
+                    subtitle
                   </div>
                 </div>
 
@@ -146,7 +146,7 @@ fetch('/apps/cart-drawer-settings', {
           <span>Subtotal</span>
           <span id="xcart-subtotal">$0.00</span>
         </div>
-        <p class="xcart-note">Taxes and shipping calculated at checkout.</p>
+        <span class="xcart-note">Taxes and shipping calculated at checkout.</span>
       </div>
 
       <div class="xcart-cta">

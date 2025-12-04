@@ -116,12 +116,12 @@ export default function DuoBundle() {
                   borderRadius: "8px",
                   border: "1px solid #86efac"
                 }}>
-                  <Text as="p" tone="success">
+                  <Text as="span" tone="success">
                     You save ${savingsAmount} ({savings}%)
                   </Text>
                 </div>
 
-                <Text as="p" variant="headingMd">
+                <Text as="span" variant="headingMd">
                   Color Selection
                 </Text>
 
@@ -170,35 +170,35 @@ export default function DuoBundle() {
                 <Badge tone="attention" size="small">MOST POPULAR</Badge>
                 <InlineStack align="space-between" blockAlign="center">
                   <div>
-                    <Text as="p" variant="headingLg" fontWeight="bold">
+                    <Text as="span" variant="headingLg" fontWeight="bold">
                       Duo
                     </Text>
-                    <Text as="p" tone="success" fontWeight="semibold">
+                    <Text as="span" tone="success" fontWeight="semibold">
                       SAVE ${savingsAmount}
                     </Text>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       You save {savings}%
                     </Text>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <Text as="p" variant="headingLg" fontWeight="bold">
+                    <Text as="span" variant="headingLg" fontWeight="bold">
                       ${formState.discountedPrice}
                     </Text>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       <s>${formState.originalPrice}</s>
                     </Text>
                   </div>
                 </InlineStack>
 
                 <div style={{ marginTop: "16px" }}>
-                  <Text as="p" variant="bodyMd" fontWeight="semibold">
+                  <Text as="span" variant="bodyMd" fontWeight="semibold">
                     Color
                   </Text>
                   <div style={{ marginTop: "8px" }}>
-                    <Text as="p" variant="bodySm">
+                    <Text as="span" variant="bodySm">
                       #1: {formState.color1}
                     </Text>
-                    <Text as="p" variant="bodySm">
+                    <Text as="span" variant="bodySm">
                       #2: {formState.color2}
                     </Text>
                   </div>

@@ -201,7 +201,7 @@ export function GeneralStylePanel({
               <InlineStack align="space-between" gap="0">
                 <Box width="48%">
                   <BlockStack gap="200" inlineAlign="stretch">
-                    <Text as="p" variant="bodySm">Corner radius</Text>
+                    <Text as="span" variant="bodySm">Corner radius</Text>
                     <InlineStack gap="0" align="space-between" blockAlign="center">
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "65%" }}>
                         <RangeSlider
@@ -240,7 +240,7 @@ export function GeneralStylePanel({
                 </Box>
                 <Box width="48%">
                   <BlockStack gap="200" inlineAlign="stretch">
-                    <Text as="p" variant="bodySm">Spacing</Text>
+                    <Text as="span" variant="bodySm">Spacing</Text>
 
                     <InlineStack align="space-between" blockAlign="center" gap="0">
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "32px", width: "100%" }}

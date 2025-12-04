@@ -29,7 +29,7 @@ export function BundleTypeCard({ bundleType, onSelect }: BundleTypeCardProps) {
           <Text as="h3" variant="headingMd">
             {bundleType.title}
           </Text>
-          <Text as="p" variant="bodySm" tone="subdued">
+          <Text as="span" variant="bodySm" tone="subdued">
             {bundleType.description}
           </Text>
         </BlockStack>

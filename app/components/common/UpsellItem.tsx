@@ -65,7 +65,7 @@ export function UpsellItem({ index, upsellData, deleteId, deleteSection, product
   return (
     <div style={{ borderRadius: "10px", border: '1px solid lightgrey', padding: '15px', gap: "10px", display: 'flex', flexDirection: 'column' }}>
       <InlineStack align="space-between">
-        <Text as="p" variant="bodyMd" fontWeight="semibold">
+        <Text as="span" variant="bodyMd" fontWeight="semibold">
           Upsell # {index + 1}
         </Text>
         <Button variant="plain" textAlign="left" onClick={() => deleteSection(deleteId)}>

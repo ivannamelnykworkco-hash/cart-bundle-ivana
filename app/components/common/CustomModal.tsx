@@ -89,14 +89,14 @@ export function CustomModal({ onSave }) {
             {/* {left layout} */}
             <BlockStack gap="200">
               {/* {custom modal style} */}
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Style
               </Text>
               <BlockStack gap="200">
                 <InlineStack gap="200">
                   <Box width='47%'>
                     <BlockStack gap="200" inlineAlign="stretch">
-                      <Text as="p" variant="bodySm">Primary button size</Text>
+                      <Text as="span" variant="bodySm">Primary button size</Text>
                       <InlineStack gap="0" align="space-between" blockAlign="center">
                         <div style={{ width: "65%" }}>
                           <RangeSlider
@@ -124,7 +124,7 @@ export function CustomModal({ onSave }) {
                   </Box>
                   <Box width='47%'>
                     <BlockStack gap="200" inlineAlign="stretch">
-                      <Text as="p" variant="bodySm">Text size</Text>
+                      <Text as="span" variant="bodySm">Text size</Text>
                       <InlineStack gap="0" align="space-between" blockAlign="center">
                         <div style={{ width: "65%" }}>
                           <RangeSlider
@@ -156,7 +156,7 @@ export function CustomModal({ onSave }) {
 
               {/* { custom modal colors} */}
               <BlockStack gap="200">
-                <Text as="p" variant="bodyMd" fontWeight="semibold">
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
                   Colors
                 </Text>
                 <BlockStack gap="200">
@@ -175,7 +175,7 @@ export function CustomModal({ onSave }) {
               </BlockStack>
               <Divider />
               {/* {custome modal settings} */}
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Settings
               </Text>
               <BlockStack gap="200">
@@ -191,7 +191,7 @@ export function CustomModal({ onSave }) {
                   <PopUpover title='Subtitle' upPopTextChange={handlePopupTextChange} defaultPopText={conf.customMessageText} dataArray={products} />
                   {/* {button text} */}
                   <BlockStack gap='200'>
-                    <Text as='p'>
+                    <Text as='span'>
                       Button text
                     </Text>
                     <TextField
@@ -207,7 +207,7 @@ export function CustomModal({ onSave }) {
               <BlockStack gap="200">
                 <Box>
                   <BlockStack gap="200" inlineAlign="stretch">
-                    <Text as="p" variant="bodySm">Product photo size</Text>
+                    <Text as="span" variant="bodySm">Product photo size</Text>
                     <InlineStack gap="0" align="space-between" blockAlign="center">
                       <div style={{ width: "65%" }}>
                         <RangeSlider
@@ -241,7 +241,7 @@ export function CustomModal({ onSave }) {
             {/* {right layout} */}
             <BlockStack>
               <div className='customProductMain'>
-                <Text as="p" variant="bodyMd" fontWeight="semibold">
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
                   Preview
                 </Text>
                 <div className='ProductViewheadingContainer' style={{ background: overlayColor }}>

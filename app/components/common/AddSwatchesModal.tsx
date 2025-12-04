@@ -184,7 +184,7 @@ export function AddSwatchesModal({ onSaveSwatch }) {
             <Box width="50%">
 
               <BlockStack gap="200">
-                <Text as="p" variant="headingMd" fontWeight="bold">
+                <Text as="span" variant="headingMd" fontWeight="bold">
                   Swatches
                 </Text>
                 <InlineStack align="space-between">
@@ -231,7 +231,7 @@ export function AddSwatchesModal({ onSaveSwatch }) {
                 )}
 
                 <Divider />
-                <Text as="p" variant="headingMd" fontWeight="bold">
+                <Text as="span" variant="headingMd" fontWeight="bold">
                   Settings
                 </Text>
 
@@ -259,7 +259,7 @@ export function AddSwatchesModal({ onSaveSwatch }) {
             </Box>
             {/* Right Part */}
             <Box width="45%">
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Preview
               </Text>
               <div style={{
@@ -298,20 +298,20 @@ export function AddSwatchesModal({ onSaveSwatch }) {
                     <InlineStack align="space-between" blockAlign="start">
                       <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <Text as="p" variant="headingMd" fontWeight="semibold">
+                          <Text as="span" variant="headingMd" fontWeight="semibold">
                             Duo
                           </Text>
                           <Badge tone="attention" size="small">SAVE $14.99</Badge>
                         </div>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           You save 15%
                         </Text>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <Text as="p" variant="headingLg" fontWeight="bold">
+                        <Text as="span" variant="headingLg" fontWeight="bold">
                           $84.99
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           <s>$99.98</s>
                         </Text>
                       </div>

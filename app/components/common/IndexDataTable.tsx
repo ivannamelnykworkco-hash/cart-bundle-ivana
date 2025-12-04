@@ -219,7 +219,7 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
           <Box width="10%">
             <Thumbnail size="Small" source={product.imageUrl || ImageIcon} alt="" />
           </Box>
-          <Text as="p">{product.title}</Text>
+          <Text as="span">{product.title}</Text>
         </InlineStack>
       </IndexTable.Row>
     );
@@ -254,13 +254,13 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
               </div>
             </Box>
             <Box width="50%" paddingInlineStart="400">
-              <Text as="p"> {v.title}</Text>
+              <Text as="span"> {v.title}</Text>
             </Box>
             <Box width="20%">
-              <Text as="p"> {v.inventoryQuantity} /available</Text>
+              <Text as="span"> {v.inventoryQuantity} /available</Text>
             </Box>
             <Box width="20%" >
-              <Text as="p">
+              <Text as="span">
                 {v.price != null ? `$${v.price}` : ""}
               </Text>
             </Box>

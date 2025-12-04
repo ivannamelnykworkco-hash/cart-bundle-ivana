@@ -154,26 +154,26 @@ export default function EditBundle() {
               
               <BlockStack gap="200">
                 <div>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Visitors
                   </Text>
-                  <Text as="p" variant="headingMd">
+                  <Text as="span" variant="headingMd">
                     {bundle.stats.visitors}
                   </Text>
                 </div>
                 <div>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Conversion Rate
                   </Text>
-                  <Text as="p" variant="headingMd">
+                  <Text as="span" variant="headingMd">
                     {bundle.stats.conversionRate}%
                   </Text>
                 </div>
                 <div>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Revenue Per Visitor
                   </Text>
-                  <Text as="p" variant="headingMd">
+                  <Text as="span" variant="headingMd">
                     ${bundle.stats.revenuePerVisitor.toFixed(2)}
                   </Text>
                 </div>

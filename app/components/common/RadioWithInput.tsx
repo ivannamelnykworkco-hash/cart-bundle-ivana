@@ -12,7 +12,7 @@ export function RadioWithInput({ defaultValue, title, onChange }: { defaultValue
   return (
     <Box>
       <BlockStack gap="200" inlineAlign="stretch">
-        <Text as="p" variant="bodySm">{title}</Text>
+        <Text as="span" variant="bodySm">{title}</Text>
         <InlineStack gap="0" align="space-between" blockAlign="center">
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "65%" }}>
             <RangeSlider

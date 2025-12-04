@@ -226,7 +226,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
               <InlineStack align="space-between">
                 <Box width="65%">
                   <InlineStack align="space-between">
-                    <Text as='p'>Message text</Text>
+                    <Text as='span'>Message text</Text>
                     <Popover
                       active={active === 'popover'}
                       preferredAlignment="right"
@@ -282,15 +282,15 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
 
             <InlineStack align="space-around" blockAlign="end">
               <Box width="20%">
-                <Text as="p" variant="bodySm">Background</Text>
+                <Text as="span" variant="bodySm">Background</Text>
                 <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgBgColor} colorWidth="100%" onColorChange={handleBgColorChange} />
               </Box>
               <Box>
-                <Text as="p" variant="bodySm">Text</Text>
+                <Text as="span" variant="bodySm">Text</Text>
                 <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgTextColor} colorWidth="100%" onColorChange={handleTextColorChange} />
               </Box>
               <Box>
-                <Text as="p" variant="bodySm">Alignment</Text>
+                <Text as="span" variant="bodySm">Alignment</Text>
                 <ButtonGroup gap="extraTight">
                   <Button
                     pressed={activeAlignmentButtonIndex === 0}
@@ -314,7 +314,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
 
               </Box>
               <Box>
-                <Text as="p" variant="bodySm">Style</Text>
+                <Text as="span" variant="bodySm">Style</Text>
                 <ButtonGroup gap="extraTight">
                   <Button
                     pressed={activeTextBoldButton}
@@ -331,7 +331,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
                 </ButtonGroup>
               </Box>
               <Box width="25%">
-                <Text as="p" variant="bodySm">Size</Text>
+                <Text as="span" variant="bodySm">Size</Text>
                 <TextField
                   label=""
                   type="number"

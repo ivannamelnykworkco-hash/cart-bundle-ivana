@@ -93,7 +93,7 @@ export default function MultiPackBundle() {
               </Text>
               
               <FormLayout>
-                <Text as="p" variant="headingMd">
+                <Text as="span" variant="headingMd">
                   Pack Options
                 </Text>
 
@@ -122,25 +122,25 @@ export default function MultiPackBundle() {
                           onChange={() => setSelectedPack(pack.quantity)}
                         />
                         <div>
-                          <Text as="p" variant="bodyMd" fontWeight="semibold">
+                          <Text as="span" variant="bodyMd" fontWeight="semibold">
                             {pack.quantity} pack
                           </Text>
                           {pack.savings > 0 && (
                             <Badge tone="success" size="small">SAVE {pack.savings}%</Badge>
                           )}
                           {pack.savings > 0 && (
-                            <Text as="p" variant="bodySm" tone="subdued">
+                            <Text as="span" variant="bodySm" tone="subdued">
                               You save ${((pack.quantity * 49.99 - pack.price)).toFixed(2)}
                             </Text>
                           )}
                         </div>
                       </InlineStack>
                       <div style={{ textAlign: "right" }}>
-                        <Text as="p" variant="headingMd" fontWeight="bold">
+                        <Text as="span" variant="headingMd" fontWeight="bold">
                           ${pack.price.toFixed(2)}
                         </Text>
                         {pack.savings > 0 && (
-                          <Text as="p" variant="bodySm" tone="subdued">
+                          <Text as="span" variant="bodySm" tone="subdued">
                             <s>${(pack.quantity * 49.99).toFixed(2)}</s>
                           </Text>
                         )}
@@ -150,10 +150,10 @@ export default function MultiPackBundle() {
                 ))}
 
                 <div style={{ marginTop: "24px" }}>
-                  <Text as="p" variant="headingMd">
+                  <Text as="span" variant="headingMd">
                     Free Gifts Configuration
                   </Text>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Add free gifts that unlock at different pack quantities
                   </Text>
                 </div>
@@ -170,10 +170,10 @@ export default function MultiPackBundle() {
                   >
                     <InlineStack align="space-between" blockAlign="center">
                       <div>
-                        <Text as="p" variant="bodyMd">
+                        <Text as="span" variant="bodyMd">
                           {gift.icon} {gift.name}
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           Unlocks at {gift.unlockAt} pack
                         </Text>
                       </div>
@@ -251,24 +251,24 @@ export default function MultiPackBundle() {
                       )}
                       <InlineStack align="space-between">
                         <div>
-                          <Text as="p" variant="bodyMd" fontWeight="semibold">
+                          <Text as="span" variant="bodyMd" fontWeight="semibold">
                             {pack.quantity} pack
                           </Text>
                           {pack.savings > 0 && (
                             <>
                               <Badge tone="success" size="small">SAVE {pack.savings}%</Badge>
-                              <Text as="p" variant="bodySm" tone="subdued">
+                              <Text as="span" variant="bodySm" tone="subdued">
                                 You save ${((pack.quantity * 49.99 - pack.price)).toFixed(2)}
                               </Text>
                             </>
                           )}
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <Text as="p" variant="headingMd" fontWeight="bold">
+                          <Text as="span" variant="headingMd" fontWeight="bold">
                             ${pack.price.toFixed(2)}
                           </Text>
                           {pack.savings > 0 && (
-                            <Text as="p" variant="bodySm" tone="subdued">
+                            <Text as="span" variant="bodySm" tone="subdued">
                               <s>${(pack.quantity * 49.99).toFixed(2)}</s>
                             </Text>
                           )}
@@ -285,7 +285,7 @@ export default function MultiPackBundle() {
                   borderRadius: "8px",
                   border: "1px solid #fbbf24"
                 }}>
-                  <Text as="p" variant="bodyMd" fontWeight="semibold">
+                  <Text as="span" variant="bodyMd" fontWeight="semibold">
                     🎁 Unlock Free gifts with your order
                   </Text>
                   <div style={{ marginTop: "12px", display: "flex", gap: "12px", justifyContent: "space-around" }}>
@@ -310,7 +310,7 @@ export default function MultiPackBundle() {
                         }}>
                           {selectedPack >= gift.unlockAt ? gift.icon : "🔒"}
                         </div>
-                        <Text as="p" variant="bodySm">
+                        <Text as="span" variant="bodySm">
                           {selectedPack >= gift.unlockAt ? "FREE" : `FREE ${gift.unlockAt}+`}
                         </Text>
                       </div>
@@ -330,7 +330,7 @@ export default function MultiPackBundle() {
                       checked={true}
                       onChange={() => {}}
                     />
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       Delivered {subscriptionFrequency}
                     </Text>
                   </div>

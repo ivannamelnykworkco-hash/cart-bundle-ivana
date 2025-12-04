@@ -244,7 +244,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
             <Divider />
 
             <BlockStack gap="200">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Visibility
               </Text>
               <BlockStack gap="100">
@@ -326,7 +326,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
             <Divider />
 
             <BlockStack gap="300">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Active dates
               </Text>
               <InlineStack gap="200" blockAlign="end">
@@ -381,7 +381,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
             </BlockStack>
             <Divider />
             <BlockStack gap="200">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Variants
               </Text>
 
@@ -412,7 +412,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
 
             <Divider />
             <BlockStack gap="200">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Pricing
               </Text>
               <BlockStack gap="100">
@@ -493,7 +493,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
             </BlockStack>
             <Divider />
             <BlockStack gap="200">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Cart
               </Text>
               <Checkbox
@@ -505,7 +505,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
             <Divider />
             <BlockStack gap="200">
               <InlineStack align="space-between">
-                <Text as="p" variant="bodyMd" fontWeight="semibold">
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
                   Low stock alert
                 </Text>
                 <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
@@ -513,7 +513,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
               {isShowLowAlert && (
                 <BlockStack gap="200">
                   <InlineStack gap="300" blockAlign="center">
-                    <Text as='p' variant="bodyMd">
+                    <Text as='span' variant="bodyMd">
                       Show when stock is less than
                     </Text>
                     <Box maxWidth="20%">
@@ -529,7 +529,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
                   <InlineStack gap="300">
                     <Box width="80%">
                       <InlineStack align="space-between">
-                        <Text as='p'>Message text</Text>
+                        <Text as='span'>Message text</Text>
                         <Popover
                           active={active === 'popover'}
                           preferredAlignment="right"
@@ -577,7 +577,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
                     </Box>
                     <Box width="15%">
                       <BlockStack gap="200">
-                        <Text as='p'>Color</Text>
+                        <Text as='span'>Color</Text>
                         <ColorPickerPopoverItem defaultColorSetting={textColor} subtitle="" colorWidth="100%" onColorChange={handleColorChange} />
                       </BlockStack>
                     </Box>

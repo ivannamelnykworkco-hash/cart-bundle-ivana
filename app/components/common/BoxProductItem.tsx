@@ -77,7 +77,7 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
                 source={selectproductInfo[0].imageUrl}
                 alt={selectproductInfo[0].title}
               />
-              <Text as='p' fontWeight="bold">
+              <Text as='span' fontWeight="bold">
                 {selectproductInfo[0].title}
               </Text>
             </div>
