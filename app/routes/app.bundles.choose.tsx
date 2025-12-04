@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { PlusCircleIcon, DiscountIcon, MegaphoneIcon, ProductIcon, NoteIcon } from '@shopify/polaris-icons';
+// import 
 
 import {
   Page,
@@ -95,6 +96,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       }
     }
   }
+  shopifyFunctions(first: 10) {
+    edges {
+      node {
+        id
+        apiType
+        title
+      }
+    }
+  }
 }
 `);
   const body = await response.json();
@@ -116,6 +126,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     title: node.title,
     imageUrl: node.image?.url ?? "",
   }));
+  const shopifyFunctionsEdges = body?.data?.shopifyFunctions?.edges ?? [];
+  const shopifyFunctions = shopifyFunctionsEdges.map(({ node }) => ({
+    id: node.id,
+    title: node.title,
+    apiType: node.apiType
+  }));
+
   // fetch data from prisma
   try {
     const [
@@ -139,6 +156,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       {
         products,
         collections,
+        shopifyFunctions,
         countdownTimerConf,
         generalStyleConf,
         generalVolumeConf,
@@ -160,6 +178,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 /*********************Action to receive submit data****************/
 //Save data in database
 export async function action({ request, params }) {
+
   const { admin, session } = await authenticate.admin(request);
   const parsedData = {
     ...Object.fromEntries(await request.formData()),
@@ -172,6 +191,72 @@ export async function action({ request, params }) {
   const checkboxUpsell = JSON.parse(form.checkboxUpsell);
   const generalSetting = JSON.parse(form.generalSetting);
   const generalStyle = JSON.parse(form.generalStyle);
+  const discountData = JSON.parse(form.discountData);
+
+  const mutationQuery = `
+    mutation discountAutomaticAppCreate($automaticAppDiscount: DiscountAutomaticAppInput!) {
+    discountAutomaticAppCreate(automaticAppDiscount: $automaticAppDiscount) {
+      userErrors {
+        field
+        message
+      }
+      automaticAppDiscount {
+        discountId
+        title
+        startsAt
+        endsAt
+        status
+        appDiscountType {
+          appKey
+          functionId
+          }
+        combinesWith {
+        orderDiscounts
+        productDiscounts
+        shippingDiscounts
+        }
+      }
+    }
+  }`;
+  // const mutationQuery = `
+  // {
+  //   shopifyFunctions(first: 10) {
+  //   edges {
+  //     node {
+  //         id
+  //         apiType
+  //         title
+  //       }
+  //     }
+  //   }
+  // } `;
+
+  const variables = {
+    automaticAppDiscount: {
+      title: "sdfsdfsdsfd93f",
+      functionId: "019ab4d1-2584-7967-8b14-020d019454d8",
+      startsAt: "2025-12-02T17:09:21Z",
+      endsAt: "2026-02-02T17:09:21Z",
+      combinesWith: {
+        orderDiscounts: true,
+        productDiscounts: true,
+        shippingDiscounts: true
+      },
+      discountClasses: "PRODUCT"
+    }
+  };
+
+  const graphqlResult = await admin.graphql(mutationQuery, { variables });
+  const body = await graphqlResult.json();
+  const automaticAppDiscount = body?.data?.discountAutomaticAppCreate;//?.automaticAppDiscount ?? null;
+  // const automaticAppDiscountId = automaticAppDiscount.discountId;
+  // const shopifyFunctionsEdges = body?.data?.shopifyFunctions?.edges ?? [];
+  // const shopifyFunctions = shopifyFunctionsEdges.map(({ node }) => ({
+  //   id: node.id,
+  //   title: node.title,
+  //   apiType: node.apiType
+  // }));
+  // const title = shopifyFunctions.title;
   try {
     // Parse each JSON string
     await Promise.all([
@@ -182,7 +267,8 @@ export async function action({ request, params }) {
       updateGeneralSetting(generalSetting.id, generalSetting),
       updateGeneralStyle(generalStyle.id, generalStyle)
     ]);
-    return json({ success: true });
+
+    return json({ success: true, automaticAppDiscount });
 
   } catch (err) {
     return json(
@@ -218,23 +304,23 @@ const fontStyleMap = {
   styleBold: 'normal',
   styleBoldItalic: 'italic',
 };
-
+/************************************************************* */
 export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
   const checkboxUpsellConf = loaderData.checkboxUpsellConf;
-  /*recevie response from action function*/
+  const shopifyFunctions = loaderData.shopifyFunctions;
+  /**************recevie response from action function************/
   const actionData = useActionData();
   useEffect(() => {
     if (actionData) {
       if (actionData.success) {
+        console.log("Data updated successfully!", JSON.stringify(actionData, null, 2));
         showToast("Data updated successfully!", "success");
       } else {
-        showToast(`Error: ${actionData.error}`, "error");
-        console.log("error", actionData.error);
+        showToast(`Error: ${actionData.error} `, "error");
       }
     }
   }, [actionData]);
-  console.log("actiondata<<<", actionData);
   const [upsellChecked, setUpsellChecked] = useState({});
   const handleUpsellValueChange = (bundlId: string | number, upsellId: boolean, value: boolean | undefined) => {
     setUpsellChecked(prev => ({
@@ -310,7 +396,7 @@ export default function BundleSettingsAdvanced() {
     return Object.fromEntries(fd.entries());
   }
 
-  function saveData() {
+  async function saveData() {
     const countdownTimerFormData = new FormData();
     countdownTimerFormData.append('actionType', 'countdownTimer');
     Object.entries(countdownTimerData).forEach(([key, value]) => {
@@ -332,11 +418,6 @@ export default function BundleSettingsAdvanced() {
         generalVolumeFormData.append(key, value as string);
       }
     });
-    console.log("volume<<", generalVolumeData);
-    console.log("setting<<", generalSettingData);
-    console.log("sticky<<", generalStickyAddData);
-    console.log("checkbox<<", checkboxUpsellData);
-    console.log("count<<", countdownTimerData);
     //Save Sticky add to cart data
     const generalStickyAddFormData = new FormData();
     generalStickyAddFormData.append('actionType', 'stickyAdd');
@@ -401,6 +482,15 @@ export default function BundleSettingsAdvanced() {
     generalStyleFormData.append("unitLabelSize", unitLabelSize);
     generalStyleFormData.append("unitLabelStyle", unitLabelStyle);
     generalStyleFormData.append("createdAt", GeneralStyleConf.createdAt);
+    // Create discount automatic app 
+    const functionId = shopifyFunctions.find((f) => f.title === "bundle-discount").id;
+    const discountFormData = new FormData();
+    const suffix = new Date().toISOString();
+    const discountTitle = `${functionId}_${suffix} `;
+    discountFormData.append("actionType", "discountData");
+    discountFormData.append("discountTitle", discountTitle);
+    discountFormData.append("functionId", functionId);
+    //    discountFormData.append("metafieldValue", metafieldValue);
 
     const fd = new FormData();
     fd.append("countdownTimer", JSON.stringify(formDataToObject(countdownTimerFormData)));
@@ -409,9 +499,9 @@ export default function BundleSettingsAdvanced() {
     fd.append("checkboxUpsell", JSON.stringify(formDataToObject(checkboxUpsellFormData)));
     fd.append("generalSetting", JSON.stringify(formDataToObject(generalSettingFormData)));
     fd.append("generalStyle", JSON.stringify(formDataToObject(generalStyleFormData)));
+    fd.append("discountData", JSON.stringify(discountFormData));
     submit(fd, { method: "post" });
   }
-
   /***************Database Migration Part************/
   //id: ==> upsellTexts state.,
   const [boxUpsellSelectedProduct, setBoxUpsellSelectedProduct] = useState({});
@@ -1097,7 +1187,7 @@ export default function BundleSettingsAdvanced() {
                             className="barHeading"
                             style={{
                               color: blockTitleColor,
-                              fontSize: `${barBlocktitle}px`,
+                              fontSize: `${barBlocktitle} px`,
                               fontWeight: fontWeightMap[barBlocktitleFontStyle as keyof typeof fontWeightMap],
                               fontStyle: fontStyleMap[barBlocktitleFontStyle as keyof typeof fontWeightMap],
                             }}
@@ -1135,20 +1225,20 @@ export default function BundleSettingsAdvanced() {
                               </Box>
                               <div className="main-section--container"
                                 style={{
-                                  borderRadius: `${cornerRadius}px`,
+                                  borderRadius: `${cornerRadius} px`,
                                   border: '2px solid',
                                   borderColor: selectedId === item.id ? borderColor : cardsBgColor,
                                   boxShadow: selectedId === item.id
                                     ? `inset 0 0 0 2px ${borderColor}, #000`
                                     : `inset 0 0 0 1px ${cardsBgColor}, #000`,
-                                  paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`,
+                                  paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10} px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5} px` : `${spacing * 0.5} px`,
                                   backgroundColor: selectedId === item.id ? selectedBgColor : cardsBgColor,
                                   height: layoutSelectedStyle == 'layout2' ? '100%' : ''
                                 }}>
                                 <div style={{
-                                  padding: `${spacing * 0.5}px ${spacing}px`,
+                                  padding: `${spacing * 0.5}px ${spacing} px`,
                                   backgroundColor: selectedId === item.id ? selectedBgColor : cardsBgColor, display: "flex",
-                                  borderRadius: `${cornerRadius}px`,
+                                  borderRadius: `${cornerRadius} px`,
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row'
@@ -1173,16 +1263,16 @@ export default function BundleSettingsAdvanced() {
                                         <p className="barTitle" style={{
                                           textAlign: 'center',
                                           color: barTitleColor,
-                                          fontSize: `${bartitleSize}px`,
+                                          fontSize: `${bartitleSize} px`,
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
                                           {barTitle[item.id] || 'Single'}
                                         </p>
-                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius} px` }}>
                                           <p className="bar-label--text" style={{
                                             color: barLabelTextColor,
-                                            fontSize: `${labelSize}px`,
+                                            fontSize: `${labelSize} px`,
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
@@ -1192,7 +1282,7 @@ export default function BundleSettingsAdvanced() {
                                       </InlineStack>
                                       <span className="barSubTitle" style={{
                                         color: barSubTitleColor,
-                                        fontSize: `${subTitleSize}px`,
+                                        fontSize: `${subTitleSize} px`,
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         textAlign: layoutSelectedStyle === 'layout2' ? 'center' : ''
@@ -1205,7 +1295,7 @@ export default function BundleSettingsAdvanced() {
                                     <BlockStack gap="050">
                                       <div className="bar-price" style={{
                                         color: barPriceColor,
-                                        fontSize: `${bartitleSize}px`,
+                                        fontSize: `${bartitleSize} px`,
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1214,7 +1304,7 @@ export default function BundleSettingsAdvanced() {
                                       {defaultBasePrice[item.id] && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
-                                          fontSize: `${subTitleSize}px`,
+                                          fontSize: `${subTitleSize} px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
@@ -1243,7 +1333,7 @@ export default function BundleSettingsAdvanced() {
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
-                                          <div className="bar-upsell-img" style={{ width: `${addupsellImage[item.id]?.[upsell.id]}px`, height: `${addupsellImage[item.id]?.[upsell.id]}px`, }}>
+                                          <div className="bar-upsell-img" style={{ width: `${addupsellImage[item.id]?.[upsell.id]} px`, height: `${addupsellImage[item.id]?.[upsell.id]} px`, }}>
                                             <Thumbnail
                                               source={boxUpsellSelectedProduct[item.id]?.[upsell.id]?.[0]?.imageUrl || ''}
                                               alt=""
@@ -1305,21 +1395,21 @@ export default function BundleSettingsAdvanced() {
                               </Box>
                               <div className="main-section--container"
                                 style={{
-                                  borderRadius: `${cornerRadius}px`,
+                                  borderRadius: `${cornerRadius} px`,
                                   border: '2px solid',
                                   borderColor: selectedId === buyitem.id ? borderColor : cardsBgColor,
                                   boxShadow: selectedId === buyitem.id
                                     ? `inset 0 0 0 2px ${borderColor}, #000`
                                     : `inset 0 0 0 1px ${cardsBgColor}, #000`,
-                                  paddingTop: badgeSelected[buyitem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[buyitem.id] === "simple" && bagdeText[buyitem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`,
+                                  paddingTop: badgeSelected[buyitem.id] ? `${spacing * 0.5 + 10} px` : badgeSelected[buyitem.id] === "simple" && bagdeText[buyitem.id] ? `${spacing * 0.5} px` : `${spacing * 0.5} px`,
                                   backgroundColor: selectedId === buyitem.id ? selectedBgColor : cardsBgColor,
                                   height: layoutSelectedStyle == 'layout2' ? '100%' : ''
                                 }}>
                                 <div style={{
-                                  padding: `${spacing * 0.5}px ${spacing}px`,
+                                  padding: `${spacing * 0.5}px ${spacing} px`,
                                   backgroundColor: selectedId === buyitem.id ? selectedBgColor : cardsBgColor,
                                   display: "flex",
-                                  borderRadius: `${cornerRadius}px`,
+                                  borderRadius: `${cornerRadius} px`,
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row'
@@ -1344,16 +1434,16 @@ export default function BundleSettingsAdvanced() {
                                         <p className="barTitle" style={{
                                           textAlign: 'center',
                                           color: barTitleColor,
-                                          fontSize: `${bartitleSize}px`,
+                                          fontSize: `${bartitleSize} px`,
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
                                           {xybarTitle[buyitem.id] || 'Buy 3, Get 1 Free!'}
                                         </p>
-                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius} px` }}>
                                           <p className="bar-label--text" style={{
                                             color: barLabelTextColor,
-                                            fontSize: `${labelSize}px`,
+                                            fontSize: `${labelSize} px`,
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
@@ -1363,7 +1453,7 @@ export default function BundleSettingsAdvanced() {
                                       </InlineStack>
                                       <span className="barSubTitle" style={{
                                         color: barSubTitleColor,
-                                        fontSize: `${subTitleSize}px`,
+                                        fontSize: `${subTitleSize} px`,
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1375,7 +1465,7 @@ export default function BundleSettingsAdvanced() {
                                     <BlockStack gap="050">
                                       <div className="bar-price" style={{
                                         color: barPriceColor,
-                                        fontSize: `${bartitleSize}px`,
+                                        fontSize: `${bartitleSize} px`,
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1384,7 +1474,7 @@ export default function BundleSettingsAdvanced() {
                                       {xydefaultBasePrice[buyitem.id] && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
-                                          fontSize: `${subTitleSize}px`,
+                                          fontSize: `${subTitleSize} px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
@@ -1413,7 +1503,7 @@ export default function BundleSettingsAdvanced() {
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
-                                          <div className="bar-upsell-img" style={{ width: `${xyAddupsellImage[buyitem.id]?.[upsell.id]}px`, height: `${xyAddupsellImage[buyitem.id]?.[upsell.id]}px`, }}>
+                                          <div className="bar-upsell-img" style={{ width: `${xyAddupsellImage[buyitem.id]?.[upsell.id]} px`, height: `${xyAddupsellImage[buyitem.id]?.[upsell.id]} px`, }}>
                                             <Thumbnail
                                               source={xyBoxUpsellSelectedProduct[buyitem.id]?.[upsell.id]?.[0]?.imageUrl || ''}
                                               alt=""
@@ -1473,20 +1563,20 @@ export default function BundleSettingsAdvanced() {
                               </Box>
                               <div className="main-section--container"
                                 style={{
-                                  borderRadius: `${cornerRadius}px`,
+                                  borderRadius: `${cornerRadius} px`,
                                   border: '2px solid',
                                   borderColor: selectedId === bundleitem.id ? borderColor : cardsBgColor,
                                   boxShadow: selectedId === bundleitem.id
                                     ? `inset 0 0 0 2px ${borderColor}, #000`
                                     : `inset 0 0 0 1px ${cardsBgColor}, #000`,
-                                  paddingTop: badgeSelected[bundleitem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[bundleitem.id] === "simple" && bagdeText[bundleitem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`,
+                                  paddingTop: badgeSelected[bundleitem.id] ? `${spacing * 0.5 + 10} px` : badgeSelected[bundleitem.id] === "simple" && bagdeText[bundleitem.id] ? `${spacing * 0.5} px` : `${spacing * 0.5} px`,
                                   backgroundColor: selectedId === bundleitem.id ? selectedBgColor : cardsBgColor,
                                   height: layoutSelectedStyle == 'layout2' ? '100%' : ''
                                 }}>
                                 <div style={{
-                                  padding: `${spacing * 0.5}px ${spacing}px`,
+                                  padding: `${spacing * 0.5}px ${spacing} px`,
                                   backgroundColor: selectedId === bundleitem.id ? selectedBgColor : cardsBgColor, display: "flex",
-                                  borderRadius: `${cornerRadius}px`,
+                                  borderRadius: `${cornerRadius} px`,
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row'
@@ -1511,16 +1601,16 @@ export default function BundleSettingsAdvanced() {
                                         <p className="barTitle" style={{
                                           textAlign: 'center',
                                           color: barTitleColor,
-                                          fontSize: `${bartitleSize}px`,
+                                          fontSize: `${bartitleSize} px`,
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
                                           {bundleUpsellBarTitle[bundleitem.id] || 'Complete the bundle'}
                                         </p>
-                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius} px` }}>
                                           <p className="bar-label--text" style={{
                                             color: barLabelTextColor,
-                                            fontSize: `${labelSize}px`,
+                                            fontSize: `${labelSize} px`,
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
@@ -1530,7 +1620,7 @@ export default function BundleSettingsAdvanced() {
                                       </InlineStack>
                                       <span className="barSubTitle" style={{
                                         color: barSubTitleColor,
-                                        fontSize: `${subTitleSize}px`,
+                                        fontSize: `${subTitleSize} px`,
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1542,7 +1632,7 @@ export default function BundleSettingsAdvanced() {
                                     <BlockStack gap="050">
                                       <div className="bar-price" style={{
                                         color: barPriceColor,
-                                        fontSize: `${bartitleSize}px`,
+                                        fontSize: `${bartitleSize} px`,
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1551,7 +1641,7 @@ export default function BundleSettingsAdvanced() {
                                       {defaultBasePrice && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
-                                          fontSize: `${subTitleSize}px`,
+                                          fontSize: `${subTitleSize} px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
@@ -1645,7 +1735,7 @@ export default function BundleSettingsAdvanced() {
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
-                                          <div className="bar-upsell-img" style={{ width: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]}px`, height: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]}px`, }}>
+                                          <div className="bar-upsell-img" style={{ width: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]} px`, height: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]} px`, }}>
                                             <Thumbnail
                                               source={bundleBoxUpsellSelectedProduct[bundleitem.id]?.[upsell.id]?.[0]?.imageUrl || ''}
                                               alt=""
