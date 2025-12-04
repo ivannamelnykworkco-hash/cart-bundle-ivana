@@ -34,7 +34,7 @@ export function cartLinesDiscountsGenerateRun(input) {
     if (quantity === 2) {
       discountPercent = 10;
     } else if (quantity >= 3) {
-      discountPercent = 15;
+      discountPercent = 50;
     }
 
     if (discountPercent > 0) {
