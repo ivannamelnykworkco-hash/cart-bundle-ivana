@@ -3,11 +3,8 @@
 {{ 'cartdrawer-bundle.css' | asset_url | stylesheet_tag }}
 {{ 'cartdrawer-bundle-app.css' | asset_url | stylesheet_tag }}
 
-<script
-  src="{{ 'cartdrawer-bundle.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
+<script  src="{{ 'cartdrawer-bundle.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
+<script  src="{{ 'cartdrawer-bundle-countdown.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
 <script>
 fetch('/apps/cart-drawer-settings', {
   method: 'POST',
@@ -16,7 +13,7 @@ fetch('/apps/cart-drawer-settings', {
   }
 })
   .then(response => {return response.json();})
-  .then(products => {console.log(products);
+  .then(products => {
   products.map((product) => {
     if(product.id === "gid://shopify/Product/7769186762830") {
       document.querySelector('.xcart-bundle-subtitle').textContent = product.title;
@@ -66,72 +63,17 @@ fetch('/apps/cart-drawer-settings', {
     </button>
   </header>
 
+  {% comment %} countdownTimer {% endcomment %}
+    <div class="countdown-timer-container">
+      <span class="countdown-text">
+        Hurry! Offer ends in {{timer}}
+      </span>
+    </div>
+
   <section class="xcart-drawer__body">
     <div class="xcart-line-items-with-bundle">
       <div id="xcart-line-items" class="xcart-line-items" role="list"></div>
-
-      <div id="xcart-bundle-app">
-        <div class="xcart-bundle-app--header">
-          <span>BUNDLE &amp; SAVE</span>
-        </div>
-        <div class="xcart-main-quantity-break">
-          <div class="xcart-main-quantity-break--container">
-            <div class="xcart-bundle_bar_most_popular">
-              <div class="xcart-bundle_bar_most_popular_content">
-                <span>BadgeText</span>
-              </div>
-              <div class="xcart-bundle_bar_most_popular_fancy">
-                {%- render 'cart-badge' -%}
-              </div>
-            </div>
-          </div>
-
-          <div class="xcart-main-section--container">
-            <div class="xcart-main-section--wrapper">
-              <div class="xcart-bundle-checkbox-wrapper">
-                <div class="xcart-bundle-checkbox-body">
-                  <!-- checkbox / selection UI goes here -->
-                </div>
-              </div>
-
-              <div class="xcart-bundle-content">
-                <div class="xcart-bundle-text">
-                  <div class="xcart-bundle-title-with-label">
-                    <span class="xcart-bundle-title">Buy 1, get 1 free</span>
-                    <span class="xcart-bundle-label">save 50%</span>
-                  </div>
-                  <div class="xcart-bundle-subtitle">
-                    subtitle
-                  </div>
-                </div>
-
-                <div class="xcart--bundle-price">
-                  <div class="xcart-bundle-discounted-price">
-                    $729.95
-                  </div>
-                  <div class="xcart-bundle-full-price">
-                    <s>1,459.90</s>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="xcart-add-upsell--wrapper">
-              <div class="xcart-upsell-checkbox-with-product--info">
-                <input type="checkbox" id="xcart-upsell-1" name="xcart-upsell-1" value="Bike">
-                <div class="xcart-add-upsell-product--img"></div>
-                <span class="xcart-add-upsell-text">+ Add at 20% discount</span>
-              </div>
-              <div class="xcart-add-upsell-price">
-                <div class="xcart-add-upsell-discounted-price">$8.00</div>
-                <div class="xcart-add-upsell-full-price"><s>$8.00</s></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-
     <div class="xcart-drawer__actions">
       <div class="xcart-discount">
         <label for="xcart-discount-input" class="xcart-label">Discount code</label>

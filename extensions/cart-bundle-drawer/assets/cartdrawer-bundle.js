@@ -74,11 +74,12 @@
           : null;
 
       const row = document.createElement('div');
-      row.className = 'xcart-line';
+      row.className = 'xcart-line-wrapper';
       row.setAttribute('role', 'listitem');
       row.dataset.key = it.key;
 
       row.innerHTML = `
+      <div class="xcart-line">
         <img
           class="xcart-line__img"
           alt="${(it.title || '').replace(/"/g, '&quot;')}"
@@ -145,6 +146,57 @@
         )}
           </div>
         </div>
+      </div>
+
+
+      <div id="xcart-bundle-app">
+        <div class="xcart-bundle-app--header">
+          <span>BUNDLE &amp; SAVE</span>
+        </div>
+        <div class="xcart-main-quantity-break">
+          <div class="xcart-main-quantity-break--container">
+            <div class="xcart-bundle_bar_most_popular">
+              <div class="xcart-bundle_bar_most_popular_content">
+                <span>BadgeText</span>
+              </div>
+              <div class="xcart-bundle_bar_most_popular_fancy">
+                
+              </div>
+            </div>
+          </div>
+
+          <div class="xcart-main-section--container">
+            <div class="xcart-main-section--wrapper">
+              <div class="xcart-bundle-checkbox-wrapper">
+                <div class="xcart-bundle-checkbox-body">
+                  <!-- checkbox / selection UI goes here -->
+                </div>
+              </div>
+
+              <div class="xcart-bundle-content">
+                <div class="xcart-bundle-text">
+                  <div class="xcart-bundle-title-with-label">
+                    <span class="xcart-bundle-title">Buy 1, get 1 free</span>
+                    <span class="xcart-bundle-label">save 50%</span>
+                  </div>
+                  <div class="xcart-bundle-subtitle">
+                    subtitle
+                  </div>
+                </div>
+
+                <div class="xcart--bundle-price">
+                  <div class="xcart-bundle-discounted-price">
+                    $729.95
+                  </div>
+                  <div class="xcart-bundle-full-price">
+                    <s>1,459.90</s>
+                  </div>
+                </div>
+              </div>
+            </div>            
+          </div>
+        </div>
+      </div>
       `;
 
       lineList.appendChild(row);

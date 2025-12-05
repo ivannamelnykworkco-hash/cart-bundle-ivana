@@ -144,3 +144,20 @@
   align-items: center;
   gap: 10px;
 }
+.countdown-text {
+  font-size: var(--msg-size);
+  font-weight: var(--msgBold-weight);
+  font-style: var(--msgItalic-style);
+  color: var(--msgText-color);
+}
+.countdown-timer-container {
+  background: var(--msgBg-color);
+  text-align: var(--msg-alignment);
+  padding: 10px 20px;
+  border-radius: var(--corner-radius);
+}
+
+.xcart-line-wrapper {
+  display: flex;
+  flex-direction: column;
+}
