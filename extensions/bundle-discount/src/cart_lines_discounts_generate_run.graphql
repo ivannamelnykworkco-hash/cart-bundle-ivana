@@ -1,4 +1,4 @@
-query CartInput {
+query CartInput($selectedCollectionIds: [ID!]) {
   cart {
     lines {
       id
@@ -11,6 +11,7 @@ query CartInput {
           product{
             id
             title
+            inAnyCollection(ids: $selectedCollectionIds)
           }
         }
       }
@@ -21,4 +22,13 @@ query CartInput {
       }
     }
   }
+   discount{
+    discountClasses
+    metafield (
+      namespace: "$app:discountInfo"
+      key: "productInfo"
+    ){
+      value
+    }
+   }
 }

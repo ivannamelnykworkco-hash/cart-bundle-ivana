@@ -16,6 +16,7 @@ export async function getGeneralSetting(): Promise<GeneralSetting> {
     data: {
       id: Math.random().toString(36).substr(2, 9),
       bundleId: Math.random().toString(36).substr(2, 9),
+      discountId: "",
       bundleName: "",
       discountName: "",
       blockTitle: "",
@@ -63,6 +64,7 @@ export async function getGeneralSetting(): Promise<GeneralSetting> {
 
 export async function updateGeneralSetting(id: string, data: Partial<GeneralSetting>) {
   const updateData: any = {
+    discountId: data?.discountId ?? "",
     bundleName: data.bundleName,
     discountName: data.discountName,
     blockTitle: data.blockTitle,
@@ -89,6 +91,10 @@ export async function updateGeneralSetting(id: string, data: Partial<GeneralSett
     // showWhenStock: parseInt(data.showStock, 10),
     msgText: data.textValue,
     msgColor: data.textColor,
+    excludedProducts: data.excludedProductData,
+    excludedCollections: data.excludedCollectionData,
+    selectedProducts: data.selectedProductData,
+    selectedCollections: data.selectedCollectionData,
     updatedAt: new Date().toISOString()
   };
 

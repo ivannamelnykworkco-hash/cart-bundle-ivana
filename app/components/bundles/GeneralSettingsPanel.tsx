@@ -102,6 +102,8 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   const [excludedCollection, setExcludedCollection] = useState<any>(null);
   const [swatchData, setSwatchData] = useState<any>(null);
   const id = conf.id;
+  const discountId = conf.discountId;
+  const bundleId = conf.bundleId;
   //FUNCTIONS
   const addCluryDobule = () => {
     setTextValue(prev => prev + "{{stack}}"); // append "abc"
@@ -116,15 +118,29 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   };
   const handleReceiveProduct = (value) => {
     setSelectedProduct(value); // get products array from product modal
+    setSelectedCollection(null);
+    setExcludedProduct(null);
+    setExcludedCollection(null);
   };
   const handleReceiveCollection = (value) => {
     setSelectedCollection(value); // get collections array from collection modal
+    setSelectedProduct(null);
+    setExcludedProduct(null);
+    setExcludedCollection(null);
+
   };
   const handleReceiveExcludedProduct = (value) => {
     setExcludedProduct(value); // get excluded products array from product modal
+    setSelectedProduct(null);
+    setSelectedCollection(null);
+    setExcludedCollection(null);
+
   };
   const handleReceiveExcludedCollection = (value) => {
     setExcludedCollection(value); // get excluded collection array from collection modal
+    setSelectedProduct(null); // get products array from product modal
+    setSelectedCollection(null);
+    setExcludedProduct(null);
   };
   const handleOnSaveSwatch = (swatchData) => {
     setSwatchData(swatchData);
@@ -132,8 +148,14 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   const handleColorChange = (value) => {
     setTextColor(value);
   }
+  const selectedProductData = visibility === "all" ? [] : selectedProduct?.map(item => item.id);
+  const selectedCollectionData = visibility === "all" ? [] : selectedCollection?.map(item => item.id);
+  const excludedProductData = visibility === "all" ? [] : excludedProduct?.map(item => item.id);
+  const excludedCollectionData = visibility === "all" ? [] : excludedCollection?.map(item => item.id);
   const settingData = () => ({
     id,
+    discountId,
+    bundleId,
     bundleName,
     discountName,
     blockTitle,
@@ -162,6 +184,10 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
     showStock,
     textColor,
     textValue,
+    selectedProductData,
+    selectedCollectionData,
+    excludedProductData,
+    excludedCollectionData
   });
 
   useEffect(() => {
@@ -196,6 +222,10 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
     showStock,
     textValue,
     textColor,
+    selectedProduct,
+    selectedCollection,
+    excludedProduct,
+    excludedCollection,
     onDataChange
   ]);
 

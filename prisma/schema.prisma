@@ -84,6 +84,7 @@ model BundlePurchase {
 model GeneralSetting {
   id String @id @default(cuid())
   bundleId String
+  discountId String
   bundleName String
   discountName String
   blockTitle String

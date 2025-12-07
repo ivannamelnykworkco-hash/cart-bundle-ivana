@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { PlusCircleIcon, DiscountIcon, MegaphoneIcon, ProductIcon, NoteIcon } from '@shopify/polaris-icons';
-// import 
 
 import {
   Page,
@@ -175,6 +174,164 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 };
 
+async function getAutomaticAppDiscount(admin: any, discountId: string) {
+  const getDiscountQuery = `
+    query getAutomaticAppDiscount($id: ID!) {
+    automaticDiscountNode(id: $id) {
+      id
+      automaticDiscount {
+        __typename
+        ... on DiscountAutomaticApp {
+          title
+          startsAt
+          endsAt
+          appDiscountType { functionId }
+        }
+      }
+    }
+  }`;
+  const getDiscountVariables = {
+    id: discountId
+  };
+  try {
+    const graphqlResult = await admin.graphql(getDiscountQuery, { variables: getDiscountVariables });
+    const body = await graphqlResult.json();
+    const automaticDiscount = body?.data?.automaticDiscountNode?.automaticDiscount ?? null;
+    return automaticDiscount;
+  } catch (err: any) {
+    // Network or other exceptions
+    return null;
+  }
+}
+
+async function createDiscountAutomaticApp(admin: any, variables: any) {
+  const createDiscountQuery = `
+    mutation discountAutomaticAppCreate($automaticAppDiscount: DiscountAutomaticAppInput!) {
+    discountAutomaticAppCreate(automaticAppDiscount: $automaticAppDiscount) {
+      userErrors {
+        field
+        message
+      }
+      automaticAppDiscount {
+        discountId
+        title
+        startsAt
+        endsAt
+        status
+        appDiscountType {
+          appKey
+          functionId
+          title
+          description
+          }
+        combinesWith {
+        orderDiscounts
+        productDiscounts
+        shippingDiscounts
+        }
+      }
+    }
+  }`;
+  try {
+    const graphqlResult = await admin.graphql(createDiscountQuery, { variables: variables });
+    const body = await graphqlResult.json();
+    const userErrors = body.data?.discountAutomaticAppCreate?.userErrors || [];
+    if (userErrors.length > 0) {
+      return null;
+    }
+    const automaticAppDiscount = body?.data?.discountAutomaticAppCreate?.automaticAppDiscount ?? null;
+    return automaticAppDiscount;
+  } catch (err: any) {
+    // Network or other exceptions
+    return null;
+  }
+}
+
+async function updateDiscountAutomaticApp(admin: any, discountId: string, discountData: any) {
+  const updateDiscountQuery = `
+    mutation discountAutomaticAppUpdate($automaticAppDiscount: DiscountAutomaticAppInput!, $id: ID!) {
+    discountAutomaticAppUpdate(automaticAppDiscount: $automaticAppDiscount, id: $id) {
+      automaticAppDiscount {
+        title
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }`;
+  const updateVariables = {
+    id: discountId,
+    automaticAppDiscount: {
+      title: discountData.discountName,
+      startsAt: discountData.startsAt,
+      endsAt: discountData.endsAt === "" ? null : discountData.endsAt,
+    }
+  };
+  try {
+    const graphqlResult = await admin.graphql(updateDiscountQuery, { variables: updateVariables });
+    const body = await graphqlResult.json();
+    const userErrors = body.data?.discountAutomaticAppUpdate?.userErrors || [];
+    if (body.errors?.length) {
+      // return body.errors.map((e: any) => e.message).join(", ");
+      return "body error";
+    }
+    if (userErrors.length > 0) {
+      // return userErrors.map(e => e.message).join(", ");
+      return "usererror";
+    }
+    const automaticAppDiscount = body?.data?.discountAutomaticAppUpdate?.automaticAppDiscount ?? null;
+    if (automaticAppDiscount == null)
+      return body.errors[0].message;
+    if (!automaticAppDiscount) {
+      return "Unknown error: discountAutomaticAppUpdate returned null";
+    }
+    return automaticAppDiscount;
+  } catch (err: any) {
+    // Network or other exceptions
+    // return err.message;
+    return "othererror";
+  }
+}
+
+async function addMetafield(admin: any, variables: any) {
+  try {
+    const addMetafieldQuery = `
+    mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
+      metafieldsSet(metafields: $metafields) {
+        metafields {
+          id
+          key
+          value
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`;
+    const response = await admin.graphql(addMetafieldQuery, { variables: variables });
+    const json = await response.json?.() || response;
+    if (json.errors?.length) {
+      throw new Error(json.errors[0].message);
+    }
+    const userErrors = json.data?.metafieldsSet?.userErrors;
+    if (userErrors?.length) {
+      throw new Error(userErrors[0].message);
+    }
+    return json.data.metafieldsSet.metafields;
+  } catch (err) {
+    throw new Error(`Failed to set metafields: ${err.message}`);
+  }
+}
+
+function safeParse(json) {
+  try {
+    return JSON.parse(json);
+  } catch {
+    return [];
+  }
+}
 /*********************Action to receive submit data****************/
 //Save data in database
 export async function action({ request, params }) {
@@ -193,79 +350,137 @@ export async function action({ request, params }) {
   const generalStyle = JSON.parse(form.generalStyle);
   const discountData = JSON.parse(form.discountData);
 
-  const mutationQuery = `
-    mutation discountAutomaticAppCreate($automaticAppDiscount: DiscountAutomaticAppInput!) {
-    discountAutomaticAppCreate(automaticAppDiscount: $automaticAppDiscount) {
-      userErrors {
-        field
-        message
+  const existingDiscount = await getAutomaticAppDiscount(admin, generalSetting.discountId);
+  //if no discount exists, create a new discount   
+  if (existingDiscount == null) {
+    const createVariables = {
+      automaticAppDiscount: {
+        title: discountData.discountName,
+        functionId: discountData.functionId,
+        startsAt: discountData.startsAt,
+        endsAt: discountData.endsAt === "" ? null : discountData.endsAt,
+        combinesWith: {
+          orderDiscounts: true,
+          productDiscounts: true,
+          shippingDiscounts: true
+        },
+        discountClasses: "PRODUCT"
       }
-      automaticAppDiscount {
-        discountId
-        title
-        startsAt
-        endsAt
-        status
-        appDiscountType {
-          appKey
-          functionId
-          }
-        combinesWith {
-        orderDiscounts
-        productDiscounts
-        shippingDiscounts
+    };
+    const automaticAppDiscount = await createDiscountAutomaticApp(admin, createVariables);
+    if (automaticAppDiscount == null) {
+      return json(
+        { success: false, error: "Discount create failed" },
+        { status: 500 }
+      );
+    }
+    const automaticAppDiscountId = automaticAppDiscount.discountId;
+    generalSetting.discountId = automaticAppDiscountId;
+    try {
+      await Promise.all([
+        updateCountdownTimer(countdownTimer.id, countdownTimer),
+        updateVolumeDiscount(volumeDiscount.id, volumeDiscount),
+        updateStickyAdd(stickyAdd.id, stickyAdd),
+        updateCheckboxUpsell(checkboxUpsell.id, checkboxUpsell),
+        updateGeneralSetting(generalSetting.id, generalSetting),
+        updateGeneralStyle(generalStyle.id, generalStyle)
+      ]);
+      return json({ success: true, automaticAppDiscount });
+    } catch (err) {
+      return json(
+        { success: false, error: err.message || "Database update failed" },
+        { status: 500 }
+      );
+    }
+  }
+  //if a discount exists, update it
+  else {
+    const discountId = generalSetting.discountId;
+    let productList;
+    let collectionList;
+    // apply discount to specific products(4 types - all, except, specific, collection)
+    const productScope = generalSetting.visibility;
+
+    switch (productScope) {
+      case "specific":
+        productList = generalSetting.selectedProductData;
+        break;
+      case "collections":
+        collectionList = generalSetting.selectedCollectionData;
+        break;
+      case "except":
+        collectionList = generalSetting?.excludedCollectionData ?? [];
+        productList = generalSetting?.excludedProductData ?? [];
+        break;
+      default:
+        productList = [];
+        collectionList = [];
+    }
+    // productList = productList === "undefined" ? [] : JSON.parse(productList);
+    // collectionList = collectionList === "undefined" ? [] : JSON.parse(collectionList);
+
+    productList = safeParse(productList);
+    collectionList = safeParse(collectionList);
+
+    const automaticAppDiscount = await updateDiscountAutomaticApp(admin, discountId, discountData);
+    if (automaticAppDiscount == null) {
+      return json(
+        { success: false, error: "Discount update failed" },
+        { status: 500 }
+      );
+    }
+
+    // add metafields of product info
+    const addMetafieldVariables = {
+      metafields: [
+        {
+          ownerId: discountId,
+          namespace: "$app:discountInfo",
+          key: "productInfo",
+          type: "json",
+          value: JSON.stringify({
+            productScope: productScope,
+            productList: productList,
+            selectedCollectionIds: collectionList
+          })
         }
+      ]
+    };
+    ////////////////////////
+    try {
+      const result = await addMetafield(admin, addMetafieldVariables);
+      try {
+        // Parse each JSON string
+        await Promise.all([
+          updateCountdownTimer(String(countdownTimer.id), countdownTimer),
+          updateVolumeDiscount(volumeDiscount.id, volumeDiscount),
+          updateStickyAdd(stickyAdd.id, stickyAdd),
+          updateCheckboxUpsell(checkboxUpsell.id, checkboxUpsell),
+          updateGeneralSetting(generalSetting.id, generalSetting),
+          updateGeneralStyle(generalStyle.id, generalStyle)
+        ]);
+        return json({ success: true, result });
+      } catch (err) {
+        return json(
+          { success: false, error: err.message || "Database update failed" },
+          { status: 500 }
+        );
       }
+
+    } catch (err) {
+      return json(
+        { success: false, error: err.message || "Metafield update failed" },
+        { status: 500 }
+      );
     }
-  }`;
-
-  const variables = {
-    automaticAppDiscount: {
-      title: discountData.discountTitle,
-      functionId: discountData.functionId,
-      startsAt: discountData.startsAt,
-      endsAt: discountData.endsAt,
-      combinesWith: {
-        orderDiscounts: true,
-        productDiscounts: true,
-        shippingDiscounts: true
-      },
-      discountClasses: "PRODUCT"
-    }
-  };
-
-  const graphqlResult = await admin.graphql(mutationQuery, { variables });
-  const body = await graphqlResult.json();
-  const automaticAppDiscount = body?.data?.discountAutomaticAppCreate;//?.automaticAppDiscount ?? null;
-
-  try {
-    // Parse each JSON string
-    await Promise.all([
-      updateCountdownTimer(String(countdownTimer.id), countdownTimer),
-      updateVolumeDiscount(volumeDiscount.id, volumeDiscount),
-      updateStickyAdd(stickyAdd.id, stickyAdd),
-      updateCheckboxUpsell(checkboxUpsell.id, checkboxUpsell),
-      updateGeneralSetting(generalSetting.id, generalSetting),
-      updateGeneralStyle(generalStyle.id, generalStyle)
-    ]);
-
-    return json({ success: true, automaticAppDiscount });
-
-  } catch (err) {
-    return json(
-      { success: false, error: err.message || "Data update failed" },
-      { status: 500 }
-    );
   }
 }
-
 
 /**************************************************************/
 
 interface BoxQuantity {
   id: number;
 };
-
 const fontWeightMap = {
   styleLight: '200',
   styleLightItalic: '200',
@@ -275,7 +490,6 @@ const fontWeightMap = {
   styleBold: '700',
   styleBoldItalic: '700',
 };
-
 const fontStyleMap = {
   styleLight: 'normal',
   styleLightItalic: 'italic',
@@ -354,7 +568,6 @@ export default function BundleSettingsAdvanced() {
   const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
   const [generalStickyAddData, setGeneralStickyAddData] = useState(loaderData.generalStickyAddConf);
   const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf);
-
   const handleCountdownTimerChange = useCallback((updated: any) => {
     setCountdownTimerData(prev => ({ ...prev, ...updated }));
   }, []);
@@ -370,6 +583,8 @@ export default function BundleSettingsAdvanced() {
   const handleGeneralSetting = useCallback((updated: any) => {
     setGeneralSettingData(prev => ({ ...prev, ...updated }));
   }, []);
+  console.log("<<<", generalSettingData);
+
   // Send data to action
   const submit = useSubmit();
 
@@ -466,15 +681,14 @@ export default function BundleSettingsAdvanced() {
     // Create discount automatic app 
     const functionId = shopifyFunctions.find((f) => f.title === "bundle-discount").id;
     const discountFormData = new FormData();
-    const discountTitle = generalSettingData.discountName;
+    const discountName = generalSettingData.discountName;
     const startsAt = new Date(`${generalSettingData.startDate}T${generalSettingData.startTime}`).toISOString();
-    const endsAt = new Date(`${generalSettingData.endDate}T${generalSettingData.endTime}`).toISOString();
+    const endsAt = generalSettingData.setEndDate ? new Date(`${generalSettingData.endDate}T${generalSettingData.endTime}`).toISOString() : "";
     discountFormData.append("actionType", "discountData");
-    discountFormData.append("discountTitle", discountTitle);
+    discountFormData.append("discountName", discountName);
     discountFormData.append("functionId", functionId);
     discountFormData.append("startsAt", startsAt);
     discountFormData.append("endsAt", endsAt);
-
     //    discountFormData.append("metafieldValue", metafieldValue);
 
     const fd = new FormData();
@@ -623,6 +837,8 @@ export default function BundleSettingsAdvanced() {
   const [barLabelText, setBarLabelText] = useState({});
   const [badgeSelected, setBadgeSelected] = useState({});
   const [selectedProductChange, setSelectedProductChange] = useState({});
+  const [qbDataObj, setQbDataObj] = useState({});
+
   //buy x and get y free
   const [defaultBasePrice, setDefaultBasePrice] = useState({});
   const [calculatedPrice, setCalculatedPrice] = useState({});
@@ -667,6 +883,11 @@ export default function BundleSettingsAdvanced() {
     }));
   };
 
+  const handleQbDataObj = useCallback((updated: any) => {
+    setQbDataObj(prev => ({ ...prev, ...updated }));
+  }, []);
+
+  console.log("qbDataObj===", qbDataObj);
   //product add
   const hanldeonAddProductChange = (bundleId: string | number, item: any) => {
     setProducts(prev => ({
@@ -728,7 +949,8 @@ export default function BundleSettingsAdvanced() {
   const handleBundleUpsellSelectedChange = (id: string | number, value: string) => {
     setBundleUpsellbadgeSelected(prev => ({ ...prev, [id]: value }));
   }
-  const handlePriceChange = (bundleId: any, calc: any, base: any) => {
+
+  const handlePriceChange = useCallback((bundleId, calc, base) => {
     setCalculatedPrice(prev => ({
       ...prev,
       [bundleId]: calc
@@ -737,7 +959,8 @@ export default function BundleSettingsAdvanced() {
       ...prev,
       [bundleId]: base
     }));
-  };
+  }, []);
+
   const handlexyPriceChange = (bundleId: any, calc: any, base: any) => {
     setXyCalculatedPrice(prev => ({
       ...prev,
@@ -1038,21 +1261,23 @@ export default function BundleSettingsAdvanced() {
                     onToggle={() => setOpenPanel(openPanel === item.id ? null : item.id)}
                     deleteSection={deleteQuantityBreak}
                     heading="Bar #1 - Single"
-                    upBundlesChooseTitleChange={handleBarTitleChange}
-                    upBundlesChooseSubTitleChange={handleBarSubTitleChange}
-                    upBundlesBadgeTextChange={handleBagdeTextChange}
-                    upBunlesBarLabelTextChange={handleBarLabelTextChange}
-                    upBundlesBarUpsellTextChange={handleBundlesChooseBarUpsellTextChanges}
+                    // upBundlesChooseTitleChange={handleBarTitleChange}
+                    // upBundlesChooseSubTitleChange={handleBarSubTitleChange}
+                    // upBundlesBadgeTextChange={handleBagdeTextChange}
+                    // upBunlesBarLabelTextChange={handleBarLabelTextChange}
+                    // upBundlesBarUpsellTextChange={handleBundlesChooseBarUpsellTextChanges}
                     upPriceChange={handlePriceChange}
                     upAddUpsellPriceChange={handleAddUpsellPriceChange}
                     upBadgeSelectedChange={handleBadgeSelectedChange}
                     upSelectedProductChange={handleSelectedProductChange}
                     upAddUpsellImageChange={handleAddupsellImageChange}
                     onAddUpsell={handelonAddUpsellChange}
-                    onDeleteUpsell={handleonDeleteUpsellChange} />
+                    onDeleteUpsell={handleonDeleteUpsellChange}
+                    onDataObjChange={handleQbDataObj}
+                  />
                 ))}
 
-
+                {/* 
                 {buyXGetYs.map((buyitem) => (
                   <GeneralBuyXgetYfree
                     id={buyitem.id}
@@ -1105,7 +1330,7 @@ export default function BundleSettingsAdvanced() {
                     selectedStyle={selectedStyle}
                     onChangeStyle={setSelectedStyle}
                   />
-                ))}
+                ))} */}
                 {showOriginal ? (
                   <div style={{ border: "1px dashed  black", borderRadius: '10px', padding: '15px' }}>
                     <Button fullWidth icon={PlusCircleIcon} variant="primary" onClick={() => setShowOriginal(false)}>Add bar</Button>

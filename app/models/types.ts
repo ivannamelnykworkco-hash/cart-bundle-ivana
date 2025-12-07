@@ -66,6 +66,7 @@ export interface BundleTypeOption {
 export interface GeneralSetting {
   id: string;
   bundleId: string;
+  discountId: string;
   bundleName: string;//
   discountName: string;//
   blockTitle: string;//
