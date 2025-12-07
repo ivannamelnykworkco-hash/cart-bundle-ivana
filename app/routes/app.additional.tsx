@@ -18,7 +18,7 @@ export default function AdditionalPage() {
         <Layout.Section>
           <Card>
             <BlockStack gap="300">
-              <Text as="p" variant="bodyMd">
+              <Text as="span" variant="bodyMd">
                 The app template comes with an additional page which
                 demonstrates how to create multiple pages within app navigation
                 using{" "}
@@ -31,7 +31,7 @@ export default function AdditionalPage() {
                 </Link>
                 .
               </Text>
-              <Text as="p" variant="bodyMd">
+              <Text as="span" variant="bodyMd">
                 To create your own page and have it show up in the app
                 navigation, add a page inside <Code>app/routes</Code>, and a
                 link to it in the <Code>&lt;NavMenu&gt;</Code> component found

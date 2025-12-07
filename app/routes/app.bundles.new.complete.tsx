@@ -99,7 +99,7 @@ export default function CompleteBundle() {
                   autoComplete="off"
                 />
 
-                <Text as="p" variant="headingMd">
+                <Text as="span" variant="headingMd">
                   Products in Bundle
                 </Text>
 
@@ -115,10 +115,10 @@ export default function CompleteBundle() {
                   >
                     <InlineStack align="space-between" blockAlign="center">
                       <div>
-                        <Text as="p" variant="bodyMd" fontWeight="semibold">
+                        <Text as="span" variant="bodyMd" fontWeight="semibold">
                           {product.name}
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           ${product.price.toFixed(2)}
                         </Text>
                       </div>
@@ -131,7 +131,7 @@ export default function CompleteBundle() {
                   </div>
                 ))}
 
-                <Text as="p" variant="headingMd">
+                <Text as="span" variant="headingMd">
                   Add Product to Complete Bundle
                 </Text>
 
@@ -148,10 +148,10 @@ export default function CompleteBundle() {
                       borderRadius: "8px",
                     }}></div>
                     <div style={{ flex: 1 }}>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         {additionalProduct.name}
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         ${additionalProduct.price.toFixed(2)}
                       </Text>
                       <div style={{ marginTop: "8px" }}>
@@ -176,13 +176,13 @@ export default function CompleteBundle() {
                   borderRadius: "8px",
                   border: "1px solid #86efac",
                 }}>
-                  <Text as="p" variant="headingMd" fontWeight="bold">
+                  <Text as="span" variant="headingMd" fontWeight="bold">
                     Bundle Price: ${bundlePrice.toFixed(2)}
                   </Text>
-                  <Text as="p" variant="bodySm" tone="success">
+                  <Text as="span" variant="bodySm" tone="success">
                     Save ${savings.toFixed(2)} ({savingsPercent}%)
                   </Text>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Original: ${totalOriginalPrice.toFixed(2)}
                   </Text>
                 </div>
@@ -204,7 +204,7 @@ export default function CompleteBundle() {
                 padding: "16px",
                 backgroundColor: "#fff"
               }}>
-                <Text as="p" variant="headingMd" fontWeight="bold">
+                <Text as="span" variant="headingMd" fontWeight="bold">
                   {bundleTitle}
                 </Text>
 
@@ -228,10 +228,10 @@ export default function CompleteBundle() {
                         borderRadius: "4px",
                       }}></div>
                       <div style={{ flex: 1 }}>
-                        <Text as="p" variant="bodySm" fontWeight="semibold">
+                        <Text as="span" variant="bodySm" fontWeight="semibold">
                           {product.name}
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           ${product.price.toFixed(2)}
                         </Text>
                       </div>
@@ -254,13 +254,13 @@ export default function CompleteBundle() {
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <Text as="p" variant="headingLg">?</Text>
+                      <Text as="span" variant="headingLg">?</Text>
                     </div>
                     <div style={{ flex: 1 }}>
-                      <Text as="p" variant="bodySm" fontWeight="semibold">
+                      <Text as="span" variant="bodySm" fontWeight="semibold">
                         {additionalProduct.name}
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         ${additionalProduct.price.toFixed(2)}
                       </Text>
                       <Button size="slim" variant="plain">Choose</Button>
@@ -276,10 +276,10 @@ export default function CompleteBundle() {
                   borderRadius: "8px",
                   textAlign: "center",
                 }}>
-                  <Text as="p" variant="headingMd" fontWeight="bold">
+                  <Text as="span" variant="headingMd" fontWeight="bold">
                     Complete the bundle ${bundlePrice.toFixed(2)}
                   </Text>
-                  <Text as="p" variant="bodySm">
+                  <Text as="span" variant="bodySm">
                     Save ${savings.toFixed(2)}!
                   </Text>
                 </div>

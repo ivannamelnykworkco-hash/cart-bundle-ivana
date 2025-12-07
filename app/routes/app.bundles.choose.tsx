@@ -17,7 +17,6 @@ import {
   Badge,
   InlineGrid,
   Checkbox,
-  TextField,
   Toast,
   Frame,
   Thumbnail,
@@ -1207,7 +1206,7 @@ export default function BundleSettingsAdvanced() {
 
   return (
     <Page
-      title="Kaching Bundles"
+      title="Carting Bundles"
       backAction={{ content: "Back", url: "/app" }}
       primaryAction={{
         content: "Save",
@@ -1393,24 +1392,44 @@ export default function BundleSettingsAdvanced() {
                           alignment="center"
                           fontWeight="bold"
                         >
-                          <p
+                          <span
                             className="barHeading"
                             style={{
                               color: blockTitleColor,
-                              fontSize: `${barBlocktitle} px`,
+                              fontSize: `${barBlocktitle}px`,
                               fontWeight: fontWeightMap[barBlocktitleFontStyle as keyof typeof fontWeightMap],
                               fontStyle: fontStyleMap[barBlocktitleFontStyle as keyof typeof fontWeightMap],
                             }}
                           >
                             BUNDLE & SAVE
-                          </p>
+                          </span>
                         </Text>
-
-
-
-
                         {/* Bundle Options */}
                         <div className="preview-main" style={{ flexDirection: layoutSelectedStyle === 'layout1' ? 'column' : 'row', overflow: layoutSelectedStyle === 'layout1' ? '' : 'auto' }} >
+
+                          {/* { coundownTimerData right} */}
+                          {countdownTimerData.showCountdownTimer && (
+                            <div className="countdown-timer" style={{ background: countdownTimerData.msgBgColor, borderRadius: `${cornerRadius}px` }}>
+                              <div
+                                className="countdown-timer-container"
+                                style={{
+                                  textAlign:
+                                    countdownTimerData.activeAlignmentButtonIndex === 0
+                                      ? "left"
+                                      : countdownTimerData.activeAlignmentButtonIndex === 1
+                                        ? "center"
+                                        : "right",
+                                }}
+                              >
+                                <span style={{ color: countdownTimerData.msgTextColor, fontWeight: countdownTimerData.activeTextBoldButton ? "bold" : "normal", fontStyle: countdownTimerData.activeTextItalicButton ? "italic" : 'normal', fontSize: `${countdownTimerData.textFontSize}px` }}>
+                                  {(countdownTimerData.textValue || "").split("{{timer}}").join(
+                                    countdownTimerData.formatted ?? "--:--"
+                                  )}{" "}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
                           {quantityBreaks.map((item) => (
                             <div key={item.id} className="main-quantity-break" onClick={() => setSelectedId(item.id)}>
                               <Box position="relative">
@@ -1435,20 +1454,20 @@ export default function BundleSettingsAdvanced() {
                               </Box>
                               <div className="main-section--container"
                                 style={{
-                                  borderRadius: `${cornerRadius} px`,
+                                  borderRadius: `${cornerRadius}px`,
                                   border: '2px solid',
                                   borderColor: selectedId === item.id ? borderColor : cardsBgColor,
                                   boxShadow: selectedId === item.id
                                     ? `inset 0 0 0 2px ${borderColor}, #000`
                                     : `inset 0 0 0 1px ${cardsBgColor}, #000`,
-                                  paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10} px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5} px` : `${spacing * 0.5} px`,
+                                  paddingTop: badgeSelected[item.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[item.id] === "simple" && bagdeText[item.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`,
                                   backgroundColor: selectedId === item.id ? selectedBgColor : cardsBgColor,
                                   height: layoutSelectedStyle == 'layout2' ? '100%' : ''
                                 }}>
                                 <div style={{
-                                  padding: `${spacing * 0.5}px ${spacing} px`,
+                                  padding: `${spacing * 0.5}px ${spacing}px`,
                                   backgroundColor: selectedId === item.id ? selectedBgColor : cardsBgColor, display: "flex",
-                                  borderRadius: `${cornerRadius} px`,
+                                  borderRadius: `${cornerRadius}px`,
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row'
@@ -1470,29 +1489,29 @@ export default function BundleSettingsAdvanced() {
                                     </div>
                                     <BlockStack gap="050">
                                       <InlineStack gap="100">
-                                        <p className="barTitle" style={{
+                                        <span className="barTitle" style={{
                                           textAlign: 'center',
                                           color: barTitleColor,
-                                          fontSize: `${bartitleSize} px`,
+                                          fontSize: `${bartitleSize}px`,
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
                                           {barTitle[item.id] || 'Single'}
-                                        </p>
-                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius} px` }}>
-                                          <p className="bar-label--text" style={{
+                                        </span>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                          <span className="bar-label--text" style={{
                                             color: barLabelTextColor,
-                                            fontSize: `${labelSize} px`,
+                                            fontSize: `${labelSize}px`,
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
                                             {barLabelText[item.id] || ''}
-                                          </p>
+                                          </span>
                                         </div>
                                       </InlineStack>
                                       <span className="barSubTitle" style={{
                                         color: barSubTitleColor,
-                                        fontSize: `${subTitleSize} px`,
+                                        fontSize: `${subTitleSize}px`,
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         textAlign: layoutSelectedStyle === 'layout2' ? 'center' : ''
@@ -1505,7 +1524,7 @@ export default function BundleSettingsAdvanced() {
                                     <BlockStack gap="050">
                                       <div className="bar-price" style={{
                                         color: barPriceColor,
-                                        fontSize: `${bartitleSize} px`,
+                                        fontSize: `${bartitleSize}px`,
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1514,7 +1533,7 @@ export default function BundleSettingsAdvanced() {
                                       {defaultBasePrice[item.id] && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
-                                          fontSize: `${subTitleSize} px`,
+                                          fontSize: `${subTitleSize}px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
@@ -1543,7 +1562,7 @@ export default function BundleSettingsAdvanced() {
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
-                                          <div className="bar-upsell-img" style={{ width: `${addupsellImage[item.id]?.[upsell.id]} px`, height: `${addupsellImage[item.id]?.[upsell.id]} px`, }}>
+                                          <div className="bar-upsell-img" style={{ width: `${addupsellImage[item.id]?.[upsell.id]}px`, height: `${addupsellImage[item.id]?.[upsell.id]}px`, }}>
                                             <Thumbnail
                                               source={boxUpsellSelectedProduct[item.id]?.[upsell.id]?.[0]?.imageUrl || ''}
                                               alt=""
@@ -1605,21 +1624,21 @@ export default function BundleSettingsAdvanced() {
                               </Box>
                               <div className="main-section--container"
                                 style={{
-                                  borderRadius: `${cornerRadius} px`,
+                                  borderRadius: `${cornerRadius}px`,
                                   border: '2px solid',
                                   borderColor: selectedId === buyitem.id ? borderColor : cardsBgColor,
                                   boxShadow: selectedId === buyitem.id
                                     ? `inset 0 0 0 2px ${borderColor}, #000`
                                     : `inset 0 0 0 1px ${cardsBgColor}, #000`,
-                                  paddingTop: badgeSelected[buyitem.id] ? `${spacing * 0.5 + 10} px` : badgeSelected[buyitem.id] === "simple" && bagdeText[buyitem.id] ? `${spacing * 0.5} px` : `${spacing * 0.5} px`,
+                                  paddingTop: badgeSelected[buyitem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[buyitem.id] === "simple" && bagdeText[buyitem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`,
                                   backgroundColor: selectedId === buyitem.id ? selectedBgColor : cardsBgColor,
                                   height: layoutSelectedStyle == 'layout2' ? '100%' : ''
                                 }}>
                                 <div style={{
-                                  padding: `${spacing * 0.5}px ${spacing} px`,
+                                  padding: `${spacing * 0.5}px ${spacing}px`,
                                   backgroundColor: selectedId === buyitem.id ? selectedBgColor : cardsBgColor,
                                   display: "flex",
-                                  borderRadius: `${cornerRadius} px`,
+                                  borderRadius: `${cornerRadius}px`,
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row'
@@ -1641,29 +1660,29 @@ export default function BundleSettingsAdvanced() {
                                     </div>
                                     <BlockStack gap="050">
                                       <InlineStack gap="100">
-                                        <p className="barTitle" style={{
+                                        <span className="barTitle" style={{
                                           textAlign: 'center',
                                           color: barTitleColor,
-                                          fontSize: `${bartitleSize} px`,
+                                          fontSize: `${bartitleSize}px`,
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
                                           {xybarTitle[buyitem.id] || 'Buy 3, Get 1 Free!'}
-                                        </p>
-                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius} px` }}>
-                                          <p className="bar-label--text" style={{
+                                        </span>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                          <span className="bar-label--text" style={{
                                             color: barLabelTextColor,
-                                            fontSize: `${labelSize} px`,
+                                            fontSize: `${labelSize}px`,
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
                                             {xybarLabelText[buyitem.id]}
-                                          </p>
+                                          </span>
                                         </div>
                                       </InlineStack>
                                       <span className="barSubTitle" style={{
                                         color: barSubTitleColor,
-                                        fontSize: `${subTitleSize} px`,
+                                        fontSize: `${subTitleSize}px`,
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1675,7 +1694,7 @@ export default function BundleSettingsAdvanced() {
                                     <BlockStack gap="050">
                                       <div className="bar-price" style={{
                                         color: barPriceColor,
-                                        fontSize: `${bartitleSize} px`,
+                                        fontSize: `${bartitleSize}px`,
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1684,7 +1703,7 @@ export default function BundleSettingsAdvanced() {
                                       {xydefaultBasePrice[buyitem.id] && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
-                                          fontSize: `${subTitleSize} px`,
+                                          fontSize: `${subTitleSize}px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
@@ -1713,7 +1732,7 @@ export default function BundleSettingsAdvanced() {
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
-                                          <div className="bar-upsell-img" style={{ width: `${xyAddupsellImage[buyitem.id]?.[upsell.id]} px`, height: `${xyAddupsellImage[buyitem.id]?.[upsell.id]} px`, }}>
+                                          <div className="bar-upsell-img" style={{ width: `${xyAddupsellImage[buyitem.id]?.[upsell.id]}px`, height: `${xyAddupsellImage[buyitem.id]?.[upsell.id]}px`, }}>
                                             <Thumbnail
                                               source={xyBoxUpsellSelectedProduct[buyitem.id]?.[upsell.id]?.[0]?.imageUrl || ''}
                                               alt=""
@@ -1773,20 +1792,20 @@ export default function BundleSettingsAdvanced() {
                               </Box>
                               <div className="main-section--container"
                                 style={{
-                                  borderRadius: `${cornerRadius} px`,
+                                  borderRadius: `${cornerRadius}px`,
                                   border: '2px solid',
                                   borderColor: selectedId === bundleitem.id ? borderColor : cardsBgColor,
                                   boxShadow: selectedId === bundleitem.id
                                     ? `inset 0 0 0 2px ${borderColor}, #000`
                                     : `inset 0 0 0 1px ${cardsBgColor}, #000`,
-                                  paddingTop: badgeSelected[bundleitem.id] ? `${spacing * 0.5 + 10} px` : badgeSelected[bundleitem.id] === "simple" && bagdeText[bundleitem.id] ? `${spacing * 0.5} px` : `${spacing * 0.5} px`,
+                                  paddingTop: badgeSelected[bundleitem.id] ? `${spacing * 0.5 + 10}px` : badgeSelected[bundleitem.id] === "simple" && bagdeText[bundleitem.id] ? `${spacing * 0.5}px` : `${spacing * 0.5}px`,
                                   backgroundColor: selectedId === bundleitem.id ? selectedBgColor : cardsBgColor,
                                   height: layoutSelectedStyle == 'layout2' ? '100%' : ''
                                 }}>
                                 <div style={{
-                                  padding: `${spacing * 0.5}px ${spacing} px`,
+                                  padding: `${spacing * 0.5}px ${spacing}px`,
                                   backgroundColor: selectedId === bundleitem.id ? selectedBgColor : cardsBgColor, display: "flex",
-                                  borderRadius: `${cornerRadius} px`,
+                                  borderRadius: `${cornerRadius}px`,
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
                                   flexDirection: layoutSelectedStyle === 'layout2' ? 'column' : 'row'
@@ -1808,29 +1827,29 @@ export default function BundleSettingsAdvanced() {
                                     </div>
                                     <BlockStack gap="050">
                                       <InlineStack gap="100">
-                                        <p className="barTitle" style={{
+                                        <span className="barTitle" style={{
                                           textAlign: 'center',
                                           color: barTitleColor,
-                                          fontSize: `${bartitleSize} px`,
+                                          fontSize: `${bartitleSize}px`,
                                           fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         }}>
                                           {bundleUpsellBarTitle[bundleitem.id] || 'Complete the bundle'}
-                                        </p>
-                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius} px` }}>
-                                          <p className="bar-label--text" style={{
+                                        </span>
+                                        <div className="bar-label--text-container" style={{ background: barLabelBack, borderRadius: `${cornerRadius}px` }}>
+                                          <span className="bar-label--text" style={{
                                             color: barLabelTextColor,
-                                            fontSize: `${labelSize} px`,
+                                            fontSize: `${labelSize}px`,
                                             fontWeight: fontWeightMap[labelStyle as keyof typeof fontWeightMap],
                                             fontStyle: fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                           }}>
                                             {bunldeUpsellLabelText[bundleitem.id]}
-                                          </p>
+                                          </span>
                                         </div>
                                       </InlineStack>
                                       <span className="barSubTitle" style={{
                                         color: barSubTitleColor,
-                                        fontSize: `${subTitleSize} px`,
+                                        fontSize: `${subTitleSize}px`,
                                         fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1842,7 +1861,7 @@ export default function BundleSettingsAdvanced() {
                                     <BlockStack gap="050">
                                       <div className="bar-price" style={{
                                         color: barPriceColor,
-                                        fontSize: `${bartitleSize} px`,
+                                        fontSize: `${bartitleSize}px`,
                                         fontWeight: fontWeightMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                         fontStyle: fontStyleMap[bartitleFontStyle as keyof typeof fontWeightMap],
                                       }}>
@@ -1851,7 +1870,7 @@ export default function BundleSettingsAdvanced() {
                                       {defaultBasePrice && (
                                         <div className="bar-fullPrice" style={{
                                           color: barFullPriceColor,
-                                          fontSize: `${subTitleSize} px`,
+                                          fontSize: `${subTitleSize}px`,
                                           fontWeight: fontWeightMap[subTitleStyle as keyof typeof fontWeightMap],
                                           fontStyle: fontStyleMap[subTitleStyle as keyof typeof fontWeightMap],
                                         }}>
@@ -1945,7 +1964,7 @@ export default function BundleSettingsAdvanced() {
                                           />
                                         </div>
                                         <div className="bar-upsell-checkbox-content">
-                                          <div className="bar-upsell-img" style={{ width: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]} px`, height: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]} px`, }}>
+                                          <div className="bar-upsell-img" style={{ width: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]}px`, height: `${bundleAddupsellImage[bundleitem.id]?.[upsell.id]}px`, }}>
                                             <Thumbnail
                                               source={bundleBoxUpsellSelectedProduct[bundleitem.id]?.[upsell.id]?.[0]?.imageUrl || ''}
                                               alt=""
@@ -1993,7 +2012,7 @@ export default function BundleSettingsAdvanced() {
                             borderRadius="100"
                           >
                             <BlockStack gap="200">
-                              <Text as="p" variant="bodySm" alignment="center">
+                              <Text as="span" variant="bodySm" alignment="center">
                                 Your cart will expire in{" "}
                                 <Text as="span" fontWeight="bold" tone="critical">
                                   09:59 ⏰

@@ -437,3 +437,6 @@
   align-items: center;
   gap: 20px;
 }
+.countdown-timer-container {
+  padding: 10px 20px;
+}

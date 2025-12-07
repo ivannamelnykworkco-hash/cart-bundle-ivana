@@ -39,7 +39,7 @@ export function SetDefaultVariantsModal({ productArray }) {
         source={productArray[0]?.imageUrl}
       />
     </Box>,
-    <Text as="p" alignment="start">
+    <Text as="span" alignment="start">
       {productArray[0]?.title}
     </Text>
   ];
@@ -52,7 +52,7 @@ export function SetDefaultVariantsModal({ productArray }) {
         source={product?.imageUrl || ImageIcon}
       />
     </Box>,
-    <Text as="p" alignment="start">
+    <Text as="span" alignment="start">
       {product.title}
     </Text>
   ]);
@@ -81,7 +81,7 @@ export function SetDefaultVariantsModal({ productArray }) {
           <Box width="45%" borderWidth="050" borderRadius="400" padding="400">
             <BlockStack gap="400">
               <Text
-                as="p"
+                as="span"
                 variant="bodyMd"
                 alignment="start"
                 fontWeight="bold"
@@ -92,7 +92,7 @@ export function SetDefaultVariantsModal({ productArray }) {
               <Box paddingInline="200">
                 <BlockStack gap="200">
                   <Text
-                    as="p"
+                    as="span"
                     variant="bodyLg"
                     alignment="center"
                     fontWeight="bold"
@@ -125,15 +125,15 @@ export function SetDefaultVariantsModal({ productArray }) {
                           onChange={handleBundleType}
                         />
                         <BlockStack gap="050">
-                          <Text as="p" variant="bodyMd" fontWeight="semibold">
+                          <Text as="span" variant="bodyMd" fontWeight="semibold">
                             Single
                           </Text>
-                          <Text as="p" variant="bodySm" tone="subdued">
+                          <Text as="span" variant="bodySm" tone="subdued">
                             Standard price
                           </Text>
                         </BlockStack>
                       </InlineStack>
-                      <Text as="p" variant="headingMd" fontWeight="bold">
+                      <Text as="span" variant="headingMd" fontWeight="bold">
                         $10.00
                       </Text>
                     </InlineStack>
@@ -195,7 +195,7 @@ export function SetDefaultVariantsModal({ productArray }) {
                         <BlockStack gap="050">
                           <InlineStack gap="200" blockAlign="center">
                             <Text
-                              as="p"
+                              as="span"
                               variant="bodyMd"
                               fontWeight="semibold"
                             >
@@ -213,17 +213,17 @@ export function SetDefaultVariantsModal({ productArray }) {
                               SAVE $3.00
                             </div>
                           </InlineStack>
-                          <Text as="p" variant="bodySm" tone="success">
+                          <Text as="span" variant="bodySm" tone="success">
                             You save 15%
                           </Text>
                         </BlockStack>
                       </InlineStack>
                       <BlockStack gap="050" inlineAlign="end">
-                        <Text as="p" variant="headingMd" fontWeight="bold">
+                        <Text as="span" variant="headingMd" fontWeight="bold">
                           $17.00
                         </Text>
                         <Text
-                          as="p"
+                          as="span"
                           variant="bodySm"
                           tone="subdued"
                           fontWeight="regular"
@@ -241,7 +241,7 @@ export function SetDefaultVariantsModal({ productArray }) {
           {/* Right part */}
           <Box width="50%">
             <BlockStack>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Product
               </Text>
               <InlineStack blockAlign="center">

@@ -82,12 +82,12 @@ export default function Index() {
       <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <Text as="p" fontWeight="semibold">
+          <Text as="span" fontWeight="semibold">
             {bundle.name}
           </Text>
           <Badge tone="info">{bundle.status}</Badge>
         </div>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           {bundle.products.join(", ")}
         </Text>
       </div>
@@ -96,66 +96,66 @@ export default function Index() {
     // Stats Column
     <div key={index} style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px" }}>
       <div style={{ minWidth: "60px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           Visitors
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           {bundle.stats.visitors}
         </Text>
       </div>
       <div style={{ minWidth: "60px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           CR
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           {bundle.stats.conversionRate}%
         </Text>
       </div>
       <div style={{ minWidth: "60px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           Bundles
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           {bundle.stats.bundlesRate}%
         </Text>
       </div>
       <div style={{ minWidth: "60px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           AOV
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           ${bundle.stats.aov.toFixed(2)}
         </Text>
       </div>
       <div style={{ minWidth: "80px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           Add. rev.
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           ${bundle.stats.addedRevenue}
         </Text>
       </div>
       <div style={{ minWidth: "80px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           Total rev.
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           ${bundle.stats.totalRevenue}
         </Text>
       </div>
       <div style={{ minWidth: "100px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           Rev. per visitor
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           ${bundle.stats.revenuePerVisitor.toFixed(2)}
         </Text>
       </div>
       <div style={{ minWidth: "100px" }}>
-        <Text as="p" variant="bodySm" tone="subdued">
+        <Text as="span" variant="bodySm" tone="subdued">
           Profit per visitor
         </Text>
-        <Text as="p" fontWeight="semibold">
+        <Text as="span" fontWeight="semibold">
           {bundle.stats.profitPerVisitor === 0 ? "-" : `$${bundle.stats.profitPerVisitor}`}
         </Text>
       </div>
@@ -193,10 +193,10 @@ export default function Index() {
                     Usage overview
                   </Text>
                 </div>
-                <Text as="p" tone="subdued">
+                <Text as="span" tone="subdued">
                   ${analytics.thisMonthRevenue}/∞ added revenue this month
                 </Text>
-                <Text as="p" variant="bodySm" tone="subdued">
+                <Text as="span" variant="bodySm" tone="subdued">
                   Resets on {analytics.resetDate}
                 </Text>
               </div>
@@ -215,18 +215,18 @@ export default function Index() {
                 </div>
                 <div style={{ display: "flex", gap: "40px" }}>
                   <div>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       This month's added revenue
                     </Text>
-                    <Text as="p" variant="headingLg">
+                    <Text as="span" variant="headingLg">
                       ${analytics.thisMonthRevenue}
                     </Text>
                   </div>
                   <div>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       All time added revenue
                     </Text>
-                    <Text as="p" variant="headingLg">
+                    <Text as="span" variant="headingLg">
                       ${analytics.allTimeRevenue}
                     </Text>
                   </div>
@@ -243,7 +243,7 @@ export default function Index() {
                   </Text>
                   <Badge tone="success">Active</Badge>
                 </div>
-                <Text as="p" variant="bodySm">
+                <Text as="span" variant="bodySm">
                   Bundles widget is visible in product pages.
                 </Text>
                 <Button variant="plain" onClick={() => { }}>

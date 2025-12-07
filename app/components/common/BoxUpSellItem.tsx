@@ -95,7 +95,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
   return (
     <div style={{ borderRadius: "10px", border: '1px solid lightgrey', padding: '15px', gap: "10px", display: 'flex', flexDirection: 'column' }}>
       <InlineStack align="space-between">
-        <Text as="p" variant="bodyMd" fontWeight="semibold">
+        <Text as="span" variant="bodyMd" fontWeight="semibold">
           Upsell
         </Text>
         <Button
@@ -160,7 +160,7 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
                 tone="info"
               >
                 <BlockStack gap="200">
-                  <p>Set complementary products in Shopify Search & Discovery app.</p>
+                  <span>Set complementary products in Shopify Search & Discovery app.</span>
                   <InlineGrid columns={2}>
                     <Button>Open Search && Discovery</Button>
                   </InlineGrid>

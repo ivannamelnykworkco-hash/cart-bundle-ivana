@@ -92,7 +92,7 @@ export default function SingleBundle() {
                   autoComplete="off"
                 />
 
-                <Text as="p" variant="headingMd">
+                <Text as="span" variant="headingMd">
                   Color Selection
                 </Text>
 
@@ -139,14 +139,14 @@ export default function SingleBundle() {
               }}>
                 <InlineStack align="space-between" blockAlign="center">
                   <div>
-                    <Text as="p" variant="headingMd">
+                    <Text as="span" variant="headingMd">
                       Single
                     </Text>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       Standard price
                     </Text>
                   </div>
-                  <Text as="p" variant="headingLg">
+                  <Text as="span" variant="headingLg">
                     ${formState.standardPrice}
                   </Text>
                 </InlineStack>

@@ -147,7 +147,7 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
           <BlockStack gap="200">
             {/* {eligible layout} */}
             <BlockStack gap="200">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Eligible for bundling
               </Text>
               <BlockStack gap="100">
@@ -190,7 +190,7 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
             <Divider />
 
             <BlockStack gap="300">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Layout
               </Text>
               {/* {edit image and utton text} */}
@@ -208,7 +208,7 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
               <BlockStack gap="200">
                 <ColorPickerPopoverItem subtitle="Color" defaultColorSetting={layoutColor} colorWidth="50px" onColorChange={handleColorChange} />
                 <BlockStack inlineAlign="stretch">
-                  <Text as="p" variant="bodySm">Product photo size</Text>
+                  <Text as="span" variant="bodySm">Product photo size</Text>
                   <InlineStack gap="0" align="space-between" blockAlign="center">
                     <div style={{ width: "70%" }}>
                       <RangeSlider
@@ -239,7 +239,7 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
             <Divider />
             {/* {other settings} */}
             <BlockStack gap="200">
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 Other settings
               </Text>
               <Checkbox

@@ -19,7 +19,7 @@ export function GiftItem({ deleteId, deleteSection }: { deleteId: any, deleteSec
       <InlineStack align="space-between">
         <InlineStack>
           <Icon source={GiftCardIcon}></Icon>
-          <Text as="p" variant="bodyMd" fontWeight="semibold">
+          <Text as="span" variant="bodyMd" fontWeight="semibold">
             Gift
           </Text>
         </InlineStack>

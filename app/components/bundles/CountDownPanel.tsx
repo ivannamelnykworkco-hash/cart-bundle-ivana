@@ -41,6 +41,90 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
   const [msgBgColor, setMsgBgColor] = useState<any>(conf.msgBgColor);
   const [msgTextColor, setMsgTextColor] = useState<any>(conf.msgTextColor);
   const [active, setActive] = useState<any>(null);
+  // const [timeLeft, setTimeLeft] = useState(() => Number(timeDuration) * 60);
+
+  // ----------------------countdown timer logic-----------------
+
+
+  const [timeLeft, setTimeLeft] = useState(0);
+
+
+
+  // helper to compute seconds until local midnight
+  const getSecondsUntilMidnight = () => {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    return Math.max(
+      0,
+      Math.floor((midnight.getTime() - now.getTime()) / 1000)
+    );
+  };
+  // custom endDate time
+  const getSecondsUntilCustom = (dateStr: string, timeStr: string) => {
+    if (!dateStr || !timeStr) return 0;
+
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const [h, m, s = "0"] = timeStr.split(":");
+    const hours = Number(h);
+    const minutes = Number(m);
+    const seconds = Number(s);
+
+    // local time
+    const target = new Date(year, month - 1, day, hours, minutes, seconds);
+    const now = new Date();
+    const diff = Math.floor((target.getTime() - now.getTime()) / 1000);
+    return Math.max(0, diff);
+  };
+
+  useEffect(() => {
+    const initialSeconds =
+      visibility === "showEndsAtMidnight"
+        ? getSecondsUntilMidnight()
+        : visibility === "showCustomEndDate"
+          ? getSecondsUntilCustom(endDate, endTime)
+          : Number(timeDuration) * 60;
+
+    setTimeLeft(initialSeconds);
+
+    if (initialSeconds <= 0) return;
+
+    const intervalId = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(intervalId);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [visibility, timeDuration, endDate, endTime, showCountdownTimer]);
+
+  const days = Math.floor(timeLeft / 86400);
+  const hours = Math.floor((timeLeft % 86400) / 3600);
+  const minutes = Math.floor((timeLeft % 3600) / 60);
+  const seconds = timeLeft % 60;
+  const formatted =
+    days > 0
+      ? [
+        days,
+        hours.toString().padStart(2, "0"),
+        minutes.toString().padStart(2, "0"),
+        seconds.toString().padStart(2, "0"),
+      ].join(":")
+      : hours > 0
+        ? [
+          hours.toString().padStart(2, "0"),
+          minutes.toString().padStart(2, "0"),
+          seconds.toString().padStart(2, "0"),
+        ].join(":")
+        : [
+          minutes.toString().padStart(2, "0"),
+          seconds.toString().padStart(2, "0"),
+        ].join(":");
+
 
   const gatherStateData = () => ({
     showCountdownTimer,
@@ -54,14 +138,14 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
     activeTextItalicButton,
     textFontSize,
     msgBgColor,
-    msgTextColor
+    msgTextColor,
+    timeLeft,
+    formatted,
   });
 
   // Send data to parent on any change
   useEffect(() => {
-    if (onDataChange) {
-      onDataChange(gatherStateData());
-    }
+    onDataChange?.(gatherStateData());
   }, [
     showCountdownTimer,
     visibility,
@@ -75,6 +159,8 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
     textFontSize,
     msgBgColor,
     msgTextColor,
+    timeLeft,
+    formatted,
     onDataChange,
   ]);
 
@@ -88,7 +174,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
   };
 
   const addRemainingTime = () => {
-    setTextValue(prev => prev + "{{timer}}"); // append "abc"
+    setTextValue(prev => prev + " {{timer}}"); // append "abc"
   };
 
   const handleAlignmentButtonClick = useCallback(
@@ -111,6 +197,8 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
   const handleTextColorChange = (value) => {
     setMsgTextColor(value);
   }
+
+
 
   return (
     < Card >
@@ -226,7 +314,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
               <InlineStack align="space-between">
                 <Box width="65%">
                   <InlineStack align="space-between">
-                    <Text as='p'>Message text</Text>
+                    <Text as='span'>Message text</Text>
                     <Popover
                       active={active === 'popover'}
                       preferredAlignment="right"
@@ -282,15 +370,15 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
 
             <InlineStack align="space-around" blockAlign="end">
               <Box width="20%">
-                <Text as="p" variant="bodySm">Background</Text>
+                <Text as="span" variant="bodySm">Background</Text>
                 <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgBgColor} colorWidth="100%" onColorChange={handleBgColorChange} />
               </Box>
               <Box>
-                <Text as="p" variant="bodySm">Text</Text>
+                <Text as="span" variant="bodySm">Text</Text>
                 <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgTextColor} colorWidth="100%" onColorChange={handleTextColorChange} />
               </Box>
               <Box>
-                <Text as="p" variant="bodySm">Alignment</Text>
+                <Text as="span" variant="bodySm">Alignment</Text>
                 <ButtonGroup gap="extraTight">
                   <Button
                     pressed={activeAlignmentButtonIndex === 0}
@@ -314,7 +402,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
 
               </Box>
               <Box>
-                <Text as="p" variant="bodySm">Style</Text>
+                <Text as="span" variant="bodySm">Style</Text>
                 <ButtonGroup gap="extraTight">
                   <Button
                     pressed={activeTextBoldButton}
@@ -331,7 +419,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
                 </ButtonGroup>
               </Box>
               <Box width="25%">
-                <Text as="p" variant="bodySm">Size</Text>
+                <Text as="span" variant="bodySm">Size</Text>
                 <TextField
                   label=""
                   type="number"

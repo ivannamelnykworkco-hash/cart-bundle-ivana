@@ -149,7 +149,7 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange }) {
                     <PopUpover title='Title' defaultPopText={contentTitleText} dataArray={productArray} />
                   </BlockStack>
                   <BlockStack gap="200">
-                    <Text as="p">Button</Text>
+                    <Text as="span">Button</Text>
                     <TextField
                       label=""
                       value={contentButtonText}

@@ -328,7 +328,7 @@ export function GeneralBuyXgetYfree({
             {/* {Show as Sold out} */}
             <BlockStack gap="300">
               <InlineStack align="space-between">
-                <Text as="p" variant="bodyMd" fontWeight="semibold">
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
                   Show as Sold out
                 </Text>
                 <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />

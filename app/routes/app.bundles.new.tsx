@@ -104,14 +104,14 @@ export default function NewBundle() {
                   <div style={{ flex: 1 }}>
                     <InlineStack align="space-between" blockAlign="start">
                       <div>
-                        <Text as="p" variant="headingMd" fontWeight="semibold">
+                        <Text as="span" variant="headingMd" fontWeight="semibold">
                           Single
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           Standard price
                         </Text>
                       </div>
-                      <Text as="p" variant="headingLg" fontWeight="bold">
+                      <Text as="span" variant="headingLg" fontWeight="bold">
                         $49.99
                       </Text>
                     </InlineStack>
@@ -155,20 +155,20 @@ export default function NewBundle() {
                     <InlineStack align="space-between" blockAlign="start">
                       <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <Text as="p" variant="headingMd" fontWeight="semibold">
+                          <Text as="span" variant="headingMd" fontWeight="semibold">
                             Duo
                           </Text>
                           <Badge tone="attention" size="small">SAVE $14.99</Badge>
                         </div>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           You save 15%
                         </Text>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <Text as="p" variant="headingLg" fontWeight="bold">
+                        <Text as="span" variant="headingLg" fontWeight="bold">
                           $84.99
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           <s>$99.98</s>
                         </Text>
                       </div>
@@ -176,12 +176,12 @@ export default function NewBundle() {
 
                     {selectedOption === "duo" && (
                       <div style={{ marginTop: "16px" }}>
-                        <Text as="p" variant="bodyMd" fontWeight="medium">
+                        <Text as="span" variant="bodyMd" fontWeight="medium">
                           Color
                         </Text>
                         <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
                           <div style={{ flex: 1 }}>
-                            <Text as="p" variant="bodySm" tone="subdued">
+                            <Text as="span" variant="bodySm" tone="subdued">
                               #1
                             </Text>
                             <Select
@@ -196,7 +196,7 @@ export default function NewBundle() {
                             />
                           </div>
                           <div style={{ flex: 1 }}>
-                            <Text as="p" variant="bodySm" tone="subdued">
+                            <Text as="span" variant="bodySm" tone="subdued">
                               #2
                             </Text>
                             <Select
@@ -221,7 +221,7 @@ export default function NewBundle() {
 
           <div style={{ marginTop: "16px" }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Quantity breaks for the same product
               </Text>
             </div>
@@ -265,16 +265,16 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="center" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         Buy 1, get 1 free
                       </Text>
                       <Badge tone="attention" size="small">SAVE 50%</Badge>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <Text as="p" variant="headingMd" fontWeight="bold">
+                      <Text as="span" variant="headingMd" fontWeight="bold">
                         $49.99
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         <s>$99.98</s>
                       </Text>
                     </div>
@@ -298,16 +298,16 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="center" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         Buy 2, get 3 free
                       </Text>
                       <Badge tone="success" size="small">SAVE 60%</Badge>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <Text as="p" variant="headingMd" fontWeight="bold">
+                      <Text as="span" variant="headingMd" fontWeight="bold">
                         $99.98
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         <s>$249.95</s>
                       </Text>
                     </div>
@@ -331,16 +331,16 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="center" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         Buy 3, get 6 free
                       </Text>
                       <Badge tone="success" size="small">SAVE 67%</Badge>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <Text as="p" variant="headingMd" fontWeight="bold">
+                      <Text as="span" variant="headingMd" fontWeight="bold">
                         $149.97
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         <s>$449.91</s>
                       </Text>
                     </div>
@@ -356,7 +356,7 @@ export default function NewBundle() {
 
           <div style={{ marginTop: "16px" }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Quantity breaks for different products
               </Text>
             </div>
@@ -400,14 +400,14 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="start" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         1 pack
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         Standard price
                       </Text>
                     </div>
-                    <Text as="p" variant="headingMd" fontWeight="bold">
+                    <Text as="span" variant="headingMd" fontWeight="bold">
                       $49.99
                     </Text>
                   </InlineStack>
@@ -437,15 +437,15 @@ export default function NewBundle() {
                   <div style={{ flex: 1 }}>
                     <InlineStack align="space-between" blockAlign="start">
                       <div>
-                        <Text as="p" variant="bodyMd" fontWeight="semibold">
+                        <Text as="span" variant="bodyMd" fontWeight="semibold">
                           2 pack
                         </Text>
                         <Badge tone="success" size="small">SAVE 15%</Badge>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           You save $14.99
                         </Text>
                         <div style={{ marginTop: "12px" }}>
-                          <Text as="p" variant="bodySm" fontWeight="medium">
+                          <Text as="span" variant="bodySm" fontWeight="medium">
                             Make time for Brain, Body & Beauty!
                           </Text>
                           <Select
@@ -461,10 +461,10 @@ export default function NewBundle() {
                         </div>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <Text as="p" variant="headingMd" fontWeight="bold">
+                        <Text as="span" variant="headingMd" fontWeight="bold">
                           $84.99
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           <s>$99.98</s>
                         </Text>
                       </div>
@@ -479,7 +479,7 @@ export default function NewBundle() {
                         alignItems: "center",
                         justifyContent: "center"
                       }}>
-                        <Text as="p" variant="headingLg">?</Text>
+                        <Text as="span" variant="headingLg">?</Text>
                       </div>
                       <Button variant="primary" size="slim">Choose</Button>
                     </div>
@@ -491,7 +491,7 @@ export default function NewBundle() {
 
           <div style={{ marginTop: "16px" }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Quantity breaks for different products
               </Text>
             </div>
@@ -534,14 +534,14 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="center" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         Make time for Brain, Body & Beauty!
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         Standard price
                       </Text>
                     </div>
-                    <Text as="p" variant="headingMd" fontWeight="bold">
+                    <Text as="span" variant="headingMd" fontWeight="bold">
                       $49.99
                     </Text>
                   </InlineStack>
@@ -565,18 +565,18 @@ export default function NewBundle() {
                   <div style={{ flex: 1 }}>
                     <InlineStack align="space-between" blockAlign="start">
                       <div>
-                        <Text as="p" variant="bodyMd" fontWeight="semibold">
+                        <Text as="span" variant="bodyMd" fontWeight="semibold">
                           Complete the bundle
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           Save $15.99!
                         </Text>
                       </div>
                       <div style={{ textAlign: "right" }}>
-                        <Text as="p" variant="headingMd" fontWeight="bold">
+                        <Text as="span" variant="headingMd" fontWeight="bold">
                           $64.00
                         </Text>
-                        <Text as="p" variant="bodySm" tone="subdued">
+                        <Text as="span" variant="bodySm" tone="subdued">
                           <s>$79.99</s>
                         </Text>
                       </div>
@@ -600,14 +600,14 @@ export default function NewBundle() {
                               </div>
                             </div>
                             <div style={{ textAlign: "center" }}>
-                              <Text as="p" variant="bodySm" fontWeight="medium">
+                              <Text as="span" variant="bodySm" fontWeight="medium">
                                 Make time for Brain, Body & Beauty!
                               </Text>
                               <div style={{ marginTop: "4px" }}>
-                                <Text as="p" variant="bodyMd" fontWeight="bold">
+                                <Text as="span" variant="bodyMd" fontWeight="bold">
                                   $40.00
                                 </Text>
-                                <Text as="p" variant="bodySm" tone="subdued">
+                                <Text as="span" variant="bodySm" tone="subdued">
                                   <s>$49.99</s>
                                 </Text>
                               </div>
@@ -637,14 +637,14 @@ export default function NewBundle() {
                               </div>
                             </div>
                             <div style={{ textAlign: "center" }}>
-                              <Text as="p" variant="bodySm" fontWeight="medium">
+                              <Text as="span" variant="bodySm" fontWeight="medium">
                                 Shorts
                               </Text>
                               <div style={{ marginTop: "4px" }}>
-                                <Text as="p" variant="bodyMd" fontWeight="bold">
+                                <Text as="span" variant="bodyMd" fontWeight="bold">
                                   $24.00
                                 </Text>
-                                <Text as="p" variant="bodySm" tone="subdued">
+                                <Text as="span" variant="bodySm" tone="subdued">
                                   <s>$30.00</s>
                                 </Text>
                               </div>
@@ -661,7 +661,7 @@ export default function NewBundle() {
 
           <div style={{ marginTop: "16px" }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Complete the bundle
               </Text>
             </div>
@@ -705,16 +705,16 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="center" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         Buy 1, get 1 free
                       </Text>
                       <Badge tone="success" size="small">SAVE 55%</Badge>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <Text as="p" variant="headingMd" fontWeight="bold">
+                      <Text as="span" variant="headingMd" fontWeight="bold">
                         $44.99
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         <s>$99.98</s>
                       </Text>
                     </div>
@@ -738,16 +738,16 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="center" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         Buy 2, get 3 free
                       </Text>
                       <Badge tone="success" size="small">SAVE 64%</Badge>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <Text as="p" variant="headingMd" fontWeight="bold">
+                      <Text as="span" variant="headingMd" fontWeight="bold">
                         $89.98
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         <s>$249.95</s>
                       </Text>
                     </div>
@@ -771,16 +771,16 @@ export default function NewBundle() {
                   />
                   <InlineStack align="space-between" blockAlign="center" gap="400">
                     <div>
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         Buy 3, get 6 free
                       </Text>
                       <Badge tone="success" size="small">SAVE 70%</Badge>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <Text as="p" variant="headingMd" fontWeight="bold">
+                      <Text as="span" variant="headingMd" fontWeight="bold">
                         $134.97
                       </Text>
-                      <Text as="p" variant="bodySm" tone="subdued">
+                      <Text as="span" variant="bodySm" tone="subdued">
                         <s>$449.91</s>
                       </Text>
                     </div>
@@ -810,7 +810,7 @@ export default function NewBundle() {
 
           <div style={{ marginTop: "16px" }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Subscription
               </Text>
             </div>
@@ -852,14 +852,14 @@ export default function NewBundle() {
                 />
                 <InlineStack align="space-between" blockAlign="center" gap="400">
                   <div>
-                    <Text as="p" variant="bodyMd" fontWeight="semibold">
+                    <Text as="span" variant="bodyMd" fontWeight="semibold">
                       1 pack
                     </Text>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       Standard price
                     </Text>
                   </div>
-                  <Text as="p" variant="headingMd" fontWeight="bold">
+                  <Text as="span" variant="headingMd" fontWeight="bold">
                     $49.99
                   </Text>
                 </InlineStack>
@@ -888,19 +888,19 @@ export default function NewBundle() {
                 />
                 <InlineStack align="space-between" blockAlign="center" gap="400">
                   <div>
-                    <Text as="p" variant="bodyMd" fontWeight="semibold">
+                    <Text as="span" variant="bodyMd" fontWeight="semibold">
                       2 pack
                     </Text>
                     <Badge tone="success" size="small">SAVE 15%</Badge>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       You save $14.99
                     </Text>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <Text as="p" variant="headingMd" fontWeight="bold">
+                    <Text as="span" variant="headingMd" fontWeight="bold">
                       $84.99
                     </Text>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       <s>$99.98</s>
                     </Text>
                   </div>
@@ -924,19 +924,19 @@ export default function NewBundle() {
                 />
                 <InlineStack align="space-between" blockAlign="center" gap="400">
                   <div>
-                    <Text as="p" variant="bodyMd" fontWeight="semibold">
+                    <Text as="span" variant="bodyMd" fontWeight="semibold">
                       3 pack
                     </Text>
                     <Badge tone="success" size="small">SAVE 15%</Badge>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       You save $22.49
                     </Text>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <Text as="p" variant="headingMd" fontWeight="bold">
+                    <Text as="span" variant="headingMd" fontWeight="bold">
                       $127.48
                     </Text>
-                    <Text as="p" variant="bodySm" tone="subdued">
+                    <Text as="span" variant="bodySm" tone="subdued">
                       <s>$149.97</s>
                     </Text>
                   </div>
@@ -950,7 +950,7 @@ export default function NewBundle() {
               borderRadius: "8px",
               border: "1px solid #fbbf24"
             }}>
-              <Text as="p" variant="bodyMd" fontWeight="semibold">
+              <Text as="span" variant="bodyMd" fontWeight="semibold">
                 🎁 Unlock Free gifts with your order
               </Text>
               <div style={{ marginTop: "12px", display: "flex", gap: "12px", justifyContent: "space-around" }}>
@@ -968,10 +968,10 @@ export default function NewBundle() {
                   }}>
                     {selectedPack >= 1 ? "🚚" : "🔒"}
                   </div>
-                  <Text as="p" variant="bodySm" fontWeight="medium">
+                  <Text as="span" variant="bodySm" fontWeight="medium">
                     FREE
                   </Text>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Free shipping
                   </Text>
                 </div>
@@ -994,10 +994,10 @@ export default function NewBundle() {
                       <span style={{ fontSize: "20px" }}>🔒</span>
                     )}
                   </div>
-                  <Text as="p" variant="bodySm" fontWeight="medium">
+                  <Text as="span" variant="bodySm" fontWeight="medium">
                     {selectedPack >= 2 ? "FREE" : "FREE 2+"}
                   </Text>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Shorts
                   </Text>
                   {selectedPack >= 2 && (
@@ -1027,10 +1027,10 @@ export default function NewBundle() {
                   }}>
                     🔒
                   </div>
-                  <Text as="p" variant="bodySm" fontWeight="medium">
+                  <Text as="span" variant="bodySm" fontWeight="medium">
                     FREE 3+
                   </Text>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     Locked
                   </Text>
                 </div>
@@ -1040,7 +1040,7 @@ export default function NewBundle() {
 
           <div style={{ marginTop: "16px" }}>
             <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
-              <Text as="p" variant="headingMd" fontWeight="semibold">
+              <Text as="span" variant="headingMd" fontWeight="semibold">
                 Progressive gifts
               </Text>
             </div>

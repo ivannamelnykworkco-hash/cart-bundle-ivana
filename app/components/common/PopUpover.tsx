@@ -107,7 +107,7 @@ export function PopUpover({
   return (
     <BlockStack gap="100">
       <InlineStack align="space-between">
-        <Text as="p">{title}</Text>
+        <Text as="span">{title}</Text>
         <Popover
           active={active === 'popover'}
           preferredAlignment="right"

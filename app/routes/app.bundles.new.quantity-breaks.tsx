@@ -93,7 +93,7 @@ export default function QuantityBreaksBundle() {
               </Text>
               
               <FormLayout>
-                <Text as="p" variant="headingMd">
+                <Text as="span" variant="headingMd">
                   Quantity Tiers
                 </Text>
 
@@ -108,7 +108,7 @@ export default function QuantityBreaksBundle() {
                     }}
                   >
                     <InlineStack align="space-between" blockAlign="center">
-                      <Text as="p" variant="bodyMd" fontWeight="semibold">
+                      <Text as="span" variant="bodyMd" fontWeight="semibold">
                         {tier.quantity} pack
                       </Text>
                       {index > 0 && (
@@ -179,7 +179,7 @@ export default function QuantityBreaksBundle() {
                 padding: "16px",
                 backgroundColor: "#fff"
               }}>
-                <Text as="p" variant="headingMd" fontWeight="bold">
+                <Text as="span" variant="headingMd" fontWeight="bold">
                   Quantity breaks for different products
                 </Text>
                 
@@ -202,24 +202,24 @@ export default function QuantityBreaksBundle() {
                       )}
                       <InlineStack align="space-between">
                         <div>
-                          <Text as="p" variant="bodyMd" fontWeight="semibold">
+                          <Text as="span" variant="bodyMd" fontWeight="semibold">
                             {tier.quantity} pack
                           </Text>
                           {tier.savings > 0 && (
                             <Badge tone="success" size="small">SAVE {tier.savings}%</Badge>
                           )}
                           {tier.savings > 0 && (
-                            <Text as="p" variant="bodySm" tone="subdued">
+                            <Text as="span" variant="bodySm" tone="subdued">
                               You save ${((tier.quantity * 49.99) - tier.price).toFixed(2)}
                             </Text>
                           )}
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <Text as="p" variant="headingMd" fontWeight="bold">
+                          <Text as="span" variant="headingMd" fontWeight="bold">
                             ${tier.price.toFixed(2)}
                           </Text>
                           {tier.savings > 0 && (
-                            <Text as="p" variant="bodySm" tone="subdued">
+                            <Text as="span" variant="bodySm" tone="subdued">
                               <s>${(tier.quantity * 49.99).toFixed(2)}</s>
                             </Text>
                           )}
@@ -236,7 +236,7 @@ export default function QuantityBreaksBundle() {
                 borderRadius: "8px",
                 border: "1px solid #fbbf24"
               }}>
-                <Text as="p" variant="bodySm">
+                <Text as="span" variant="bodySm">
                   💡 Unlock Free gifts with your order
                 </Text>
               </div>

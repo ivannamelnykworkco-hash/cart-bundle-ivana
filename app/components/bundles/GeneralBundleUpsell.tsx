@@ -322,7 +322,7 @@ export function GeneralBundleUpsell({
               <InlineStack align="space-between" blockAlign="center">
                 <InlineStack align="center" blockAlign="center" gap='200'>
                   <Thumbnail source={NoteIcon} size="small" alt="Small document" />
-                  <Text as="p" fontWeight="bold">Default product</Text>
+                  <Text as="span" fontWeight="bold">Default product</Text>
                 </InlineStack>
                 <Box width='20%'>
                   <TextField
@@ -447,7 +447,7 @@ export function GeneralBundleUpsell({
             {/* {Show as Sold out} */}
             <BlockStack gap="300">
               <InlineStack align="space-between">
-                <Text as="p" variant="bodyMd" fontWeight="semibold">
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
                   Show as Sold out
                 </Text>
                 <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />

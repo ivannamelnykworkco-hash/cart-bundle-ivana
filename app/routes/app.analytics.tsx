@@ -95,13 +95,13 @@ export default function Analytics() {
             {statCards.map((stat, index) => (
               <Card key={index}>
                 <BlockStack gap="200">
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     {stat.title}
                   </Text>
-                  <Text as="p" variant="heading2xl">
+                  <Text as="span" variant="heading2xl">
                     {stat.value}
                   </Text>
-                  <Text as="p" variant="bodySm" tone="subdued">
+                  <Text as="span" variant="bodySm" tone="subdued">
                     {stat.description}
                   </Text>
                 </BlockStack>
@@ -124,7 +124,7 @@ export default function Analytics() {
                 backgroundColor: "#f9fafb",
                 borderRadius: "8px",
               }}>
-                <Text as="p" tone="subdued">
+                <Text as="span" tone="subdued">
                   Chart visualization will appear here
                 </Text>
               </div>

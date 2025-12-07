@@ -1,5 +1,6 @@
 import { authenticate } from "../shopify.server";
 import { getGeneralStyle } from "app/models/generalStyle.server";
+import { getCountdownTimer } from "app/models/countdownTimer.server";
 import { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 
 
@@ -12,32 +13,41 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   ) {
     await authenticate.public.appProxy(request);
 
-    const config = await getGeneralStyle().catch(() => null);
+    const getGeneralStyleConfigS = await getGeneralStyle().catch(() => null);
+    const cornerRadius = Number(getGeneralStyleConfigS?.cornerRadius) || '';
+    const spacing = Number(getGeneralStyleConfigS?.spacing) || '';
+    const cardsBgColor = String(getGeneralStyleConfigS?.cardsBgColor) || '';
+    const selectedBgColor = String(getGeneralStyleConfigS?.selectedBgColor) || '';
+    const borderColor = String(getGeneralStyleConfigS?.borderColor) || '';
+    const blockTitleColor = String(getGeneralStyleConfigS?.blockTitleColor) || '';
+    const barTitleColor = String(getGeneralStyleConfigS?.barTitleColor) || '';
+    const barSubTitleColor = String(getGeneralStyleConfigS?.barSubTitleColor) || '';
+    const barPriceColor = String(getGeneralStyleConfigS?.barPriceColor) || '';
+    const barFullPriceColor = String(getGeneralStyleConfigS?.barFullPriceColor) || '';
+    const barLabelBackColor = String(getGeneralStyleConfigS?.barLabelBackColor) || '';
+    const barLabelTextColor = String(getGeneralStyleConfigS?.barLabelTextColor) || '';
+    const barBadgebackColor = String(getGeneralStyleConfigS?.barBadgebackColor) || '';
+    const barBadgeTextColor = String(getGeneralStyleConfigS?.barBadgeTextColor) || '';
+    const barUpsellBackColor = String(getGeneralStyleConfigS?.barUpsellBackColor) || '';
+    const barUpsellTextColor = String(getGeneralStyleConfigS?.barUpsellTextColor) || '';
+    const barUpsellSelectedBackColor = String(getGeneralStyleConfigS?.barUpsellSelectedBackColor) || '';
+    const barUpsellSelectedTextColor = String(getGeneralStyleConfigS?.barUpsellSelectedTextColor)
+    const barBlocktitle = Number(getGeneralStyleConfigS?.barBlocktitle) || 16;
+    const bartitleSize = Number(getGeneralStyleConfigS?.bartitleSize) || 16;
+    const subTitleSize = Number(getGeneralStyleConfigS?.subTitleSize) || 16;
+    const labelSize = Number(getGeneralStyleConfigS?.labelSize) || 16;
+    const upsellSize = Number(getGeneralStyleConfigS?.upsellSize) || 16;
+    const unitLabelSize = Number(getGeneralStyleConfigS?.unitLabelSize) || 16;
 
-    const cornerRadius = Number(config?.cornerRadius) || '';
-    const spacing = Number(config?.spacing) || '';
-    const cardsBgColor = String(config?.cardsBgColor) || '';
-    const selectedBgColor = String(config?.selectedBgColor) || '';
-    const borderColor = String(config?.borderColor) || '';
-    const blockTitleColor = String(config?.blockTitleColor) || '';
-    const barTitleColor = String(config?.barTitleColor) || '';
-    const barSubTitleColor = String(config?.barSubTitleColor) || '';
-    const barPriceColor = String(config?.barPriceColor) || '';
-    const barFullPriceColor = String(config?.barFullPriceColor) || '';
-    const barLabelBackColor = String(config?.barLabelBackColor) || '';
-    const barLabelTextColor = String(config?.barLabelTextColor) || '';
-    const barBadgebackColor = String(config?.barBadgebackColor) || '';
-    const barBadgeTextColor = String(config?.barBadgeTextColor) || '';
-    const barUpsellBackColor = String(config?.barUpsellBackColor) || '';
-    const barUpsellTextColor = String(config?.barUpsellTextColor) || '';
-    const barUpsellSelectedBackColor = String(config?.barUpsellSelectedBackColor) || '';
-    const barUpsellSelectedTextColor = String(config?.barUpsellSelectedTextColor)
-    const barBlocktitle = Number(config?.barBlocktitle) || 16;
-    const bartitleSize = Number(config?.bartitleSize) || 16;
-    const subTitleSize = Number(config?.subTitleSize) || 16;
-    const labelSize = Number(config?.labelSize) || 16;
-    const upsellSize = Number(config?.upsellSize) || 16;
-    const unitLabelSize = Number(config?.unitLabelSize) || 16;
+    const countdownTimerConfig = await getCountdownTimer().catch(() => null);
+    const msgAlignmentIndex = Number(countdownTimerConfig?.msgAlignment) || '';
+    const msgAlignment = msgAlignmentIndex === 0 ? "left" : msgAlignmentIndex === 1 ? "center" : "right";
+    const msgBold = countdownTimerConfig?.msgBold ? '700' : '400';
+    const msgItalic = countdownTimerConfig?.msgItalic ? 'italic' : 'normal';
+    const msgSize = Number(countdownTimerConfig?.msgSize) || '14';
+    const msgBgColor = String(countdownTimerConfig?.msgBgColor) || '';
+    const msgTextColor = String(countdownTimerConfig?.msgTextColor) || '';
+
 
     const css = `
       :root {
@@ -65,6 +75,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       --label-size: ${labelSize}px;
       --upsell-size: ${upsellSize}px;
       --unitLabel-size: ${unitLabelSize}px;
+
+      --msg-alignment: ${msgAlignment};
+      --msgItalic-style: ${msgItalic};
+      --msgBold-weight: ${msgBold};
+      --msg-size: ${msgSize}px;
+      --msgBg-color: ${msgBgColor};
+      --msgText-color: ${msgTextColor};
       }
     `;
 
@@ -81,82 +98,96 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { admin } = await authenticate.public.appProxy(request);
-  const response = await admin.graphql(`
-  query getProducts {
-    products(first: 2, query: "id:7769186762830 OR id:7769222676558") {
-      edges {
-        node {
-          id
-          title
-          featuredImage {
-            url
-          }
-          metafields(first: 1) {
-            edges {
-              node {
-                id
-                namespace
-                key
-                value
-                type
+
+  // Fetch products and countdown config in parallel
+  const [response, countdownTimerConfig] = await Promise.all([
+    admin.graphql(`
+      query getProducts {
+        products(first: 2, query: "id:7769186762830 OR id:7769222676558") {
+          edges {
+            node {
+              id
+              title
+              featuredImage {
+                url
               }
-            }
-          }
-          variants(first: 1) {
-            edges {
-              node {
-                id
-                title
-                price
-                inventoryQuantity
-                compareAtPrice
-                selectedOptions {
-                  name
-                  value
+              metafields(first: 1) {
+                edges {
+                  node {
+                    id
+                    namespace
+                    key
+                    value
+                    type
+                  }
+                }
+              }
+              variants(first: 1) {
+                edges {
+                  node {
+                    id
+                    title
+                    price
+                    inventoryQuantity
+                    compareAtPrice
+                    selectedOptions {
+                      name
+                      value
+                    }
+                  }
                 }
               }
             }
           }
         }
       }
-    }
-  }
-`);
+    `),
+    getCountdownTimer().catch(() => null),
+  ]);
 
   const body = await response.json();
   const nodes = body?.data?.products?.edges?.map(edge => edge.node) ?? [];
 
   if (!nodes.length) {
-    // Handle not found or error
     return new Response(JSON.stringify({ error: "Products not found" }), {
       headers: { "Content-Type": "application/json" },
-      status: 404
+      status: 404,
     });
   }
 
+  // Normalize countdown config once
+  const isCountdown = Boolean(countdownTimerConfig?.isCountdown);
+  const visibility = String(countdownTimerConfig?.visibility || "");
+  const fixedDurationTime = Number(countdownTimerConfig?.fixedDurationTime) || 0;
+  const endDateTime = countdownTimerConfig?.endDateTime || "";
+  const msgText = String(countdownTimerConfig?.msgText || "");
+
   const products = nodes.map(node => {
     const firstVariant = node.variants?.edges?.[0]?.node ?? null;
+
     return {
       id: node.id,
       title: node.title,
       imageUrl: node.featuredImage?.url ?? "",
       price: firstVariant?.price ?? null,
       compareAtPrice: firstVariant?.compareAtPrice ?? null,
-      variants: node.variants?.edges ?? null,
-      metafields: node.metafields?.edges ?? null,
+      variants: node.variants?.edges ?? [],
+      metafields: node.metafields?.edges ?? [],
+
+      countdownTimerConfig: {
+        isCountdown,
+        visibility,
+        fixedDurationTime,
+        endDateTime,
+        msgText,
+      },
     };
   });
 
   return new Response(JSON.stringify(products), {
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "no-store"
-    }
+      "Cache-Control": "no-store",
+    },
   });
-  // return new Response(JSON.stringify(products), {
-  //   headers: {
-  //     "Content-Type": "application/json; charset=utf-8",
-  //     "Cache-Control": "no-store"
-  //   }
-  // });
 };
