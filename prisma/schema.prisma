@@ -229,9 +229,30 @@ model StickyAdd {
 }
 
 model CheckboxUpsell {
-  id                  String @id
+  id                  String @id @default(cuid())
   bundleId            String
   upsellData          Json
   createdAt             String
   updatedAt             String
+}
+
+model QuantityBreak {
+  id        String @id @default(cuid())
+  bundleId  String
+  isOpen    Boolean
+  quantity  Int
+  title     String     
+  subtitle  String
+  price     String 
+  discountPrice       Int
+  badgeText   String
+  badgeStyle  String
+  label     String
+  isSelectedByDefault   Boolean
+  
+
+
+  createdAt String
+  updatedAt String
+
 }

@@ -40,7 +40,6 @@ export function cartLinesDiscountsGenerateRun(input) {
 
   const { allowedProductIds, selectedCollectionIds, productScope } = parseMetafield(discount.metafield);
 
-
   const candidates = [];
 
   for (const line of cart.lines) {
@@ -49,8 +48,6 @@ export function cartLinesDiscountsGenerateRun(input) {
     const quantity = line.quantity;
     // const views = line.merchandise.product.inAnyCollection;
     let ids = line.merchandise.product.inAnyCollection;
-
-    console.log("ids==>", ids);
 
     if (productScope === "specific" && !allowedProductIds.includes(productId))
       continue;

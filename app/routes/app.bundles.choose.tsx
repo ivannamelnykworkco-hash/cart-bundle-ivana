@@ -582,7 +582,6 @@ export default function BundleSettingsAdvanced() {
   const handleGeneralSetting = useCallback((updated: any) => {
     setGeneralSettingData(prev => ({ ...prev, ...updated }));
   }, []);
-  console.log("<<<", generalSettingData);
 
   // Send data to action
   const submit = useSubmit();
@@ -886,7 +885,6 @@ export default function BundleSettingsAdvanced() {
     setQbDataObj(prev => ({ ...prev, ...updated }));
   }, []);
 
-  console.log("qbDataObj===", qbDataObj);
   //product add
   const hanldeonAddProductChange = (bundleId: string | number, item: any) => {
     setProducts(prev => ({
