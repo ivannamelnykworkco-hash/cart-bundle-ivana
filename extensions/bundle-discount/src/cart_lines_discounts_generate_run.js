@@ -1,12 +1,10 @@
 import {
   ProductDiscountSelectionStrategy,
 } from "../generated/api";
-
 /**
  * @typedef {import("../generated/api").CartInput} RunInput
  * @typedef {import("../generated/api").CartLinesDiscountsGenerateRunResult} CartLinesDiscountsGenerateRunResult
  */
-
 /**
  * @param {RunInput} input
  * @returns {CartLinesDiscountsGenerateRunResult}
@@ -46,7 +44,6 @@ export function cartLinesDiscountsGenerateRun(input) {
     const productId = line.merchandise.product.id;
     const variantTitle = line.merchandise.title;
     const quantity = line.quantity;
-    // const views = line.merchandise.product.inAnyCollection;
     let ids = line.merchandise.product.inAnyCollection;
 
     if (productScope === "specific" && !allowedProductIds.includes(productId))

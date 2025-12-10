@@ -243,16 +243,107 @@ model QuantityBreak {
   quantity  Int
   title     String     
   subtitle  String
-  price     String 
-  discountPrice       Int
+  selectPrice           String 
+  discountPrice         Float?
+  badgeText             String
+  badgeStyle            String
+  label                 String
+  isSelectedByDefault   Boolean
+  isShowAsSoldOut       Boolean
+  labelTitle            String
+  opacity               Float
+  bgColor               String
+  textColor             String
+  labelSize             Int
+  upsellItems           UpsellItem[]  @relation("QbUpsell")
+  createdAt             String
+  updatedAt             String
+}
+
+model BuyXGetY {
+  id        String @id @default(cuid())
+  bundleId  String
+  isOpen    Boolean
+  buyQuantity   Int
+  getQuantity   Int
+  title       String     
+  subtitle    String
   badgeText   String
   badgeStyle  String
-  label     String
+  label       String
   isSelectedByDefault   Boolean
-  
+  isShowAsSoldOut       Boolean
+  labelTitle      String
+  opacity         Float
+  bgColor         String
+  textColor       String
+  labelSize       Int
+  upsellItems         UpsellItem[]    @relation("BxGyUpsell")
+  createdAt       String
+  updatedAt       String
+}
 
-
+model BundleUpsell {
+  id          String @id @default(cuid())
+  bundleId    String
+  isOpen      Boolean
+  layoutOption    String
+  title       String     
+  subtitle    String
+  badgeText   String
+  badgeStyle  String
+  label       String
+  isSelectedByDefault     Boolean
+  isShowQuantitySelector  Boolean
+  productCounts           Int
+  selectPrice             String
+  discountPrice           Float?
+  productItems            ProductItem[]   
+  isShowAsSoldOut         Boolean
+  labelTitle      String
+  opacity         Float
+  bgColor         String
+  textColor       String
+  labelSize       Int
+  upsellItems         UpsellItem[]  @relation("BundlesUpsell")
   createdAt String
   updatedAt String
-
 }
+
+model UpsellItem {
+  id          String @id @default(cuid())
+  qbId        String?
+  bxGyId      String?
+  buId        String?
+  isSelectedProduct   Boolean
+  selectedVariants    String
+  selectPrice         String
+  discountPrice       Float?
+  priceText           String
+  isSelectedByDefault Boolean
+  isVisibleOnly       Boolean
+  isShowAsSoldOut     Boolean
+  labelTitle          String
+  opacity             Float
+  bgColor             String
+  textColor           String
+  labelSize           Int
+  quantityBreak       QuantityBreak?   @relation("QbUpsell", fields: [qbId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  buyXGetY            BuyXGetY?        @relation("BxGyUpsell", fields: [bxGyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  bundleUpsell        BundleUpsell?    @relation("BundlesUpsell", fields: [buId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt           String
+  updatedAt           String
+}
+
+model ProductItem {
+  id          String @id @default(cuid())
+  buId        String
+  quantity    Int
+  selectPrice     String
+  discountPrice   Float?
+  selectedVariants         String
+  createdAt           String
+  updatedAt           String
+  bundleUpsell        BundleUpsell    @relation(fields: [buId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+

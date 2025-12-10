@@ -53,7 +53,6 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle }) {
       const newSections = prevSections.filter(item => item.id !== id);
       // 2. Remove the corresponding upsellData entry
       setUpsellData(prevData => prevData.filter((_, i) => i !== index));
-
       return newSections;
     });
   }
@@ -98,10 +97,6 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle }) {
             {upsellData.map((upsellItem, index) => (
               <UpsellItem index={index} key={upsellItem.deleteId} upsellData={upsellData} deleteId={upsellItem.deleteId} deleteSection={deleteSection} productArray={productArray} onChange={handleOnChange} />
             ))}
-
-            {/* {sections.map((section, index) => (
-              <UpsellItem index={index} number={index + 1} key={section.id} deleteId={section.id} deleteSection={deleteSection} productArray={productArray} onChange={handleOnChange} />
-            ))} */}
             <Button fullWidth onClick={addSection}>Add upsell</Button>
           </BlockStack>
 

@@ -87,8 +87,6 @@ export function GeneralQuantityBreack({
     upBunlesBarLabelTextChange(id, v);
   };
 
-
-
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
   const [gifts, setGifts] = useState<Gifts[]>([]);
 
@@ -109,9 +107,7 @@ export function GeneralQuantityBreack({
   const addGift = () => {
     setGifts(prev => [...prev, { id: Date.now() }])
   }
-  // const deleteGift = (id: any) => {
-  //   setGifts(prev => prev.filter(item => item.id !== id))
-  // }
+
   const handleUpsellSelectChange = useCallback(
     (value: string) => {
       setSelected(value);

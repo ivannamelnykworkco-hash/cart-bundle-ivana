@@ -7,7 +7,7 @@ const defaultColor = "#000000";
 export async function getGeneralStyle(): Promise<GeneralStyle> {
   const result = await db.generalStyle.findFirst({
     orderBy: {
-      createdAt: 'desc',
+      updatedAt: 'desc',
     },
   });
   if (result)

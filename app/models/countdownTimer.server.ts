@@ -5,7 +5,7 @@ export async function getCountdownTimer(): Promise<CountdownTimer> {
   // TODO: Implement database query
   const result = await db.countdownTimer.findFirst({
     orderBy: {
-      createdAt: 'desc',
+      updatedAt: 'desc',
     },
   });
   if (result)

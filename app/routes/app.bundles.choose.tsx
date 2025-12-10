@@ -39,7 +39,10 @@ import { getGeneralStyle, updateGeneralStyle } from "app/models/generalStyle.ser
 import { getVolumeDiscount, updateVolumeDiscount } from "app/models/volumeDiscount.server";
 import { getStickyAdd, updateStickyAdd } from "app/models/stickyAdd.server";
 import { getCheckboxUpsell, updateCheckboxUpsell } from "app/models/checkboxUpsell.server";
-import { getGeneralSetting, updateGeneralSetting } from "app/models/generalSetting.server"
+import { getGeneralSetting, updateGeneralSetting } from "app/models/generalSetting.server";
+import { getQuantityBreaks, updateQuantityBreak, updateQuantityBreaks } from "app/models/quantityBreak.server";
+import { getBuyXGetYs, updateBuyXGetY, updateBuyXGetYs } from "app/models/buyXGetY.server";
+import { getBundleUpsells, updateBundleUpsell, updateBundleUpsells } from "app/models/bundleUpsell.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
@@ -139,14 +142,20 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       generalVolumeConf,
       generalStickyAddConf,
       checkboxUpsellConf,
-      generalSettingConf
+      generalSettingConf,
+      quantityBreakConf,
+      buyXGetYConf,
+      bundleUpsellConf
     ] = await Promise.all([
       getCountdownTimer(),
       getGeneralStyle(),
       getVolumeDiscount(),
       getStickyAdd(),
       getCheckboxUpsell(),
-      getGeneralSetting()
+      getGeneralSetting(),
+      getQuantityBreaks(),
+      getBuyXGetYs(),
+      getBundleUpsells()
     ]);
 
     // Handle error, but note that Promise.all rejects on first error
@@ -160,7 +169,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         generalVolumeConf,
         generalStickyAddConf,
         checkboxUpsellConf,
-        generalSettingConf
+        generalSettingConf,
+        quantityBreakConf,
+        buyXGetYConf,
+        bundleUpsellConf
       }
     );
   }
@@ -348,6 +360,9 @@ export async function action({ request, params }) {
   const generalSetting = JSON.parse(form.generalSetting);
   const generalStyle = JSON.parse(form.generalStyle);
   const discountData = JSON.parse(form.discountData);
+  const quantityBreak = JSON.parse(form.quantityBreak);
+  const buyXGetY = JSON.parse(form.buyXGetY);
+  const bundleUpsell = JSON.parse(form.bundleUpsell);
 
   const existingDiscount = await getAutomaticAppDiscount(admin, generalSetting.discountId);
   //if no discount exists, create a new discount   
@@ -375,6 +390,7 @@ export async function action({ request, params }) {
     }
     const automaticAppDiscountId = automaticAppDiscount.discountId;
     generalSetting.discountId = automaticAppDiscountId;
+    // update prisma db
     try {
       await Promise.all([
         updateCountdownTimer(countdownTimer.id, countdownTimer),
@@ -382,12 +398,15 @@ export async function action({ request, params }) {
         updateStickyAdd(stickyAdd.id, stickyAdd),
         updateCheckboxUpsell(checkboxUpsell.id, checkboxUpsell),
         updateGeneralSetting(generalSetting.id, generalSetting),
-        updateGeneralStyle(generalStyle.id, generalStyle)
+        updateGeneralStyle(generalStyle.id, generalStyle),
+        updateQuantityBreaks(quantityBreak),
+        updateBuyXGetYs(buyXGetY),
+        updateBundleUpsells(bundleUpsell)
       ]);
       return json({ success: true, automaticAppDiscount });
     } catch (err) {
       return json(
-        { success: false, error: err.message || "Database update failed" },
+        { success: false, error: err || "Database update failed" },
         { status: 500 }
       );
     }
@@ -445,18 +464,21 @@ export async function action({ request, params }) {
         }
       ]
     };
-    ////////////////////////
+
     try {
       const result = await addMetafield(admin, addMetafieldVariables);
       try {
-        // Parse each JSON string
+        // update prisma db
         await Promise.all([
           updateCountdownTimer(String(countdownTimer.id), countdownTimer),
           updateVolumeDiscount(volumeDiscount.id, volumeDiscount),
           updateStickyAdd(stickyAdd.id, stickyAdd),
           updateCheckboxUpsell(checkboxUpsell.id, checkboxUpsell),
           updateGeneralSetting(generalSetting.id, generalSetting),
-          updateGeneralStyle(generalStyle.id, generalStyle)
+          updateGeneralStyle(generalStyle.id, generalStyle),
+          updateQuantityBreaks(quantityBreak),
+          updateBuyXGetYs(buyXGetY),
+          updateBundleUpsells(bundleUpsell)
         ]);
         return json({ success: true, result });
       } catch (err) {
@@ -512,6 +534,8 @@ export default function BundleSettingsAdvanced() {
         showToast("Data updated successfully!", "success");
       } else {
         showToast(`Error: ${actionData.error} `, "error");
+        console.log("Data updated failed!", JSON.stringify(actionData, null, 2));
+
       }
     }
   }, [actionData]);
@@ -567,6 +591,11 @@ export default function BundleSettingsAdvanced() {
   const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
   const [generalStickyAddData, setGeneralStickyAddData] = useState(loaderData.generalStickyAddConf);
   const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf);
+  const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf);
+  const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf);
+  const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf);
+
+
   const handleCountdownTimerChange = useCallback((updated: any) => {
     setCountdownTimerData(prev => ({ ...prev, ...updated }));
   }, []);
@@ -582,6 +611,61 @@ export default function BundleSettingsAdvanced() {
   const handleGeneralSetting = useCallback((updated: any) => {
     setGeneralSettingData(prev => ({ ...prev, ...updated }));
   }, []);
+  console.log("qb", quantityBreakData);
+  console.log("xy", buyXGetYData);
+  console.log("bu", bundleUpsellData);
+
+  // const upsellItemList = [{
+  //   isSelectedProduct: true,
+  //   selectedVariants: "",
+  //   selectPrice: "Specific (e.g. $29)",
+  //   discountPrice: 20,
+  //   priceText: "==+ Add at 20% discount",
+  //   isSelectedByDefault: true,
+  //   isVisibleOnly: true,
+  //   isShowAsSoldOut: true,
+  //   labelTitle: "==labelTitle",
+  //   opacity: 0.5,
+  //   bgColor: "#FF0000",
+  //   textColor: "#00FF00",
+  //   labelSize: 15,
+  // }];
+  // const productItemList = [{
+  //   quantity: 5,
+  //   selectPrice: "Specific (e.g. $29)",
+  //   discountPrice: 20,
+  //   selectedVariants: ""
+  // }, {
+  //   quantity: 10,
+  //   selectPrice: "Specific (e.g. $29)",
+  //   discountPrice: 10,
+  //   selectedVariants: ""
+  // },];
+  // const bundleUpsellData = [{
+  //   bundleId: Math.random().toString(36).substr(2, 9),
+  //   isOpen: "true",
+  //   layoutOption: "layoutOption1",
+  //   title: "Title",
+  //   subtitle: "Subtitle",
+  //   badgeText: "==badgeText",
+  //   badgeStyle: "Simple",
+  //   label: "==label",
+  //   isSelectedByDefault: "true",
+  //   isShowAsSoldOut: "true",
+  //   isShowQuantitySelector: "true",
+  //   productCounts: 5,
+  //   selectPrice: "Specific (e.g. $29)",
+  //   discountPrice: 10,
+  //   labelTitle: "==labelTitle",
+  //   opacity: 0.5,
+  //   bgColor: "#ffffff",
+  //   textColor: "#000000",
+  //   labelSize: 15,
+  //   productItems: productItemList,
+  //   upsellItems: upsellItemList,
+  //   upsellItemsToDeleteIds: [],
+  //   productItemsToDeleteIds: []
+  // }];
 
   // Send data to action
   const submit = useSubmit();
@@ -592,7 +676,6 @@ export default function BundleSettingsAdvanced() {
 
   async function saveData() {
     const countdownTimerFormData = new FormData();
-    countdownTimerFormData.append('actionType', 'countdownTimer');
     Object.entries(countdownTimerData).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
         countdownTimerFormData.append(key, JSON.stringify(value));
@@ -603,7 +686,6 @@ export default function BundleSettingsAdvanced() {
     });
 
     const generalVolumeFormData = new FormData();
-    generalVolumeFormData.append('actionType', 'volumeDiscount');
     Object.entries(generalVolumeData).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
         generalVolumeFormData.append(key, JSON.stringify(value));
@@ -614,7 +696,6 @@ export default function BundleSettingsAdvanced() {
     });
     //Save Sticky add to cart data
     const generalStickyAddFormData = new FormData();
-    generalStickyAddFormData.append('actionType', 'stickyAdd');
     Object.entries(generalStickyAddData).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
         generalStickyAddFormData.append(key, JSON.stringify(value));
@@ -625,7 +706,6 @@ export default function BundleSettingsAdvanced() {
     });
     //Save General setting data
     const generalSettingFormData = new FormData();
-    generalSettingFormData.append('actionType', 'generalSetting');
     Object.entries(generalSettingData).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
         generalSettingFormData.append(key, JSON.stringify(value));
@@ -636,13 +716,11 @@ export default function BundleSettingsAdvanced() {
     });
     //Save Checkbox upsell data
     const checkboxUpsellFormData = new FormData();
-    checkboxUpsellFormData.append('actionType', 'checkboxUpsell');
     checkboxUpsellFormData.append("id", checkboxUpsellConf.id);
     checkboxUpsellFormData.append("bundleId", checkboxUpsellConf.bundleId);
     checkboxUpsellFormData.append("upsellData", JSON.stringify(checkboxUpsellData));
     //Save General style setting data
     const generalStyleFormData = new FormData();
-    generalStyleFormData.append('actionType', 'generalStyle');
     generalStyleFormData.append("id", GeneralStyleConf.id);
     generalStyleFormData.append("bundleId", GeneralStyleConf.bundleId);
     generalStyleFormData.append("cornerRadius", cornerRadius);
@@ -682,12 +760,10 @@ export default function BundleSettingsAdvanced() {
     const discountName = generalSettingData.discountName;
     const startsAt = new Date(`${generalSettingData.startDate}T${generalSettingData.startTime}`).toISOString();
     const endsAt = generalSettingData.setEndDate ? new Date(`${generalSettingData.endDate}T${generalSettingData.endTime}`).toISOString() : "";
-    discountFormData.append("actionType", "discountData");
     discountFormData.append("discountName", discountName);
     discountFormData.append("functionId", functionId);
     discountFormData.append("startsAt", startsAt);
     discountFormData.append("endsAt", endsAt);
-    //    discountFormData.append("metafieldValue", metafieldValue);
 
     const fd = new FormData();
     fd.append("countdownTimer", JSON.stringify(formDataToObject(countdownTimerFormData)));
@@ -697,6 +773,12 @@ export default function BundleSettingsAdvanced() {
     fd.append("generalSetting", JSON.stringify(formDataToObject(generalSettingFormData)));
     fd.append("generalStyle", JSON.stringify(formDataToObject(generalStyleFormData)));
     fd.append("discountData", JSON.stringify(formDataToObject(discountFormData)));
+    //Save quantityBreak data
+    fd.append("quantityBreak", JSON.stringify(quantityBreakData));
+    // Save buyXGetY data
+    fd.append("buyXGetY", JSON.stringify(buyXGetYData));
+    // Save bundleUpsell data
+    fd.append("bundleUpsell", JSON.stringify(bundleUpsellData));
     submit(fd, { method: "post" });
   }
   /***************Database Migration Part************/
@@ -1273,8 +1355,6 @@ export default function BundleSettingsAdvanced() {
                     onDataObjChange={handleQbDataObj}
                   />
                 ))}
-
-                {/* 
                 {buyXGetYs.map((buyitem) => (
                   <GeneralBuyXgetYfree
                     id={buyitem.id}
@@ -1327,7 +1407,7 @@ export default function BundleSettingsAdvanced() {
                     selectedStyle={selectedStyle}
                     onChangeStyle={setSelectedStyle}
                   />
-                ))} */}
+                ))}
                 {showOriginal ? (
                   <div style={{ border: "1px dashed  black", borderRadius: '10px', padding: '15px' }}>
                     <Button fullWidth icon={PlusCircleIcon} variant="primary" onClick={() => setShowOriginal(false)}>Add bar</Button>

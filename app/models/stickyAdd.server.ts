@@ -5,7 +5,7 @@ export async function getStickyAdd(): Promise<StickyAdd> {
   // TODO: Implement database query
   const result = await db.stickyAdd.findFirst({
     orderBy: {
-      createdAt: 'desc',
+      updatedAt: 'desc',
     },
   });
   if (result)

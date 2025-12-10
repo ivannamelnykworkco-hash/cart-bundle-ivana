@@ -5,7 +5,7 @@ export async function getCheckboxUpsell(): Promise<CheckboxUpsell> {
   // TODO: Implement database query
   const result = await db.checkboxUpsell.findFirst({
     orderBy: {
-      createdAt: 'desc',
+      updatedAt: 'desc',
     },
   });
   if (result)

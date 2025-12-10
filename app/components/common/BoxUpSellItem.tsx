@@ -6,7 +6,23 @@ import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
 import { SelectProductModal } from "./SelectProductModal";
 import { DeleteIcon } from '@shopify/polaris-icons';
-export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, upSelectedProductChange, upAddUpsellImageChange }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upAddUpsellImageChange: any, upBundlesBarUpsellTextChange: any, deleteSection: any, upSelectedProductChange: any }) {
+export function BoxUpSellItem({
+  bundleId,
+  id,
+  deleteSection,
+  upBundlesBarUpsellTextChange,
+  upAddUpsellPriceChange,
+  upSelectedProductChange,
+  upAddUpsellImageChange
+}: {
+  bundleId: any,
+  id: any,
+  upAddUpsellPriceChange: any,
+  upAddUpsellImageChange: any,
+  upBundlesBarUpsellTextChange: any,
+  deleteSection: any,
+  upSelectedProductChange: any
+}) {
 
   const loaderData = useLoaderData<typeof loader>();
   const [selected, setSelected] = useState("default");
@@ -52,7 +68,14 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
         basePrice.toFixed(2)
       );
     }
-  }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange, bundleId, id]);
+  }, [
+    barAddUpsellDefaultPrice,
+    upsellValue,
+    selected,
+    upAddUpsellPriceChange,
+    bundleId,
+    id
+  ]);
 
 
   const handleChange = useCallback(

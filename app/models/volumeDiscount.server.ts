@@ -7,7 +7,7 @@ const defaultColor = "#00DDDD"
 export async function getVolumeDiscount(): Promise<VolumeDiscount> {
   const result = await db.volumeDiscount.findFirst({
     orderBy: {
-      createdAt: 'desc',
+      updatedAt: 'desc',
     },
   });
   if (result)

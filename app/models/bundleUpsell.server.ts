@@ -1,0 +1,275 @@
+import db from "../db.server";
+//npm run prisma migrate dev -- --name add-qrcode-table
+export async function getBundleUpsells() {
+  return db.bundleUpsell.findMany({
+    include: {
+      upsellItems: true,
+      productItems: true
+    },
+    orderBy: {
+      updatedAt: "desc" // optional, order by updatedAt
+    }
+  });
+}
+
+export async function updateBundleUpsell(data) {
+  const bundleUpsellData: any = {
+    id: data.id || null,
+    bundleId: data.bundleId || "",
+    isOpen: data.isOpen === "true",
+    layoutOption: data.layoutOption,
+    title: data.title || "",
+    subtitle: data.subtitle || "",
+    badgeText: data.badgeText || "",
+    badgeStyle: data.badgeStyle || "",
+    label: data.label || "",
+    isSelectedByDefault: data.isSelectedByDefault === "true",
+    isShowQuantitySelector: data.isShowQuantitySelector === "true",
+    productCounts: data.productCounts ? parseInt(data.productCounts, 10) : 1,
+    selectPrice: data.selectPrice || "",
+    discountPrice: data.discountPrice ? parseFloat(data.discountPrice) : 0,
+    isShowAsSoldOut: data.isShowAsSoldOut === "true",
+    labelTitle: data.labelTitle || "",
+    opacity: data.opacity ? parseFloat(data.opacity) : 1,
+    bgColor: data.bgColor || "",
+    textColor: data.textColor || "",
+    labelSize: data.labelSize ? parseInt(data.labelSize, 10) : 12,
+    createdAt: data.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  if (data.productItems) {
+    try {
+      // const items = Array.isArray(data.productItems)
+      //   ? data.productItems
+      //   : JSON.parse(data.productItems);
+      const items = JSON.parse(data.productItems);
+      bundleUpsellData.productItems = items.map((u: any) => ({
+        id: u.id || null,
+        buId: u.buId || null,
+        quantity: parseInt(u.quantity, 10) || 0,
+        selectPrice: u.selectPrice || "",
+        discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : 0,
+        selectedVariants: u.selectedVariants || "",
+        createdAt: u.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }));
+    } catch (e) {
+      bundleUpsellData.productItems = [];
+    }
+  } else {
+    bundleUpsellData.productItems = [];
+  }
+
+  if (data.upsellItems) {
+    try {
+      // const items = Array.isArray(data.upsellItems)
+      //   ? data.upsellItems
+      //   : JSON.parse(data.upsellItems);
+      const items = JSON.parse(data.upsellItems);
+
+
+      bundleUpsellData.upsellItems = items.map((u: any) => ({
+        id: u.id || null,
+        qbId: u.qbId || null,
+        bxGyId: u.bxGyId || null,
+        buId: u.buId || null,
+        isSelectedProduct: u.isSelectedProduct === true || u.isSelectedProduct === "true",
+        selectedVariants: u.selectedVariants || "",
+        selectPrice: u.selectPrice || "",
+        discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : 0,
+        priceText: u.priceText || "",
+        isSelectedByDefault: u.isSelectedByDefault === true || u.isSelectedByDefault === "true",
+        isVisibleOnly: u.isVisibleOnly === true || u.isVisibleOnly === "true",
+        isShowAsSoldOut: u.isShowAsSoldOut === true || u.isShowAsSoldOut === "true",
+        labelTitle: u.labelTitle || "",
+        opacity: u.opacity ? parseInt(u.opacity, 10) : 1,
+        bgColor: u.bgColor || "",
+        textColor: u.textColor || "",
+        labelSize: u.labelSize ? parseInt(u.labelSize, 10) : 12,
+        createdAt: u.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }));
+    } catch (e) {
+      bundleUpsellData.upsellItems = [];
+    }
+  } else {
+    bundleUpsellData.upsellItems = [];
+  }
+
+  // Deleted upsells
+  if (data.upsellItemsToDeleteIds) {
+    try {
+      bundleUpsellData.upsellItemsToDeleteIds = JSON.parse(data.upsellItemsToDeleteIds);
+    } catch {
+      bundleUpsellData.upsellItemsToDeleteIds = [];
+    }
+  } else {
+    bundleUpsellData.upsellItemsToDeleteIds = [];
+  }
+
+  // Deleted productItems
+  if (data.productItemsToDeleteIds) {
+    try {
+      bundleUpsellData.productItemsToDeleteIds = JSON.parse(data.productItemsToDeleteIds);
+    } catch {
+      bundleUpsellData.productItemsToDeleteIds = [];
+    }
+  } else {
+    bundleUpsellData.productItemsToDeleteIds = [];
+  }
+
+  // UPSERT BundleUpsell
+  const bundleUpsell = await db.bundleUpsell.upsert({
+    where: { id: bundleUpsellData.id ?? crypto.randomUUID() },
+    update: {
+      bundleId: bundleUpsellData.bundleId,
+      isOpen: bundleUpsellData.isOpen,
+      layoutOption: bundleUpsellData.layoutOption,
+      title: bundleUpsellData.title,
+      subtitle: bundleUpsellData.subtitle,
+      badgeText: bundleUpsellData.badgeText,
+      badgeStyle: bundleUpsellData.badgeStyle,
+      label: bundleUpsellData.label,
+      isSelectedByDefault: bundleUpsellData.isSelectedByDefault,
+      isShowQuantitySelector: bundleUpsellData.isShowQuantitySelector,
+      productCounts: bundleUpsellData.productCounts,
+      selectPrice: bundleUpsellData.selectPrice,
+      discountPrice: bundleUpsellData.discountPrice,
+      isShowAsSoldOut: bundleUpsellData.isShowAsSoldOut,
+      labelTitle: bundleUpsellData.labelTitle,
+      opacity: bundleUpsellData.opacity,
+      bgColor: bundleUpsellData.bgColor,
+      textColor: bundleUpsellData.textColor,
+      labelSize: bundleUpsellData.labelSize,
+      updatedAt: new Date().toISOString()
+    },
+    create: {
+      bundleId: bundleUpsellData.bundleId,
+      isOpen: bundleUpsellData.isOpen,
+      layoutOption: bundleUpsellData.layoutOption,
+      title: bundleUpsellData.title,
+      subtitle: bundleUpsellData.subtitle,
+      badgeText: bundleUpsellData.badgeText,
+      badgeStyle: bundleUpsellData.badgeStyle,
+      label: bundleUpsellData.label,
+      isSelectedByDefault: bundleUpsellData.isSelectedByDefault,
+      isShowQuantitySelector: bundleUpsellData.isShowQuantitySelector,
+      productCounts: bundleUpsellData.productCounts,
+      selectPrice: bundleUpsellData.selectPrice,
+      discountPrice: bundleUpsellData.discountPrice,
+      isShowAsSoldOut: bundleUpsellData.isShowAsSoldOut,
+      labelTitle: bundleUpsellData.labelTitle,
+      opacity: bundleUpsellData.opacity,
+      bgColor: bundleUpsellData.bgColor,
+      textColor: bundleUpsellData.textColor,
+      labelSize: bundleUpsellData.labelSize,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  });
+
+  // DELETE upsellItems removed from frontend
+  if (bundleUpsellData.upsellItemsToDeleteIds.length > 0) {
+    await db.upsellItem.deleteMany({
+      where: { id: { in: bundleUpsellData.upsellItemsToDeleteIds } }
+    });
+  }
+  // DELETE productItems from frontend 
+  if (bundleUpsellData.productItemsToDeleteIds.length > 0) {
+    await db.productItem.deleteMany({
+      where: { id: { in: bundleUpsellData.productItemsToDeleteIds } }
+    });
+  }
+
+  // Upsert each ProductItem
+  for (const u of bundleUpsellData.productItems) {
+    await db.productItem.upsert({
+      where: { id: u.id ?? crypto.randomUUID() },
+      update: {
+        buId: bundleUpsell.id,
+        quantity: u.quantity,
+        selectPrice: u.selectPrice,
+        discountPrice: u.discountPrice,
+        selectedVariants: u.selectedVariants,
+        updatedAt: new Date().toISOString()
+      },
+      create: {
+        buId: bundleUpsell.id,
+        quantity: u.quantity,
+        selectPrice: u.selectPrice,
+        discountPrice: u.discountPrice,
+        selectedVariants: u.selectedVariants,
+        createdAt: u.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    });
+  }
+  // UPSERT each upsell
+  for (const u of bundleUpsellData.upsellItems) {
+    const relationData: any = {};
+    // only one relation should be attached
+    if (u.qbId) {
+      relationData.qbId = u.qbId;
+    }
+    if (u.bxGyId) {
+      relationData.bxGyId = u.bxGyId;
+    }
+    if (u.buId) {
+      relationData.buId = bundleUpsell.id;
+    }
+    await db.upsellItem.upsert({
+      where: { id: u.id ?? crypto.randomUUID() },
+      update: {
+        ...relationData,
+        isSelectedProduct: u.isSelectedProduct,
+        selectedVariants: u.selectedVariants,
+        selectPrice: u.selectPrice,
+        discountPrice: u.discountPrice,
+        priceText: u.priceText,
+        isSelectedByDefault: u.isSelectedByDefault,
+        isVisibleOnly: u.isVisibleOnly,
+        isShowAsSoldOut: u.isShowAsSoldOut,
+        labelTitle: u.labelTitle,
+        opacity: u.opacity,
+        bgColor: u.bgColor,
+        textColor: u.textColor,
+        labelSize: u.labelSize,
+        quantityBreak: {},
+        buyXGetY: {},
+        bundleUpsell: {
+          connect: { id: bundleUpsell.id }
+        },
+        updatedAt: new Date().toISOString()
+      },
+      create: {
+        ...relationData,
+        isSelectedProduct: u.isSelectedProduct,
+        selectedVariants: u.selectedVariants,
+        selectPrice: u.selectPrice,
+        discountPrice: u.discountPrice,
+        priceText: u.priceText,
+        isSelectedByDefault: u.isSelectedByDefault,
+        isVisibleOnly: u.isVisibleOnly,
+        isShowAsSoldOut: u.isShowAsSoldOut,
+        labelTitle: u.labelTitle,
+        opacity: u.opacity,
+        bgColor: u.bgColor,
+        textColor: u.textColor,
+        labelSize: u.labelSize,
+        quantityBreak: {},
+        buyXGetY: {},
+        bundleUpsell: {
+          connect: { id: bundleUpsell.id }
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    });
+  }
+  return bundleUpsell;
+}
+
+export async function updateBundleUpsells(bundleUpsellList) {
+  return Promise.all(bundleUpsellList.map(bundleUpsell => updateBundleUpsell(bundleUpsell)));
+}

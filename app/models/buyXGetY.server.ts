@@ -1,0 +1,197 @@
+import db from "../db.server";
+
+export async function getBuyXGetYs() {
+  return db.buyXGetY.findMany({
+    include: {
+      upsellItems: true
+    },
+    orderBy: {
+      updatedAt: "desc" // optional, order by updatedAt
+    }
+  });
+}
+
+export async function updateBuyXGetY(data) {
+  // prepare data for update
+  const buyXGetYData: any = {
+    id: data.id || null,
+    bundleId: data.bundleId || "",
+    isOpen: data.isOpen === "true",
+    buyQuantity: data.buyQuantity ? parseInt(data.buyQuantity, 10) : 0,
+    getQuantity: data.getQuantity ? parseInt(data.getQuantity, 10) : 0,
+    title: data.title || "",
+    subtitle: data.subtitle || "",
+    badgeText: data.badgeText || "",
+    badgeStyle: data.badgeStyle || "",
+    label: data.label || "",
+    isSelectedByDefault: data.isSelectedByDefault === "true",
+    isShowAsSoldOut: data.isShowAsSoldOut === "true",
+    labelTitle: data.labelTitle || "",
+    opacity: data.opacity ? parseFloat(data.opacity) : 1,
+    bgColor: data.bgColor || "",
+    textColor: data.textColor || "",
+    labelSize: data.labelSize ? parseInt(data.labelSize, 10) : 12,
+    createdAt: data.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  if (data.upsellItems) {
+    try {
+      buyXGetYData.upsellItems = JSON.parse(data.upsellItems).map((u: any) => ({
+        id: u.id || null,
+        qbId: u.qbId || null,
+        bxGyId: u.bxGyId || null,
+        buId: u.buId || null,
+        isSelectedProduct: u.isSelectedProduct === true || u.isSelectedProduct === "true",
+        selectedVariants: u.selectedVariants || "",
+        selectPrice: u.selectPrice || "",
+        discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : null,
+        priceText: u.priceText || "",
+        isSelectedByDefault: u.isSelectedByDefault === true || u.isSelectedByDefault === "true",
+        isVisibleOnly: u.isVisibleOnly === true || u.isVisibleOnly === "true",
+        isShowAsSoldOut: u.isShowAsSoldOut === true || u.isShowAsSoldOut === "true",
+        labelTitle: u.labelTitle || "",
+        opacity: u.opacity ? parseInt(u.opacity, 10) : 100,
+        bgColor: u.bgColor || "",
+        textColor: u.textColor || "",
+        labelSize: u.labelSize ? parseInt(u.labelSize, 10) : 12,
+        createdAt: u.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }));
+    } catch (e) {
+      buyXGetYData.upsellItems = [];
+    }
+  } else {
+    buyXGetYData.upsellItems = [];
+  }
+
+  // Deleted upsells
+  if (data.upsellItemsToDeleteIds) {
+    try {
+      buyXGetYData.upsellItemsToDeleteIds = JSON.parse(data.upsellItemsToDeleteIds);
+    } catch {
+      buyXGetYData.upsellItemsToDeleteIds = [];
+    }
+  } else {
+    buyXGetYData.upsellItemsToDeleteIds = [];
+  }
+
+  // UPSERT BuyXGetY
+  const buyXGetY = await db.buyXGetY.upsert({
+    where: { id: buyXGetYData.id ?? crypto.randomUUID() },
+    update: {
+      bundleId: buyXGetYData.bundleId,
+      isOpen: buyXGetYData.isOpen,
+      buyQuantity: buyXGetYData.buyQuantity,
+      getQuantity: buyXGetYData.getQuantity,
+      title: buyXGetYData.title,
+      subtitle: buyXGetYData.subtitle,
+      badgeText: buyXGetYData.badgeText,
+      badgeStyle: buyXGetYData.badgeStyle,
+      label: buyXGetYData.label,
+      isSelectedByDefault: buyXGetYData.isSelectedByDefault,
+      isShowAsSoldOut: buyXGetYData.isShowAsSoldOut,
+      labelTitle: buyXGetYData.labelTitle,
+      opacity: buyXGetYData.opacity,
+      bgColor: buyXGetYData.bgColor,
+      textColor: buyXGetYData.textColor,
+      labelSize: buyXGetYData.labelSize,
+      updatedAt: new Date().toISOString()
+    },
+    create: {
+      bundleId: buyXGetYData.bundleId,
+      isOpen: buyXGetYData.isOpen,
+      buyQuantity: buyXGetYData.buyQuantity,
+      getQuantity: buyXGetYData.getQuantity,
+      title: buyXGetYData.title,
+      subtitle: buyXGetYData.subtitle,
+      badgeText: buyXGetYData.badgeText,
+      badgeStyle: buyXGetYData.badgeStyle,
+      label: buyXGetYData.label,
+      isSelectedByDefault: buyXGetYData.isSelectedByDefault,
+      isShowAsSoldOut: buyXGetYData.isShowAsSoldOut,
+      labelTitle: buyXGetYData.labelTitle,
+      opacity: buyXGetYData.opacity,
+      bgColor: buyXGetYData.bgColor,
+      textColor: buyXGetYData.textColor,
+      labelSize: buyXGetYData.labelSize,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  });
+
+  // DELETE upsellItems removed from frontend
+  if (buyXGetYData.upsellItemsToDeleteIds.length > 0) {
+    await db.upsellItem.deleteMany({
+      where: { id: { in: buyXGetYData.upsellItemsToDeleteIds } }
+    });
+  }
+
+  // UPSERT each upsell
+  for (const u of buyXGetYData.upsellItems) {
+    const relationData: any = {};
+    // only one relation should be attached
+    if (u.qbId) {
+      relationData.qbId = u.qbId;
+    }
+    if (u.bxGyId) {
+      relationData.bxGyId = buyXGetY.id;
+    }
+    if (u.buId) {
+      relationData.buId = u.buId;
+    }
+    await db.upsellItem.upsert({
+      where: { id: u.id ?? crypto.randomUUID() },
+      update: {
+        ...relationData,
+        isSelectedProduct: u.isSelectedProduct,
+        selectedVariants: u.selectedVariants,
+        selectPrice: u.selectPrice,
+        discountPrice: u.discountPrice,
+        priceText: u.priceText,
+        isSelectedByDefault: u.isSelectedByDefault,
+        isVisibleOnly: u.isVisibleOnly,
+        isShowAsSoldOut: u.isShowAsSoldOut,
+        labelTitle: u.labelTitle,
+        opacity: u.opacity,
+        bgColor: u.bgColor,
+        textColor: u.textColor,
+        labelSize: u.labelSize,
+        quantityBreak: {},
+        buyXGetY: {
+          connect: { id: buyXGetY.id }
+        },
+        bundleUpsell: {},
+        updatedAt: new Date().toISOString()
+      },
+      create: {
+        ...relationData,
+        isSelectedProduct: u.isSelectedProduct,
+        selectedVariants: u.selectedVariants,
+        selectPrice: u.selectPrice,
+        discountPrice: u.discountPrice,
+        priceText: u.priceText,
+        isSelectedByDefault: u.isSelectedByDefault,
+        isVisibleOnly: u.isVisibleOnly,
+        isShowAsSoldOut: u.isShowAsSoldOut,
+        labelTitle: u.labelTitle,
+        opacity: u.opacity,
+        bgColor: u.bgColor,
+        textColor: u.textColor,
+        labelSize: u.labelSize,
+        quantityBreak: {},
+        buyXGetY: {
+          connect: { id: buyXGetY.id }
+        },
+        bundleUpsell: {},
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    });
+  }
+  return buyXGetY;
+}
+
+export async function updateBuyXGetYs(buyXGetYList) {
+  return Promise.all(buyXGetYList.map(buyXGetY => updateBuyXGetY(buyXGetY)));
+}
