@@ -5,51 +5,47 @@ import { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
+  // const url = new URL(request.url);
 
-  if (
-    url.pathname.endsWith("/styles.css") ||
-    request.headers.get("accept")?.includes("text/css")
-  ) {
-    await authenticate.public.appProxy(request);
+  await authenticate.public.appProxy(request);
 
-    const getGeneralStyleConfigS = await getGeneralStyle().catch(() => null);
-    const cornerRadius = Number(getGeneralStyleConfigS?.cornerRadius) || '';
-    const spacing = Number(getGeneralStyleConfigS?.spacing) || '';
-    const cardsBgColor = String(getGeneralStyleConfigS?.cardsBgColor) || '';
-    const selectedBgColor = String(getGeneralStyleConfigS?.selectedBgColor) || '';
-    const borderColor = String(getGeneralStyleConfigS?.borderColor) || '';
-    const blockTitleColor = String(getGeneralStyleConfigS?.blockTitleColor) || '';
-    const barTitleColor = String(getGeneralStyleConfigS?.barTitleColor) || '';
-    const barSubTitleColor = String(getGeneralStyleConfigS?.barSubTitleColor) || '';
-    const barPriceColor = String(getGeneralStyleConfigS?.barPriceColor) || '';
-    const barFullPriceColor = String(getGeneralStyleConfigS?.barFullPriceColor) || '';
-    const barLabelBackColor = String(getGeneralStyleConfigS?.barLabelBackColor) || '';
-    const barLabelTextColor = String(getGeneralStyleConfigS?.barLabelTextColor) || '';
-    const barBadgebackColor = String(getGeneralStyleConfigS?.barBadgebackColor) || '';
-    const barBadgeTextColor = String(getGeneralStyleConfigS?.barBadgeTextColor) || '';
-    const barUpsellBackColor = String(getGeneralStyleConfigS?.barUpsellBackColor) || '';
-    const barUpsellTextColor = String(getGeneralStyleConfigS?.barUpsellTextColor) || '';
-    const barUpsellSelectedBackColor = String(getGeneralStyleConfigS?.barUpsellSelectedBackColor) || '';
-    const barUpsellSelectedTextColor = String(getGeneralStyleConfigS?.barUpsellSelectedTextColor)
-    const barBlocktitle = Number(getGeneralStyleConfigS?.barBlocktitle) || 16;
-    const bartitleSize = Number(getGeneralStyleConfigS?.bartitleSize) || 16;
-    const subTitleSize = Number(getGeneralStyleConfigS?.subTitleSize) || 16;
-    const labelSize = Number(getGeneralStyleConfigS?.labelSize) || 16;
-    const upsellSize = Number(getGeneralStyleConfigS?.upsellSize) || 16;
-    const unitLabelSize = Number(getGeneralStyleConfigS?.unitLabelSize) || 16;
+  const getGeneralStyleConfigS = await getGeneralStyle().catch(() => null);
+  const cornerRadius = Number(getGeneralStyleConfigS?.cornerRadius) || '';
+  const spacing = Number(getGeneralStyleConfigS?.spacing) || '';
+  const cardsBgColor = String(getGeneralStyleConfigS?.cardsBgColor) || '';
+  const selectedBgColor = String(getGeneralStyleConfigS?.selectedBgColor) || '';
+  const borderColor = String(getGeneralStyleConfigS?.borderColor) || '';
+  const blockTitleColor = String(getGeneralStyleConfigS?.blockTitleColor) || '';
+  const barTitleColor = String(getGeneralStyleConfigS?.barTitleColor) || '';
+  const barSubTitleColor = String(getGeneralStyleConfigS?.barSubTitleColor) || '';
+  const barPriceColor = String(getGeneralStyleConfigS?.barPriceColor) || '';
+  const barFullPriceColor = String(getGeneralStyleConfigS?.barFullPriceColor) || '';
+  const barLabelBackColor = String(getGeneralStyleConfigS?.barLabelBackColor) || '';
+  const barLabelTextColor = String(getGeneralStyleConfigS?.barLabelTextColor) || '';
+  const barBadgebackColor = String(getGeneralStyleConfigS?.barBadgebackColor) || '';
+  const barBadgeTextColor = String(getGeneralStyleConfigS?.barBadgeTextColor) || '';
+  const barUpsellBackColor = String(getGeneralStyleConfigS?.barUpsellBackColor) || '';
+  const barUpsellTextColor = String(getGeneralStyleConfigS?.barUpsellTextColor) || '';
+  const barUpsellSelectedBackColor = String(getGeneralStyleConfigS?.barUpsellSelectedBackColor) || '';
+  const barUpsellSelectedTextColor = String(getGeneralStyleConfigS?.barUpsellSelectedTextColor)
+  const barBlocktitle = Number(getGeneralStyleConfigS?.barBlocktitle) || 16;
+  const bartitleSize = Number(getGeneralStyleConfigS?.bartitleSize) || 16;
+  const subTitleSize = Number(getGeneralStyleConfigS?.subTitleSize) || 16;
+  const labelSize = Number(getGeneralStyleConfigS?.labelSize) || 16;
+  const upsellSize = Number(getGeneralStyleConfigS?.upsellSize) || 16;
+  const unitLabelSize = Number(getGeneralStyleConfigS?.unitLabelSize) || 16;
 
-    const countdownTimerConfig = await getCountdownTimer().catch(() => null);
-    const msgAlignmentIndex = Number(countdownTimerConfig?.msgAlignment) || '';
-    const msgAlignment = msgAlignmentIndex === 0 ? "left" : msgAlignmentIndex === 1 ? "center" : "right";
-    const msgBold = countdownTimerConfig?.msgBold ? '700' : '400';
-    const msgItalic = countdownTimerConfig?.msgItalic ? 'italic' : 'normal';
-    const msgSize = Number(countdownTimerConfig?.msgSize) || '14';
-    const msgBgColor = String(countdownTimerConfig?.msgBgColor) || '';
-    const msgTextColor = String(countdownTimerConfig?.msgTextColor) || '';
+  const countdownTimerConfig = await getCountdownTimer().catch(() => null);
+  const msgAlignmentIndex = Number(countdownTimerConfig?.msgAlignment) || '';
+  const msgAlignment = msgAlignmentIndex === 0 ? "left" : msgAlignmentIndex === 1 ? "center" : "right";
+  const msgBold = countdownTimerConfig?.msgBold ? '700' : '400';
+  const msgItalic = countdownTimerConfig?.msgItalic ? 'italic' : 'normal';
+  const msgSize = Number(countdownTimerConfig?.msgSize) || '14';
+  const msgBgColor = String(countdownTimerConfig?.msgBgColor) || '';
+  const msgTextColor = String(countdownTimerConfig?.msgTextColor) || '';
 
 
-    const css = `
+  const css = `
       :root {
       --corner-radius: ${cornerRadius}px;
       --spacing: ${spacing}px;
@@ -85,109 +81,109 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       }
     `;
 
-    return new Response(css, {
-      headers: {
-        "Content-Type": "text/css; charset=utf-8",
-        "Cache-Control": "public, max-age=60, s-maxage=60",
-      },
-    });
-  }
-  return new Response("Not found", { status: 404 });
-};
-
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const { admin } = await authenticate.public.appProxy(request);
-
-  // Fetch products and countdown config in parallel
-  const [response, countdownTimerConfig] = await Promise.all([
-    admin.graphql(`
-      query getProducts {
-        products(first: 2, query: "id:7769186762830 OR id:7769222676558") {
-          edges {
-            node {
-              id
-              title
-              featuredImage {
-                url
-              }
-              metafields(first: 1) {
-                edges {
-                  node {
-                    id
-                    namespace
-                    key
-                    value
-                    type
-                  }
-                }
-              }
-              variants(first: 1) {
-                edges {
-                  node {
-                    id
-                    title
-                    price
-                    inventoryQuantity
-                    compareAtPrice
-                    selectedOptions {
-                      name
-                      value
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `),
-    getCountdownTimer().catch(() => null),
-  ]);
-
-  const body = await response.json();
-  const nodes = body?.data?.products?.edges?.map(edge => edge.node) ?? [];
-
-  if (!nodes.length) {
-    return new Response(JSON.stringify({ error: "Products not found" }), {
-      headers: { "Content-Type": "application/json" },
-      status: 404,
-    });
-  }
-
-  // Normalize countdown config once
-  const isCountdown = Boolean(countdownTimerConfig?.isCountdown);
-  const visibility = String(countdownTimerConfig?.visibility || "");
-  const fixedDurationTime = Number(countdownTimerConfig?.fixedDurationTime) || 0;
-  const endDateTime = countdownTimerConfig?.endDateTime || "";
-  const msgText = String(countdownTimerConfig?.msgText || "");
-
-  const products = nodes.map(node => {
-    const firstVariant = node.variants?.edges?.[0]?.node ?? null;
-
-    return {
-      id: node.id,
-      title: node.title,
-      imageUrl: node.featuredImage?.url ?? "",
-      price: firstVariant?.price ?? null,
-      compareAtPrice: firstVariant?.compareAtPrice ?? null,
-      variants: node.variants?.edges ?? [],
-      metafields: node.metafields?.edges ?? [],
-
-      countdownTimerConfig: {
-        isCountdown,
-        visibility,
-        fixedDurationTime,
-        endDateTime,
-        msgText,
-      },
-    };
-  });
-
-  return new Response(JSON.stringify(products), {
+  return new Response(css, {
     headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store",
+      "Content-Type": "text/css; charset=utf-8",
+      "Cache-Control": "public, max-age=60, s-maxage=60",
     },
   });
+
+  // return new Response("Not found", { status: 404 });
 };
+
+
+// export const action = async ({ request }: ActionFunctionArgs) => {
+//   const { admin } = await authenticate.public.appProxy(request);
+
+//   // Fetch products and countdown config in parallel
+//   const [response, countdownTimerConfig] = await Promise.all([
+//     admin.graphql(`
+//       query getProducts {
+//         products(first: 2, query: "id:7769186762830 OR id:7769222676558") {
+//           edges {
+//             node {
+//               id
+//               title
+//               featuredImage {
+//                 url
+//               }
+//               metafields(first: 1) {
+//                 edges {
+//                   node {
+//                     id
+//                     namespace
+//                     key
+//                     value
+//                     type
+//                   }
+//                 }
+//               }
+//               variants(first: 1) {
+//                 edges {
+//                   node {
+//                     id
+//                     title
+//                     price
+//                     inventoryQuantity
+//                     compareAtPrice
+//                     selectedOptions {
+//                       name
+//                       value
+//                     }
+//                   }
+//                 }
+//               }
+//             }
+//           }
+//         }
+//       }
+//     `),
+//     getCountdownTimer().catch(() => null),
+//   ]);
+
+//   const body = await response.json();
+//   const nodes = body?.data?.products?.edges?.map(edge => edge.node) ?? [];
+
+//   if (!nodes.length) {
+//     return new Response(JSON.stringify({ error: "Products not found" }), {
+//       headers: { "Content-Type": "application/json" },
+//       status: 404,
+//     });
+//   }
+
+//   // Normalize countdown config once
+//   const isCountdown = Boolean(countdownTimerConfig?.isCountdown);
+//   const visibility = String(countdownTimerConfig?.visibility || "");
+//   const fixedDurationTime = Number(countdownTimerConfig?.fixedDurationTime) || 0;
+//   const endDateTime = countdownTimerConfig?.endDateTime || "";
+//   const msgText = String(countdownTimerConfig?.msgText || "");
+
+//   const products = nodes.map(node => {
+//     const firstVariant = node.variants?.edges?.[0]?.node ?? null;
+
+//     return {
+//       id: node.id,
+//       title: node.title,
+//       imageUrl: node.featuredImage?.url ?? "",
+//       price: firstVariant?.price ?? null,
+//       compareAtPrice: firstVariant?.compareAtPrice ?? null,
+//       variants: node.variants?.edges ?? [],
+//       metafields: node.metafields?.edges ?? [],
+
+//       countdownTimerConfig: {
+//         isCountdown,
+//         visibility,
+//         fixedDurationTime,
+//         endDateTime,
+//         msgText,
+//       },
+//     };
+//   });
+
+//   return new Response(JSON.stringify(products), {
+//     headers: {
+//       "Content-Type": "application/json",
+//       "Cache-Control": "no-store",
+//     },
+//   });
+// };

@@ -249,9 +249,13 @@ model QuantityBreak {
   badgeStyle  String
   label     String
   isSelectedByDefault   Boolean
+  isShowAsSoldOut       Boolean
+  labelTitle      String
+  opacity       Int
+  backgroundColor  String
+  textColor    String
+  size          Int
   
-
-
   createdAt String
   updatedAt String
 

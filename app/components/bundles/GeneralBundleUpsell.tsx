@@ -14,12 +14,6 @@ import { SelectProductModal } from "../common/SelectProductModal";
 import { SelectVariantModal } from "../common/SelectVariantModal";
 import { BoxProductItem } from "../common/BoxProductItem";
 
-interface BoxUpSells {
-  id: number;
-}
-interface Gifts {
-  id: number;
-}
 
 export function GeneralBundleUpsell({
   id,
@@ -28,49 +22,18 @@ export function GeneralBundleUpsell({
   heading,
   open,
   onToggle,
-  upBundlesChooseTitleChange,
-  upBundlesChooseSubTitleChange,
-  upBunlesBarLabelTextChange,
-  upBundlesBadgeTextChange,
-  upBundlesBarUpsellTextChange,
-  upSelectedProductChange,
-  upAddUpsellImageChange,
-  upAddProductItemPriceChange,
   onAddUpsell,
   onAddProduct,
   onDeleteUpsell,
   onDeleteProducts,
   upSeletedProduct,
-  upAddUpsellPriceChange,
-  upPriceChange,
   upBadgeSelectedChange,
   styleOptions,
   selectedStyle,
-  onChangeStyle, }:
-  {
-    id: any,
-    bundleId: any,
-    deleteSection: any
-    heading: any,
-    open: any,
-    onToggle: any,
-    upBundlesChooseTitleChange: any,
-    upBundlesChooseSubTitleChange: any,
-    upBunlesBarLabelTextChange: any,
-    upBundlesBarUpsellTextChange: any,
-    upAddProductItemPriceChange: (id: string, price: string, defaultBasePrice?: string) => void,
-    onAddUpsell: any,
-    onAddProduct: any,
-    onDeleteUpsell: any,
-    onDeleteProducts: any,
-    upSeletedProduct: any,
-    upAddUpsellPriceChange: (price: string, defaultBasePrice?: string) => void,
-    upPriceChange?: (price: string, defaultBasePrice?: string) => void,
-    upBadgeSelectedChange?: (value: string) => void,
-    styleOptions: any,
-    selectedStyle: any,
-    onChangeStyle: any,
-  }) {
+  onChangeStyle,
+  onDataObjChange,
+  onDataAddUpsellChange,
+  onDataAddProductItemChange }) {
 
   const loaderData = useLoaderData<typeof loader>();
 
@@ -84,40 +47,25 @@ export function GeneralBundleUpsell({
   const [defaultQuantityValue, setDefaultQuantityValue] = useState(1);
   const [showPriceDecimal, setShowPriceDecimal] = useState(false);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>(
-    (loaderData as any).barDefaultQuality
-  );
+
   // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [barDefaultPrice, setBarDefaultPrice] = useState((loaderData as any).barDefaultPrice);
-  const [upsellValue, setUpsellValue] = useState('20');
+  const [discountValue, setDiscountValue] = useState('20');
   const [opacity, setOpacity] = useState<number>(20);
   const [sizeValue, setSizeValue] = useState('13');
   const [selected, setSelected] = useState("default");
   const [badgeSelected, setBadgeSelected] = useState("simple");
-
   const [title, setTitle] = useState((loaderData as any).bundleUpsellTitle || "");
-  const handleTitleChange = (v: string) => {
-    setTitle(v);
-    upBundlesChooseTitleChange(id, v);
-  };
   const [subtitle, setSubtitle] = useState((loaderData as any).bundleUpsellSubtitle || "");
-  const handleSubtitleChange = (v: string) => {
-    setSubtitle(v);
-    upBundlesChooseSubTitleChange(id, v);
-  };
   const [bagdeText, setBagdeText] = useState((loaderData as any).bundleUpsellBagdeText || "");
-  const handleBadgeTextChange = (v: string) => {
-    setBagdeText(v);
-    upBundlesBadgeTextChange(id, v);
-  };
   const [barLabelText, setBarLabelText] = useState((loaderData as any).bunldeUpsellLabelText || "");
-  const handlesBarLabelTextChange = (v: string) => {
-    setBarLabelText(v);
-    upBunlesBarLabelTextChange(id, v);
-  };
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
-  const [gifts, setGifts] = useState<Gifts[]>([]);
+  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState({});
+  const barDefaultPrice = selectedProduct;
+  console.log("selectedProduct==>", selectedProduct);
+
+
   // { add upsellitem and delete}
   const addBoxUpSell = () => {
     const newId = Date.now();
@@ -143,12 +91,8 @@ export function GeneralBundleUpsell({
     onDeleteProducts(bundleId, upsellId);
   };
 
-  const addGift = () => {
-    setGifts(prev => [...prev, { id: Date.now() }])
-  }
-  const deleteGift = (id: any) => {
-    setGifts(prev => prev.filter(item => item.id !== id))
-  }
+
+
   const handleUpsellSelectChange = useCallback(
     (value: string) => {
       setSelected(value);
@@ -165,41 +109,50 @@ export function GeneralBundleUpsell({
     [id, upBadgeSelectedChange],
   );
 
-  // Calculate price based on the formula: barDefaultQualityalue * barDefaultPrice * (1 - upsellValue / 100)
   useEffect(() => {
     const quantity = barDefaultQualityalue;
     const basePrice = parseFloat(barDefaultPrice || "0");
-    const discountPercent = parseFloat(upsellValue || "0");
+    const discountPercent = parseFloat(discountValue || "0");
 
-    let calculatedPrice = 0;
-    let defaulBasePrice = quantity * basePrice;
+    let calc = 0;
+    let base = quantity * basePrice;
 
     if (selected === 'discounted%') {
-      calculatedPrice = quantity * basePrice * (1 - discountPercent / 100);
+      calc = quantity * basePrice * (1 - discountPercent / 100);
     } else if (selected === 'discounted$') {
-      calculatedPrice = quantity * basePrice - (quantity * discountPercent);
+      calc = quantity * basePrice - (quantity * discountPercent);
     } else if (selected === 'specific') {
-      calculatedPrice = parseFloat(upsellValue || "0");
+      calc = parseFloat(discountValue || "0");
     } else {
-      calculatedPrice = quantity * basePrice;
+      calc = quantity * basePrice;
     }
 
-    if (upPriceChange) {
-      upPriceChange(bundleId, calculatedPrice.toFixed(2), defaulBasePrice.toFixed(2));
-    }
-  }, [barDefaultQualityalue, barDefaultPrice, upsellValue, selected, upPriceChange, bundleId]);
+    const buObjectData = () => ({
+      id,
+      title,
+      subtitle,
+      badgeSelected,
+      bagdeText,
+      barLabelText,
+      barDefaultQualityalue,
+      selectedProduct,
+      base: Number(base.toFixed(2)),
+      calc: Number(calc.toFixed(2)),
 
-  const handleChange = useCallback(
-    (newValue: string) => {
-      setUpsellValue(newValue);
-    },
-    [],
-  );
+    })
+    onDataObjChange(id, buObjectData());
+  }, [
+    id,
+    title,
+    subtitle,
+    badgeSelected,
+    bagdeText,
+    barDefaultQualityalue,
+    barLabelText,
+    selectedProduct,
+    onDataObjChange
+  ]);
 
-  const handleSizeChange = useCallback(
-    (newValue: string) => setSizeValue(newValue),
-    [],
-  );
 
   const upsellsOptions = [
     { label: "Default", value: 'default' },
@@ -221,7 +174,6 @@ export function GeneralBundleUpsell({
   const handleColorQuantityText = (newColor: string) => {
     void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
   };
-  const [selectedProduct, setSelectedProduct] = useState({});
   const handleReceiveProduct = (itemId) => (value) => {
     setSelectedProduct(prev => ({
       ...prev,
@@ -247,7 +199,6 @@ export function GeneralBundleUpsell({
           <InlineStack gap="100">
             {/* <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
             <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" /> */}
-            <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
             <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(bundleId)} />
           </InlineStack>
         </InlineStack>
@@ -270,16 +221,16 @@ export function GeneralBundleUpsell({
             </InlineGrid>
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6 }}>
-                <PopUpover title='Title' defaultPopText={title} upPopTextChange={handleTitleChange} badgeSelected={""} />
+                <PopUpover title='Title' defaultPopText={title} upPopTextChange={setTitle} badgeSelected={""} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 6 }}>
-                <PopUpover title='Subitle' defaultPopText={subtitle} upPopTextChange={handleSubtitleChange} badgeSelected={""} />
+                <PopUpover title='Subitle' defaultPopText={subtitle} upPopTextChange={setSubtitle} badgeSelected={""} />
               </Grid.Cell>
             </Grid>
             {/* {Badge text} */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
-                <PopUpover title='Badge text' defaultPopText={bagdeText} upPopTextChange={handleBadgeTextChange} badgeSelected={badgeSelected} />
+                <PopUpover title='Badge text' defaultPopText={bagdeText} upPopTextChange={setBagdeText} badgeSelected={badgeSelected} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
                 <BlockStack gap='200'>
@@ -299,7 +250,7 @@ export function GeneralBundleUpsell({
             {/* {Label} */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
-                <PopUpover title='Label' defaultPopText='' upPopTextChange={handlesBarLabelTextChange} badgeSelected={barLabelText} />
+                <PopUpover title='Label' defaultPopText='' upPopTextChange={setBarLabelText} badgeSelected={barLabelText} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
                 <Checkbox
@@ -350,8 +301,8 @@ export function GeneralBundleUpsell({
                     <TextField
                       label="Discount per item"
                       type="number"
-                      value={upsellValue}
-                      onChange={handleChange}
+                      value={discountValue}
+                      onChange={setDiscountValue}
                       autoComplete="off"
                       min={1}
                       max={100}
@@ -362,8 +313,8 @@ export function GeneralBundleUpsell({
                     <TextField
                       label="Discount per item"
                       type="number"
-                      value={upsellValue}
-                      onChange={handleChange}
+                      value={discountValue}
+                      onChange={setDiscountValue}
                       autoComplete="off"
                       min={1}
                       max={100}
@@ -375,8 +326,8 @@ export function GeneralBundleUpsell({
                     <TextField
                       label="Total price"
                       type="number"
-                      value={upsellValue}
-                      onChange={handleChange}
+                      value={discountValue}
+                      onChange={setDiscountValue}
                       autoComplete="off"
                       min={1}
                       max={100}
@@ -405,10 +356,9 @@ export function GeneralBundleUpsell({
                       id={item.id}
                       key={item.id}
                       bundleId={bundleId}
-                      upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
-                      upAddProductItemPriceChange={upAddProductItemPriceChange}
-                      deleteSection={deleteProduct}
                       selectproductInfo={selectedProduct[item.id]}
+                      deleteSection={deleteProduct}
+                      onDataAddProductItemChange={onDataAddProductItemChange}
                     />
                   </Box>
                 )}
@@ -419,27 +369,17 @@ export function GeneralBundleUpsell({
             <Divider />
             {/* {three button} */}
             <BlockStack gap="300">
-              <InlineGrid columns={3} gap='200'>
-                <Button icon={ImageIcon} >Add theme</Button>
-                <Button onClick={addBoxUpSell} icon={ProductAddIcon}>Add upsell</Button>
-                {/* <Button onClick={addGift} icon={GiftCardIcon} >Add theme</Button> */}
-              </InlineGrid>
+              <Button onClick={addBoxUpSell} icon={ProductAddIcon}>Add upsell</Button>
               <BlockStack gap="300">
                 {/* {Add upsell} */}
                 {boxUpSells.map((item) => (
-                  <BoxUpSellItem id={item.id} key={item.id}
-                    bundleId={bundleId}
-                    upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
-                    upAddUpsellPriceChange={upAddUpsellPriceChange}
-                    upSelectedProductChange={upSelectedProductChange}
-                    upAddUpsellImageChange={upAddUpsellImageChange}
-                    deleteSection={deleteBoxUpsell} />
-                ))}
-              </BlockStack>
-              <BlockStack gap="300">
-                {/* {Add upsell} */}
-                {gifts.map((item) => (
-                  <GiftItem key={item.id} deleteId={item.id} deleteSection={deleteGift} />
+                  <BoxUpSellItem
+                    key={item.id}
+                    id={item.id}
+                    bundleId={bundleId} // important
+                    deleteSection={deleteBoxUpsell}
+                    onDataAddUpsellChange={onDataAddUpsellChange}
+                  />
                 ))}
               </BlockStack>
             </BlockStack>
@@ -488,7 +428,7 @@ export function GeneralBundleUpsell({
                           label
                           type="number"
                           value={sizeValue}
-                          onChange={handleSizeChange}
+                          onChange={setSizeValue}
                           autoComplete="off"
                           min={10}
                           max={50}

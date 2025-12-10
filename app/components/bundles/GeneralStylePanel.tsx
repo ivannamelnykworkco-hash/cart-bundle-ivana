@@ -148,10 +148,6 @@ export function GeneralStylePanel({
   const labelText = conf.barLabelTextColor;
   const badgeBack = conf.barBadgebackColor;
   const badgeText = conf.barBadgeTextColor;
-  const giftBack = "#00FF00";
-  const giftText = "#00FF00";
-  const giftSelectedBack = "#00FF00";
-  const giftSelectedText = "#00FF00";
   const UpsellBack = conf.barUpsellBackColor;
   const UpsellText = conf.barUpsellTextColor;
   const UpsellSelectedBack = conf.barUpsellSelectedBackColor;
@@ -373,17 +369,6 @@ export function GeneralStylePanel({
                 </BlockStack>
 
                 <Divider />
-                <BlockStack>
-                  <Text variant="headingSm" as="h6">
-                    Free gift
-                  </Text>
-                  <InlineGrid columns={4} gap="200">
-                    <ColorPickerPopoverItem subtitle="Background" defaultColorSetting={giftBack} colorWidth="100%" onColorChange={undefined} />
-                    <ColorPickerPopoverItem subtitle="Text" defaultColorSetting={giftText} colorWidth="100%" onColorChange={undefined} />
-                    <ColorPickerPopoverItem subtitle="Selected bg" defaultColorSetting={giftSelectedBack} colorWidth="100%" onColorChange={undefined} />
-                    <ColorPickerPopoverItem subtitle="Selected text" defaultColorSetting={giftSelectedText} colorWidth="100%" onColorChange={undefined} />
-                  </InlineGrid>
-                </BlockStack>
 
                 <Divider />
                 <BlockStack>
@@ -444,19 +429,11 @@ export function GeneralStylePanel({
 
                 <BlockStack>
                   <InlineGrid columns={2} gap="200">
-                    <SelectFont subtitle="Free gift" defaultFontSize="13" defaultFontLabel="styleBold" onSizeChange={undefined} onFontStytleChange={undefined} />
                     <SelectFont subtitle="Upsell" defaultFontSize={upsellSize} defaultFontLabel={upsellStyle} onSizeChange={upUpsellSizeChange} onFontStytleChange={upUpsellStyleChange} />
-                  </InlineGrid>
-                </BlockStack>
-
-                <Divider />
-
-                <BlockStack>
-                  <InlineGrid columns={2} gap="200">
                     <SelectFont subtitle="Unit label" defaultFontSize={unitLabelSize} defaultFontLabel={unitLabelStyle} onSizeChange={upUnitLabelSizeChange} onFontStytleChange={upUnitLabelStyleChange} />
                   </InlineGrid>
-
                 </BlockStack>
+
               </BlockStack>
             </BlockStack>
 

@@ -1,13 +1,27 @@
-import { BlockStack, Button, Card, Checkbox, Collapsible, Divider, Grid, InlineGrid, InlineStack, RangeSlider, Select, Text, TextField } from "@shopify/polaris";
-import { DeleteIcon, DiscountIcon, DomainNewIcon, GiftCardIcon, ProductAddIcon, SortAscendingIcon, ImageIcon, SortDescendingIcon } from '@shopify/polaris-icons';
-import { useCallback, useState, useEffect } from "react";
+import {
+  BlockStack,
+  Button,
+  Card,
+  Checkbox,
+  Collapsible,
+  Divider,
+  Grid,
+  InlineGrid,
+  InlineStack,
+  RangeSlider,
+  Select,
+  Text,
+  TextField,
+} from "@shopify/polaris";
+import { DeleteIcon, DiscountIcon, ProductAddIcon } from "@shopify/polaris-icons";
+import { useCallback, useEffect, useState } from "react";
+import { useLoaderData } from "@remix-run/react";
+
+import type { loader } from "../product/ProductList";
 import { PopUpover } from "../common/PopUpover";
 import { BoxUpSellItem } from "../common/BoxUpSellItem";
-import { GiftItem } from "../common/GiftItem";
 import { SwitchIcon } from "../common/SwitchIcon";
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
-import type { loader } from "../product/ProductList";
-import { useLoaderData } from "@remix-run/react";
 
 export function GeneralQuantityBreack({
   bundleId,
@@ -16,221 +30,185 @@ export function GeneralQuantityBreack({
   heading,
   open,
   onToggle,
-  upBundlesChooseTitleChange,
-  upBundlesChooseSubTitleChange,
-  upBunlesBarLabelTextChange,
-  upBundlesBadgeTextChange,
-  upBundlesBarUpsellTextChange,
-  upAddUpsellImageChange,
   onAddUpsell,
   onDeleteUpsell,
-  upAddUpsellPriceChange,
-  upPriceChange,
-  upBadgeSelectedChange,
-  upSelectedProductChange }:
-  {
-    bundleId: any,
-    id: any,
-    deleteSection: any
-    open: any,
-    onToggle: any,
-    heading: any,
-    upBundlesChooseTitleChange: any,
-    upBundlesChooseSubTitleChange: any,
-    upBundlesBadgeTextChange: any,
-    upBunlesBarLabelTextChange: any,
-    upBundlesBarUpsellTextChange: any,
-    upAddUpsellImageChange: any,
-    onAddUpsell: any,
-    onDeleteUpsell: any,
-    upSelectedProductChange: any,
-    upAddUpsellPriceChange: (id: string, price: string, defaultBasePrice?: string) => void,
-    upPriceChange?: (id: string, price: string, defaultBasePrice?: string) => void, upBadgeSelectedChange?: (value: string) => void
-  }) {
-
-  const loaderData = useLoaderData<typeof loader>();
-  const [showPriceDecimal, setShowPriceDecimal] = useState(false);
-  const [isShowLowAlert, setIsShowLowAlert] = useState(false);
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>((loaderData as any).barDefaultQuality);
-  // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [barDefaultPrice, setBarDefaultPrice] = useState((loaderData as any).barDefaultPrice);
-  const [upsellValue, setUpsellValue] = useState('20');
-  const [opacity, setOpacity] = useState<number>(20);
-  const [sizeValue, setSizeValue] = useState('13');
-  const [selected, setSelected] = useState("default");
-  const [badgeSelected, setBadgeSelected] = useState("simple");
-
-  const [title, setTitle] = useState((loaderData as any).barTitle || "");
-
-  const handleTitleChange = (v: string) => {
-    setTitle(v);
-    upBundlesChooseTitleChange(id, v);
-  };
-
-  const [subtitle, setSubtitle] = useState((loaderData as any).barSubTitle || "");
-
-  const handleSubtitleChange = (v: string) => {
-    setSubtitle(v);
-    upBundlesChooseSubTitleChange(id, v);
-  };
-  const [bagdeText, setBagdeText] = useState((loaderData as any).bagdeText || "");
-
-  const handleBadgeTextChange = (v: string) => {
-    setBagdeText(v);
-    upBundlesBadgeTextChange(id, v);
-  };
-  const [barLabelText, setBarLabelText] = useState((loaderData as any).barLabelText || "");
-
-  const handlesBarLabelTextChange = (v: string) => {
-    setBarLabelText(v);
-    upBunlesBarLabelTextChange(id, v);
-  };
-
-
-
-  const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
-  const [gifts, setGifts] = useState<Gifts[]>([]);
-
-  // { add upsellitem and delete}
-  const addBoxUpSell = () => {
-    const newId = Date.now();
-    const newUpsell = { id: newId };
-
-    setBoxUpSells(prev => [...prev, newUpsell]); // local child state if needed
-    onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
-  };
-
-  const deleteBoxUpsell = (bundleId: string | number, upsellId: any) => {
-    setBoxUpSells(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
-    onDeleteUpsell(bundleId, upsellId);
-  };
-
-  const addGift = () => {
-    setGifts(prev => [...prev, { id: Date.now() }])
+  onDataObjChange,
+  onDataAddUpsellChange,
+}) {
+  const GeneralQuantityBreakDB = {
+    showPriceDecimal: false,
+    isShowLowAlert: false,
+    opacity: 20,
+    sizeValue: 13,
+    selected: "default",
+    boxUpSells: [],
+    title: 'Single',
+    subtitle: 'standard price',
+    bagdeText: '',
+    barLabelText: '',
+    badgeSelected: 'simple',
+    barDefaultQualityalue: 1,
+    discountValue: 20,
   }
-  // const deleteGift = (id: any) => {
-  //   setGifts(prev => prev.filter(item => item.id !== id))
-  // }
-  const handleUpsellSelectChange = useCallback(
-    (value: string) => {
-      setSelected(value);
-    },
-    [],
-  );
-  const handleBadgeSelectChange = useCallback(
-    (value: string) => {
-      setBadgeSelected(value);
-      if (upBadgeSelectedChange) {
-        upBadgeSelectedChange(id, value);
-      }
-    },
-    [upBadgeSelectedChange, id],
-  );
 
-  // Calculate price based on the formula: barDefaultQualityalue * barDefaultPrice * (1 - upsellValue / 100)
+  const [showPriceDecimal, setShowPriceDecimal] = useState(GeneralQuantityBreakDB.showPriceDecimal);
+  const [isShowLowAlert, setIsShowLowAlert] = useState(GeneralQuantityBreakDB.isShowLowAlert);
+  const [opacity, setOpacity] = useState<number>(GeneralQuantityBreakDB.opacity);
+  const [sizeValue, setSizeValue] = useState(GeneralQuantityBreakDB.sizeValue);
+  const [selected, setSelected] = useState(GeneralQuantityBreakDB.selected);
+  const [boxUpSells, setBoxUpSells] = useState(GeneralQuantityBreakDB.boxUpSells);
+  // send parent component(choose.tsx) by onDataObjChange
+  const [title, setTitle] = useState(GeneralQuantityBreakDB.title);
+  const [subtitle, setSubtitle] = useState(GeneralQuantityBreakDB.subtitle);
+  const [bagdeText, setBagdeText] = useState(GeneralQuantityBreakDB.bagdeText);
+  const [barLabelText, setBarLabelText] = useState(GeneralQuantityBreakDB.barLabelText);
+  const [badgeSelected, setBadgeSelected] = useState(GeneralQuantityBreakDB.badgeSelected);
+  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState(GeneralQuantityBreakDB.barDefaultQualityalue);
+  const [discountValue, setDiscountValue] = useState(GeneralQuantityBreakDB.discountValue);
+
   useEffect(() => {
-    const quantity = barDefaultQualityalue;
-    const basePrice = parseFloat(barDefaultPrice || "0");
-    const discountPercent = parseFloat(upsellValue || "0");
+    const quantity = Number(barDefaultQualityalue ?? 1);
+    const basePrice = 702.45;
+    const discountPercent = Number(discountValue ?? 0);
 
-    let calc = 0;
     let base = quantity * basePrice;
+    let calc = base;
 
-    if (selected === 'discounted%') {
-      calc = quantity * basePrice * (1 - discountPercent / 100);
-    } else if (selected === 'discounted$') {
-      calc = quantity * basePrice - quantity * discountPercent;
-    } else if (selected === 'specific') {
-      calc = parseFloat(upsellValue || "0");
+    if (selected === "discounted%") {
+      const safeDiscount = isNaN(discountPercent) ? 0 : discountPercent;
+      calc = quantity * basePrice * (1 - safeDiscount / 100);
+    } else if (selected === "discounted$") {
+      const safeDiscount = isNaN(discountPercent) ? 0 : discountPercent;
+      calc = quantity * basePrice - quantity * safeDiscount;
+    } else if (selected === "specific") {
+      const specific = Number(discountValue);
+      calc = isNaN(specific) ? base : specific;
     } else {
       calc = quantity * basePrice;
     }
 
-    if (upPriceChange) {
-      upPriceChange(bundleId, calc.toFixed(2), base.toFixed(2));
-    }
+    if (isNaN(base)) base = 0;
+    if (isNaN(calc)) calc = 0;
+
+    const qbObjectData = () => ({
+      id,
+      title,
+      subtitle,
+      badgeSelected,
+      bagdeText,
+      barLabelText,
+      barDefaultQualityalue,
+      discountValue,
+      base: Number(base.toFixed(2)),
+      calc: Number(calc.toFixed(2)),
+    });
+
+    onDataObjChange?.(id, qbObjectData());
   }, [
+    id,
+    title,
+    subtitle,
+    badgeSelected,
+    bagdeText,
+    barLabelText,
     barDefaultQualityalue,
-    barDefaultPrice,
-    upsellValue,
+    discountValue,
     selected,
-    upPriceChange,
-    bundleId
+    onDataObjChange,
   ]);
 
+  const addBoxUpSell = () => {
+    const newId = Date.now();
+    const newUpsell = { id: newId };
 
-  const handleChange = useCallback(
-    (newValue: string) => {
-      setUpsellValue(newValue);
-    },
-    [],
-  );
+    setBoxUpSells((prev) => [...prev, newUpsell]); // local child state if needed
+    onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
+  };
 
-  const handleSizeChange = useCallback(
-    (newValue: string) => setSizeValue(newValue),
-    [],
-  );
+  const deleteBoxUpsell = (bundleIdValue: string | number, upsellId: any) => {
+    setBoxUpSells((prev) => prev.filter((item) => item.id !== upsellId));
+    onDeleteUpsell(bundleIdValue, upsellId);
+  };
+
+  const handleUpsellSelectChange = useCallback((value: string) => {
+    setSelected(value);
+  }, []);
+
+  const handleSizeChange = useCallback((newValue: string) => {
+    setSizeValue(newValue);
+  }, []);
+
+  const handleDiscountValueChange = useCallback((value: string) => {
+    const numeric = Number(value);
+    setDiscountValue(Number.isFinite(numeric) ? numeric : 0);
+  }, []);
 
   const upsellsOptions = [
-    { label: "Default", value: 'default' },
-    { label: "Discounted % (e.g, %25 off)", value: 'discounted%' },
-    { label: "Discounted $ (e.g, $10 off)", value: 'discounted$' },
-    { label: "Specific (e.g, $29)", value: 'specific' }
+    { label: "Default", value: "default" },
+    { label: "Discounted % (e.g, 25% off)", value: "discounted%" },
+    { label: "Discounted $ (e.g, $10 off)", value: "discounted$" },
+    { label: "Specific (e.g, $29)", value: "specific" },
   ];
 
   const badgeStyleOption = [
-    { label: "Simple", value: 'simple' },
-    { label: "Most Popular", value: 'mostpopular' },
-  ]
+    { label: "Simple", value: "simple" },
+    { label: "Most Popular", value: "mostpopular" },
+  ];
 
   const QuantityBackground = "#00FF00";
   const handleColorQuantityBackground = (newColor: string) => {
-    void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
+    void newColor; // placeholder for future state
   };
+
   const QuantityText = "#FF0000";
   const handleColorQuantityText = (newColor: string) => {
-    void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
+    void newColor; // placeholder for future state
   };
+
   return (
-    < Card >
+    <Card>
       <BlockStack gap="400">
         <InlineStack align="space-between">
           <Button
             onClick={onToggle}
-            disclosure={open ? 'up' : 'down'}
+            disclosure={open ? "up" : "down"}
             ariaControls="collapsible-settings"
             variant="plain"
             icon={DiscountIcon}
           >
             {heading}
           </Button>
+
           <InlineStack gap="100">
-            {/* <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
-            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" /> */}
-            <Button icon={DomainNewIcon} variant="tertiary" accessibilityLabel="Add theme" />
-            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(id)} />
+            {/* 
+            <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
+            <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" />
+            */}
+            <Button
+              icon={DeleteIcon}
+              variant="tertiary"
+              accessibilityLabel="Delete quantity break"
+              onClick={() => deleteSection(id)}
+            />
           </InlineStack>
         </InlineStack>
-        <Collapsible
-          open={open}
-          id="collapsible-settings"
-          expandOnPrint
-        >
 
+        <Collapsible open={open} id="collapsible-settings" expandOnPrint>
           <BlockStack gap="300">
-            {/* {Quanlity */}
+            {/* Quantity */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 4, sm: 2, md: 2 }}>
                 <BlockStack gap="150">
-                  <Text as="span">Quanlity</Text>
+                  <Text as="span">Quantity</Text>
                   <TextField
-                    label
+                    label=""
                     type="number"
-                    value={String(barDefaultQualityalue)}
+                    value={String(barDefaultQualityalue ?? "")}
                     onChange={(val) => {
                       const newValue = Number(val);
-                      setBarDefaultQualityalue(newValue);
+                      setBarDefaultQualityalue(
+                        Number.isFinite(newValue) ? newValue : 1,
+                      );
                     }}
                     autoComplete="off"
                     min={1}
@@ -238,14 +216,27 @@ export function GeneralQuantityBreack({
                   />
                 </BlockStack>
               </Grid.Cell>
+
               <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 5 }}>
-                <PopUpover title='Title' defaultPopText={title} upPopTextChange={handleTitleChange} badgeSelected={""} />
+                <PopUpover
+                  title="Title"
+                  defaultPopText={title}
+                  upPopTextChange={setTitle}
+                  badgeSelected=""
+                />
               </Grid.Cell>
+
               <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 5 }}>
-                <PopUpover title='Subitle' defaultPopText={subtitle} upPopTextChange={handleSubtitleChange} badgeSelected={""} />
+                <PopUpover
+                  title="Subtitle"
+                  defaultPopText={subtitle}
+                  upPopTextChange={setSubtitle}
+                  badgeSelected=""
+                />
               </Grid.Cell>
             </Grid>
-            {/* {Price} */}
+
+            {/* Price */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
                 <Select
@@ -255,25 +246,27 @@ export function GeneralQuantityBreack({
                   value={selected}
                 />
               </Grid.Cell>
+
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 5 }}>
-                {selected === 'discounted%' && (
+                {selected === "discounted%" && (
                   <TextField
                     label="Discount per item"
                     type="number"
-                    value={upsellValue}
-                    onChange={handleChange}
+                    value={String(discountValue)}
+                    onChange={handleDiscountValueChange}
                     autoComplete="off"
                     min={1}
                     max={100}
                     suffix="%"
                   />
                 )}
-                {selected === 'discounted$' && (
+
+                {selected === "discounted$" && (
                   <TextField
                     label="Discount per item"
                     type="number"
-                    value={upsellValue}
-                    onChange={handleChange}
+                    value={String(discountValue)}
+                    onChange={handleDiscountValueChange}
                     autoComplete="off"
                     min={1}
                     max={100}
@@ -281,12 +274,13 @@ export function GeneralQuantityBreack({
                     prefix="$"
                   />
                 )}
-                {selected === 'specific' && (
+
+                {selected === "specific" && (
                   <TextField
                     label="Total price"
                     type="number"
-                    value={upsellValue}
-                    onChange={handleChange}
+                    value={String(discountValue)}
+                    onChange={handleDiscountValueChange}
                     autoComplete="off"
                     min={1}
                     max={100}
@@ -296,30 +290,42 @@ export function GeneralQuantityBreack({
                 )}
               </Grid.Cell>
             </Grid>
-            {/* {Badge text} */}
+
+            {/* Badge text */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
-                <PopUpover title='Badge text' defaultPopText={bagdeText} upPopTextChange={handleBadgeTextChange} badgeSelected={badgeSelected} />
+                <PopUpover
+                  title="Badge text"
+                  defaultPopText={bagdeText}
+                  upPopTextChange={setBagdeText}
+                  badgeSelected={badgeSelected}
+                />
               </Grid.Cell>
+
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 5 }}>
-                <BlockStack gap='200'>
-                  <Text as='span'>
-                    Badge style
-                  </Text>
+                <BlockStack gap="200">
+                  <Text as="span">Badge style</Text>
                   <Select
                     label=""
                     options={badgeStyleOption}
-                    onChange={handleBadgeSelectChange}
+                    onChange={setBadgeSelected}
                     value={badgeSelected}
                   />
                 </BlockStack>
               </Grid.Cell>
             </Grid>
-            {/* {Label} */}
+
+            {/* Label */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
-                <PopUpover title='Label' defaultPopText='' upPopTextChange={handlesBarLabelTextChange} badgeSelected={barLabelText} />
+                <PopUpover
+                  title="Label"
+                  defaultPopText=""
+                  upPopTextChange={setBarLabelText}
+                  badgeSelected={barLabelText}
+                />
               </Grid.Cell>
+
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
                 <Checkbox
                   label="Selected by default"
@@ -328,39 +334,29 @@ export function GeneralQuantityBreack({
                 />
               </Grid.Cell>
             </Grid>
-            {/* {three button} */}
+
+            {/* Upsell section */}
             <BlockStack gap="300">
-              <InlineGrid columns={3} gap='200'>
-                <Button icon={ImageIcon} >Add theme</Button>
-                <Button onClick={addBoxUpSell} icon={ProductAddIcon}>Add upsell</Button>
-                <Button onClick={addGift} icon={GiftCardIcon} >Add theme</Button>
-              </InlineGrid>
+              <Button fullWidth onClick={addBoxUpSell} icon={ProductAddIcon}>
+                Add upsell
+              </Button>
+
               <BlockStack gap="300">
-                {/* {Add upsell} */}
-                {boxUpSells.map((item) => (
+                {boxUpSells.map((upsellItem) => (
                   <BoxUpSellItem
-                    key={item.id}
-                    id={item.id}
-                    bundleId={bundleId} // important
-                    upBundlesBarUpsellTextChange={upBundlesBarUpsellTextChange}
-                    upAddUpsellPriceChange={upAddUpsellPriceChange}
-                    upSelectedProductChange={upSelectedProductChange}
-                    upAddUpsellImageChange={upAddUpsellImageChange}
-                    deleteSection={deleteBoxUpsell} // calls parent's delete with bundleId + upsellId
+                    key={upsellItem.id}
+                    id={upsellItem.id}
+                    bundleId={bundleId}
+                    deleteSection={deleteBoxUpsell}
+                    onDataAddUpsellChange={onDataAddUpsellChange}
                   />
                 ))}
-              </BlockStack>
-              <BlockStack gap="300">
-                {/* {Add upsell}
-                {gifts.map((item) => (
-                  <GiftItem key={item.id} id={item.id} deleteSection={deleteGift} />
-                ))} */}
               </BlockStack>
             </BlockStack>
 
             <Divider />
 
-            {/* {Show as Sold out} */}
+            {/* Show as Sold out */}
             <BlockStack gap="300">
               <InlineStack align="space-between">
                 <Text as="span" variant="bodyMd" fontWeight="semibold">
@@ -368,40 +364,54 @@ export function GeneralQuantityBreack({
                 </Text>
                 <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
               </InlineStack>
+
               {isShowLowAlert && (
                 <BlockStack gap="300">
-                  <PopUpover title='Label title' defaultPopText='Sold out' upPopTextChange={undefined} badgeSelected={""} />
+                  <PopUpover
+                    title="Label title"
+                    defaultPopText="Sold out"
+                    upPopTextChange={undefined}
+                    badgeSelected=""
+                  />
+
                   <Grid>
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <BlockStack>
-                        <Text as='span'>
-                          Opacity
-
-                        </Text>
+                        <Text as="span">Opacity</Text>
                         <RangeSlider
                           value={opacity}
                           onChange={(v: number) => setOpacity(v)}
                           min={0}
                           max={100}
                           output
-                          label
+                          label=""
                         />
                       </BlockStack>
                     </Grid.Cell>
 
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
-                      <ColorPickerPopoverItem subtitle='Background' defaultColorSetting={QuantityBackground} colorWidth="100%" onColorChange={handleColorQuantityBackground} />
+                      <ColorPickerPopoverItem
+                        subtitle="Background"
+                        defaultColorSetting={QuantityBackground}
+                        colorWidth="100%"
+                        onColorChange={handleColorQuantityBackground}
+                      />
                     </Grid.Cell>
+
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
-                      <ColorPickerPopoverItem subtitle='Text' defaultColorSetting={QuantityText} colorWidth="100%" onColorChange={handleColorQuantityText} />
+                      <ColorPickerPopoverItem
+                        subtitle="Text"
+                        defaultColorSetting={QuantityText}
+                        colorWidth="100%"
+                        onColorChange={handleColorQuantityText}
+                      />
                     </Grid.Cell>
+
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <BlockStack>
-                        <Text as="span">
-                          Size
-                        </Text>
+                        <Text as="span">Size</Text>
                         <TextField
-                          label
+                          label=""
                           type="number"
                           value={sizeValue}
                           onChange={handleSizeChange}
@@ -418,8 +428,7 @@ export function GeneralQuantityBreack({
             </BlockStack>
           </BlockStack>
         </Collapsible>
-      </BlockStack >
-    </Card >
-  )
+      </BlockStack>
+    </Card>
+  );
 }
-
