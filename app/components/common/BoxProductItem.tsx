@@ -5,18 +5,19 @@ import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
 import { SelectVariantModal } from "./SelectVariantModal";
 import { SelectProductModal } from "./SelectProductModal";
-export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo, upAddProductItemPriceChange, }: { selectproductInfo: any, bundleId: any, id: any, upAddProductItemPriceChange: any, upBundlesBarUpsellTextChange: any, deleteSection: (id: any) => void }) {
+export function BoxProductItem({
+  bundleId,
+  id,
+  deleteSection,
+  selectproductInfo,
+  onDataAddProductItemChange
+}) {
 
-  const { loaderData } = useLoaderData<typeof loader>();
-  const [productQuantiyValue, setProductQuantiyValue] = useState('1');
   const [selected, setSelected] = useState("default");
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [productItemValue, setProductItemValue] = useState("20");
-  const [barAddUpsellDefaultPrice, setBarAddUpsellDefaultPrice] = useState(
-    selectproductInfo[1].price
-  );
   const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>(1);
-
+  const barAddUpsellDefaultPrice = selectproductInfo[1].price;
   useEffect(() => {
     if (!selectproductInfo) return;
     const quantity = barDefaultQualityalue;
@@ -37,29 +38,27 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
 
     if (calculated < 0) calculated = 0;
     // IMPORTANT → Add upsell.id here
-    if (upAddProductItemPriceChange) {
-      upAddProductItemPriceChange(
-        bundleId,
-        id,
-        calculated,
-        base
+    if (onDataAddProductItemChange) {
+      onDataAddProductItemChange(id, bundleId, {
+        selected,
+        barDefaultQualityalue,
+        barAddUpsellDefaultPrice,
+        selectedProduct,
+        calc: Number(calculated.toFixed(2)),
+        base: Number(basePrice.toFixed(2)),
+      }
       );
     }
-  }, [barDefaultQualityalue, barAddUpsellDefaultPrice, productItemValue, selected, upAddProductItemPriceChange]);
+  }, [
+    id,
+    bundleId,
+    selected,
+    productItemValue,
+    selectedProduct,
+    onDataAddProductItemChange,
+  ]);
 
-  const handleChange = useCallback(
-    (newValue: string) => {
-      setProductItemValue(newValue);
-    },
-    [],
-  );
-  const handleUpsellSelectChange = useCallback(
-    (value: string) => setSelected(value),
-    [],
-  );
-  const handleReceiveProduct = (value) => {
-    setSelectedProduct(value);
-  };
+
   const upsellsOptions = [
     { label: "Default", value: 'default' },
     { label: "Discounted % (e.g, %20 off)", value: 'discounted%' },
@@ -104,7 +103,7 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
       {/* {change pre-selectd variant} */}
       <SelectProductModal
         productArray={selectproductInfo}
-        onSelect={handleReceiveProduct}
+        onSelect={setSelectedProduct}
         title="Add variant"
         selectionMode="singleVariant"
         buttonText="Select pre-selected variant"
@@ -114,7 +113,7 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
         <Select
           label="Price"
           options={upsellsOptions}
-          onChange={handleUpsellSelectChange}
+          onChange={setSelected}
           value={selected}
         />
         {selected === 'discounted%' && (
@@ -122,7 +121,7 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
             label="Discount per item"
             type="number"
             value={productItemValue}
-            onChange={handleChange}
+            onChange={setProductItemValue}
             autoComplete="off"
             min={1}
             max={100}
@@ -134,7 +133,7 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
             label="Discount per item"
             type="number"
             value={productItemValue}
-            onChange={handleChange}
+            onChange={setProductItemValue}
             autoComplete="off"
             min={1}
             max={100}
@@ -147,7 +146,7 @@ export function BoxProductItem({ bundleId, id, deleteSection, selectproductInfo,
             label="Total price"
             type="number"
             value={productItemValue}
-            onChange={handleChange}
+            onChange={setProductItemValue}
             autoComplete="off"
             min={1}
             max={100}

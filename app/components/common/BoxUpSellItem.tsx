@@ -1,51 +1,77 @@
-import { Banner, BlockStack, Box, Button, Checkbox, InlineGrid, InlineStack, RadioButton, Select, Text, TextField, Thumbnail } from "@shopify/polaris";
+import {
+  Banner,
+  BlockStack,
+  Box,
+  Button,
+  Checkbox,
+  InlineGrid,
+  InlineStack,
+  RadioButton,
+  Select,
+  Text,
+  TextField,
+  Thumbnail,
+} from "@shopify/polaris";
 import { useCallback, useEffect, useState } from "react";
-import { PopUpover } from "./PopUpover";
-import { ImageLoad } from "./ImageLoad";
 import { useLoaderData } from "@remix-run/react";
+import { DeleteIcon } from "@shopify/polaris-icons";
+
 import type { loader } from "../product/ProductList";
+import { PopUpover } from "./PopUpover";
 import { SelectProductModal } from "./SelectProductModal";
 import { DeleteIcon } from '@shopify/polaris-icons';
-export function BoxUpSellItem({
-  bundleId,
-  id,
-  deleteSection,
-  upBundlesBarUpsellTextChange,
-  upAddUpsellPriceChange,
-  upSelectedProductChange,
-  upAddUpsellImageChange
-}: {
-  bundleId: any,
-  id: any,
-  upAddUpsellPriceChange: any,
-  upAddUpsellImageChange: any,
-  upBundlesBarUpsellTextChange: any,
-  deleteSection: any,
-  upSelectedProductChange: any
-}) {
+export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, upSelectedProductChange, upAddUpsellImageChange }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upAddUpsellImageChange: any, upBundlesBarUpsellTextChange: any, deleteSection: any, upSelectedProductChange: any }) {
 
   const loaderData = useLoaderData<typeof loader>();
-  const [selected, setSelected] = useState("default");
-  const [imageSizeValue, setImageSizeValue] = useState<any>(50);
-  const [visibility, setVisibility] = useState("upsellSelectedproduct");
-  const [isSelectedDefault, setIsSelectedDefault] = useState(true);
-  const [isVisibleSelected, setIsVisibleSelected] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-  const productArray = loaderData?.products?.map((product: any) => ({
-    title: product.title,
-    imageUrl: product.imageUrl,
-    id: product.id,
-    variants: product.variants
-  }));
+  const BoxUpsellDB = {
+    selected: 'default',
+    imageSizeValue: 40,
+    visibility: 'upsellSelectedproduct',
+    isSelectedDefault: true,
+    isVisibleSelected: false,
+    selectedProduct: null,
+    barUpsellText: '+ Add at 20% discount',
+    upsellProductQuantitValue: 1,
+    upsellValue: 20,
+  }
 
-  const [upsellValue, setUpsellValue] = useState("20");
-  const barAddUpsellDefaultPrice = selectedProduct?.[1]?.price;
+  const [selected, setSelected] = useState(BoxUpsellDB.selected);
+  const [imageSizeValue, setImageSizeValue] = useState(BoxUpsellDB.imageSizeValue);
+  const [visibility, setVisibility] = useState(BoxUpsellDB.visibility);
+  const [isSelectedDefault, setIsSelectedDefault] = useState(BoxUpsellDB.isSelectedDefault);
+  const [isVisibleSelected, setIsVisibleSelected] = useState(BoxUpsellDB.isVisibleSelected);
+  const [selectedProduct, setSelectedProduct] = useState(BoxUpsellDB.selectedProduct);
+  const [barUpsellText, setBarUpsellText] = useState(BoxUpsellDB.barUpsellText);
+  const [upsellProductQuantitValue, setUpsellProductQuantitValue] = useState(BoxUpsellDB.upsellProductQuantitValue);
+  const [upsellValue, setUpsellValue] = useState(BoxUpsellDB.upsellValue);
+
+  const productArray =
+    loaderData?.products?.map((product: any) => ({
+      title: product.title,
+      imageUrl: product.imageUrl,
+      id: product.id,
+      variants: product.variants,
+    })) ?? [];
+
+  // price of first variant of the selected product
+  const barAddUpsellDefaultPrice =
+    selectedProduct?.[0]?.variants?.[0]?.price ??
+    selectedProduct?.variants?.[0]?.price ??
+    undefined;
+
   useEffect(() => {
-    const base = Number(barAddUpsellDefaultPrice) || 10;
-    const quantity = Number(upsellProductQuantitValue);
-    const basePrice = base * quantity;
-    const value = Number(upsellValue) || 0;
+    const basePerUnitRaw = Number(barAddUpsellDefaultPrice);
+    const basePerUnit = Number.isFinite(basePerUnitRaw) ? basePerUnitRaw : 10;
+
+    const quantityRaw = Number(upsellProductQuantitValue);
+    const quantity = Number.isFinite(quantityRaw) && quantityRaw > 0 ? quantityRaw : 1;
+
+    const valueRaw = Number(upsellValue);
+    const value = Number.isFinite(valueRaw) ? valueRaw : 0;
+
+    let basePrice = basePerUnit * quantity;
+    if (!Number.isFinite(basePrice)) basePrice = 0;
 
     let calculated = basePrice;
 
@@ -68,14 +94,7 @@ export function BoxUpSellItem({
         basePrice.toFixed(2)
       );
     }
-  }, [
-    barAddUpsellDefaultPrice,
-    upsellValue,
-    selected,
-    upAddUpsellPriceChange,
-    bundleId,
-    id
-  ]);
+  }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange, bundleId, id]);
 
 
   const handleChange = useCallback(
@@ -106,17 +125,39 @@ export function BoxUpSellItem({
     upSelectedProductChange(bundleId, id, value); // get products array from product modal
   };
   const handleRemoveProduct = () => {
-    setSelectedProduct(null)
-  }
+    setSelectedProduct(null);
+  };
+
+  const handleImageSizeChange = useCallback((value: string) => {
+    setImageSizeValue(value);
+  }, []);
+
+  const handleQuantityChange = useCallback((value: string) => {
+    setUpsellProductQuantitValue(value);
+  }, []);
+
+  const handleUpsellValueChange = useCallback((value: string) => {
+    setUpsellValue(value);
+  }, []);
 
   const upsellsOptions = [
-    { label: "Default", value: 'default' },
-    { label: "Discounted % (e.g, %20 off)", value: 'discounted%' },
-    { label: "Discounted $ (e.g, $10 off)", value: 'discounted$' },
-    { label: "Specific (e.g, $29)", value: 'specific' }
+    { label: "Default", value: "default" },
+    { label: "Discounted % (e.g, 20% off)", value: "discounted%" },
+    { label: "Discounted $ (e.g, $10 off)", value: "discounted$" },
+    { label: "Specific (e.g, $29)", value: "specific" },
   ];
+
   return (
-    <div style={{ borderRadius: "10px", border: '1px solid lightgrey', padding: '15px', gap: "10px", display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        borderRadius: "10px",
+        border: "1px solid lightgrey",
+        padding: "15px",
+        gap: "10px",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <InlineStack align="space-between">
         <Text as="span" variant="bodyMd" fontWeight="semibold">
           Upsell
@@ -124,16 +165,16 @@ export function BoxUpSellItem({
         <Button
           variant="plain"
           textAlign="left"
-          onClick={() => deleteSection(bundleId, id)} // pass both
+          onClick={() => deleteSection(bundleId, id)}
         >
           Remove upsell
         </Button>
       </InlineStack>
 
-      {/* { select product} */}
+      {/* Select product */}
       <BlockStack gap="100">
         <RadioButton
-          label="Selected Product"
+          label="Selected product"
           checked={visibility === "upsellSelectedproduct"}
           id="upsellSelectedproduct"
           onChange={() => setVisibility("upsellSelectedproduct")}
@@ -144,69 +185,79 @@ export function BoxUpSellItem({
           id="complementaryproduct"
           onChange={() => setVisibility("complementaryproduct")}
         />
+
         {visibility === "upsellSelectedproduct" && (
           <>
             {!selectedProduct && (
-              <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select a product" selectionMode="nestedProduct" buttonText='Select a product' />
+              <SelectProductModal
+                productArray={productArray}
+                onSelect={setSelectedProduct}
+                title="Select a product"
+                selectionMode="nestedProduct"
+                buttonText="Select a product"
+              />
             )}
+
             {selectedProduct && (
               <InlineGrid columns={2}>
                 <InlineStack gap="200" align="start" blockAlign="center">
                   <Thumbnail
-                    source={selectedProduct[0].imageUrl}
-                    alt="Black choker necklace"
+                    source={selectedProduct?.[0]?.imageUrl}
+                    alt={selectedProduct?.[0]?.title ?? "Selected product"}
                   />
-                  <Text as='h5' fontWeight="bold">{selectedProduct[0].title}</Text>
+                  <Text as="h5" fontWeight="bold">
+                    {selectedProduct?.[0]?.title ?? ""}
+                  </Text>
                 </InlineStack>
+
                 <InlineStack gap="200" align="end" blockAlign="center">
                   <Box width="60px">
                     <TextField
-                      label
+                      label=""
                       type="number"
                       min={0}
                       max={100}
                       value={upsellProductQuantitValue}
-                      onChange={setUpsellProductQuantitValue}
-                      autoComplete="off" />
+                      onChange={handleQuantityChange}
+                      autoComplete="off"
+                    />
                   </Box>
                   <Button icon={DeleteIcon} onClick={handleRemoveProduct} />
                 </InlineStack>
               </InlineGrid>
             )}
           </>
-        )
-        }
-        {
-          visibility === "complementaryproduct" && (
-            <BlockStack gap="200">
-              <Banner
-                tone="info"
-              >
-                <BlockStack gap="200">
-                  <span>Set complementary products in Shopify Search & Discovery app.</span>
-                  <InlineGrid columns={2}>
-                    <Button>Open Search && Discovery</Button>
-                  </InlineGrid>
-                </BlockStack>
-              </Banner>
-            </BlockStack>
+        )}
 
-          )
-        }
+        {visibility === "complementaryproduct" && (
+          <BlockStack gap="200">
+            <Banner tone="info">
+              <BlockStack gap="200">
+                <span>
+                  Set complementary products in the Shopify Search &amp; Discovery app.
+                </span>
+                <InlineGrid columns={2}>
+                  <Button>Open Search &amp; Discovery</Button>
+                </InlineGrid>
+              </BlockStack>
+            </Banner>
+          </BlockStack>
+        )}
 
-        {
-          visibility === "specific" && (
-            <Button variant="primary" fullWidth>Select products</Button>
-          )
-        }
+        {visibility === "specific" && (
+          <Button variant="primary" fullWidth>
+            Select products
+          </Button>
+        )}
 
-        {
-          visibility === "collections" && (
-            <Button variant="primary" fullWidth>Select collections</Button>
-          )
-        }
+        {visibility === "collections" && (
+          <Button variant="primary" fullWidth>
+            Select collections
+          </Button>
+        )}
       </BlockStack>
-      {/* { price and title and subtitle} */}
+
+      {/* Price + type */}
       <InlineGrid columns={2} gap="200">
         <Select
           label="Price"
@@ -214,24 +265,26 @@ export function BoxUpSellItem({
           onChange={handleUpsellSelectChange}
           value={selected}
         />
-        {selected === 'discounted%' && (
+
+        {selected === "discounted%" && (
           <TextField
             label="Discount per item"
             type="number"
             value={upsellValue}
-            onChange={handleChange}
+            onChange={handleUpsellValueChange}
             autoComplete="off"
             min={1}
             max={100}
             suffix="%"
           />
         )}
-        {selected === 'discounted$' && (
+
+        {selected === "discounted$" && (
           <TextField
             label="Discount per item"
             type="number"
             value={upsellValue}
-            onChange={handleChange}
+            onChange={handleUpsellValueChange}
             autoComplete="off"
             min={1}
             max={100}
@@ -239,12 +292,13 @@ export function BoxUpSellItem({
             prefix="$"
           />
         )}
-        {selected === 'specific' && (
+
+        {selected === "specific" && (
           <TextField
             label="Total price"
             type="number"
             value={upsellValue}
-            onChange={handleChange}
+            onChange={handleUpsellValueChange}
             autoComplete="off"
             min={1}
             max={100}
@@ -253,25 +307,29 @@ export function BoxUpSellItem({
           />
         )}
       </InlineGrid>
-      {/* {Text} */}
-      <PopUpover title='Text' defaultPopText={barUpsellText} upPopTextChange={handlesBarUpsellTextChange} badgeSelected={""} dataArray={undefined} />
 
-      {/* {Imageload and image size} */}
-      <InlineGrid columns={2}>
-        <ImageLoad />
-        <TextField
-          label="Image size"
-          type="number"
-          value={imageSizeValue}
-          onChange={handleImageSizeChange}
-          autoComplete="off"
-          min={1}
-          max={70}
-          suffix="px"
-        />
-      </InlineGrid>
+      {/* Text */}
+      <PopUpover
+        title="Text"
+        defaultPopText={barUpsellText}
+        upPopTextChange={setBarUpsellText}
+        badgeSelected=""
+        dataArray={undefined}
+      />
 
-      {/* {checkbox} */}
+      {/* Image size */}
+      <TextField
+        label="Image size"
+        type="number"
+        value={imageSizeValue}
+        onChange={handleImageSizeChange}
+        autoComplete="off"
+        min={1}
+        max={70}
+        suffix="px"
+      />
+
+      {/* Checkboxes */}
       <InlineStack gap="200">
         <Checkbox
           label="Selected by default"
@@ -285,6 +343,5 @@ export function BoxUpSellItem({
         />
       </InlineStack>
     </div>
-
-  )
+  );
 }

@@ -5,7 +5,7 @@
 
 <script  src="{{ 'cartdrawer-bundle.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
 <script  src="{{ 'cartdrawer-bundle-countdown.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
-<script>
+{% comment %} <script>
 fetch('/apps/cart-drawer-settings', {
   method: 'POST',
   headers: {
@@ -14,6 +14,7 @@ fetch('/apps/cart-drawer-settings', {
 })
   .then(response => {return response.json();})
   .then(products => {
+  console.log('products==>', products);
   products.map((product) => {
     if(product.id === "gid://shopify/Product/7769186762830") {
       document.querySelector('.xcart-bundle-subtitle').textContent = product.title;
@@ -32,7 +33,7 @@ fetch('/apps/cart-drawer-settings', {
   .catch(error => {
     console.error('Fetch error:', error);
   });
-</script>
+</script> {% endcomment %}
 
 <div id="xcart-overlay" class="xcart-overlay" aria-hidden="true" hidden>
 </div>

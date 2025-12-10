@@ -393,7 +393,6 @@
 }
 .main_bundles-products--container {
   display: flex;
-  border: 1px solid;
   margin: 10px 20px;
   flex-flow: wrap;
 }
