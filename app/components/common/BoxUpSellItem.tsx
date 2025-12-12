@@ -19,9 +19,24 @@ import { DeleteIcon } from "@shopify/polaris-icons";
 import type { loader } from "../product/ProductList";
 import { PopUpover } from "./PopUpover";
 import { SelectProductModal } from "./SelectProductModal";
-import { DeleteIcon } from '@shopify/polaris-icons';
-export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellTextChange, upAddUpsellPriceChange, upSelectedProductChange, upAddUpsellImageChange }: { bundleId: any, id: any, upAddUpsellPriceChange: any, upAddUpsellImageChange: any, upBundlesBarUpsellTextChange: any, deleteSection: any, upSelectedProductChange: any }) {
 
+interface BoxUpSellItemProps {
+  id: number | string;
+  bundleId: number | string;
+  deleteSection: (bundleId: number | string, upsellId: number | string) => void;
+  onDataAddUpsellChange?: (
+    id: number | string,
+    bundleId: number | string,
+    data: any,
+  ) => void;
+}
+
+export function BoxUpSellItem({
+  id,
+  bundleId,
+  deleteSection,
+  onDataAddUpsellChange,
+}: BoxUpSellItemProps) {
   const loaderData = useLoaderData<typeof loader>();
 
   const BoxUpsellDB = {
@@ -83,47 +98,39 @@ export function BoxUpSellItem({ bundleId, id, deleteSection, upBundlesBarUpsellT
       calculated = value * quantity;
     }
 
-    if (calculated < 0) calculated = 0;
-
-    // IMPORTANT → Add upsell.id here
-    if (upAddUpsellPriceChange) {
-      upAddUpsellPriceChange(
-        bundleId,
-        id,
-        calculated.toFixed(2),
-        basePrice.toFixed(2)
-      );
+    if (!Number.isFinite(calculated) || calculated < 0) {
+      calculated = 0;
     }
-  }, [barAddUpsellDefaultPrice, upsellValue, selected, upAddUpsellPriceChange, bundleId, id]);
 
+    onDataAddUpsellChange?.(id, bundleId, {
+      barUpsellText,
+      selectedProduct,
+      isVisibleSelected,
+      imageSizeValue: Number(imageSizeValue) || 0,
+      selected,
+      visibility,
+      calc: Number(calculated.toFixed(2)),
+      base: Number(basePrice.toFixed(2)),
+    });
+  }, [
+    id,
+    bundleId,
+    barUpsellText,
+    selectedProduct,
+    isVisibleSelected,
+    imageSizeValue,
+    selected,
+    visibility,
+    barAddUpsellDefaultPrice,
+    upsellValue,
+    upsellProductQuantitValue,
+    onDataAddUpsellChange,
+  ]);
 
-  const handleChange = useCallback(
-    (newValue: string) => {
-      setUpsellValue(newValue);
-    },
-    [],
-  );
-  const handleImageSizeChange = (v: any) => {
-    setImageSizeValue(v);
-    upAddUpsellImageChange(bundleId, id, v);
-  }
+  const handleUpsellSelectChange = useCallback((value: string) => {
+    setSelected(value as any);
+  }, []);
 
-  const handleUpsellSelectChange = useCallback(
-    (value: string) => setSelected(value),
-    [],
-  );
-
-  const [barUpsellText, setBarUpsellText] = useState('+ Add at 20% discount');
-  const [upsellProductQuantitValue, setUpsellProductQuantitValue] = useState<any>(1);
-
-  const handlesBarUpsellTextChange = (v: string) => {
-    setBarUpsellText(v);
-    upBundlesBarUpsellTextChange(bundleId, id, v);
-  };
-  const handleReceiveProduct = (value: string) => {
-    setSelectedProduct(value);
-    upSelectedProductChange(bundleId, id, value); // get products array from product modal
-  };
   const handleRemoveProduct = () => {
     setSelectedProduct(null);
   };

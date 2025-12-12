@@ -5,35 +5,9 @@
 
 <script  src="{{ 'cartdrawer-bundle.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
 <script  src="{{ 'cartdrawer-bundle-countdown.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
-{% comment %} <script>
-fetch('/apps/cart-drawer-settings', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
-  .then(response => {return response.json();})
-  .then(products => {
-  console.log('products==>', products);
-  products.map((product) => {
-    if(product.id === "gid://shopify/Product/7769186762830") {
-      document.querySelector('.xcart-bundle-subtitle').textContent = product.title;
-      document.querySelector('.xcart-bundle-discounted-price').textContent = `$${product.price}`;
-      document.querySelector('.xcart-bundle-full-price').textContent = `$${product.compareAtPrice}`;
-    }
-    if(product.id === "gid://shopify/Product/7769222676558") {
-      document.querySelector('.xcart-add-upsell-discounted-price').textContent = `$${product.price}`;
-      document.querySelector('.xcart-add-upsell-full-price').textContent = `$${product.compareAtPrice}`;
-      document.querySelector('.xcart-add-upsell-product--img').innerHTML =  `
-        <img src="${product.imageUrl}" alt="${product.title || ''}">
-      `;
-    }
-  })
-  })
-  .catch(error => {
-    console.error('Fetch error:', error);
-  });
-</script> {% endcomment %}
+<script>
+
+</script>
 
 <div id="xcart-overlay" class="xcart-overlay" aria-hidden="true" hidden>
 </div>
@@ -71,6 +45,8 @@ fetch('/apps/cart-drawer-settings', {
       </span>
     </div>
 
+    
+
   <section class="xcart-drawer__body">
     <div class="xcart-line-items-with-bundle">
       <div id="xcart-line-items" class="xcart-line-items" role="list"></div>
@@ -101,10 +77,10 @@ fetch('/apps/cart-drawer-settings', {
     {%- comment -%}
       If you really need a second bundle block, give it a different ID.
     {%- endcomment -%}
-    <div id="xcart-bundle-app-secondary" class="xcart-bundle">
+    {% comment %} <div id="xcart-bundle-app-secondary" class="xcart-bundle">
       <h3 class="xcart-bundle__title">Special bundle offers</h3>
       <div class="xcart-bundle__content"><!-- Mount your app here --></div>
-    </div>
+    </div> {% endcomment %}
   </section>
 </aside>
 
