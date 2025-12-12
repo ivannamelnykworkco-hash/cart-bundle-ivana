@@ -16,132 +16,196 @@ import {
 import { DeleteIcon, DiscountIcon, ProductAddIcon } from "@shopify/polaris-icons";
 import { useCallback, useEffect, useState } from "react";
 import { useLoaderData } from "@remix-run/react";
-
 import type { loader } from "../product/ProductList";
 import { PopUpover } from "../common/PopUpover";
 import { BoxUpSellItem } from "../common/BoxUpSellItem";
 import { SwitchIcon } from "../common/SwitchIcon";
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
+import type { QuantityBreak, } from "../../models/types";
+
+export function createNewQuantityBreak(): QuantityBreak {
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    quantity: 1,//quantity
+    title: 'Single', //title
+    subtitle: 'standard price', //subtitle
+    selectPrice: "default", //selectPrice
+    discountPrice: 20,//discountprice
+    badgeText: '',//badgetext
+    badgeStyle: 'simple',//badgestyle
+    isSelectedByDefault: false,//isSelectedByDefault
+    isShowAsSoldOut: false,//isShowAsSoldOut
+    labelText: '',//labelText
+    labelTitle: "",//labeltitle
+    opacity: 20,//opacity
+    bgColor: "#ffffff",
+    textColor: "#000000",
+    labelSize: 13, //labelSize
+  }
+}
 
 export function GeneralQuantityBreack({
-  bundleId,
+  barId,
   id,
   deleteSection,
   heading,
   open,
+  itemData,
   onToggle,
   onAddUpsell,
   onDeleteUpsell,
   onDataObjChange,
-  onDataAddUpsellChange,
+  // onDataAddUpsellChange,
 }) {
-  const GeneralQuantityBreakDB = {
-    showPriceDecimal: false,
-    isShowLowAlert: false,
-    opacity: 20,
-    sizeValue: 13,
-    selected: "default",
-    boxUpSells: [],
-    title: 'Single',
-    subtitle: 'standard price',
-    bagdeText: '',
-    barLabelText: '',
-    badgeSelected: 'simple',
-    barDefaultQualityalue: 1,
-    discountValue: 20,
-  }
 
-  const [showPriceDecimal, setShowPriceDecimal] = useState(GeneralQuantityBreakDB.showPriceDecimal);
-  const [isShowLowAlert, setIsShowLowAlert] = useState(GeneralQuantityBreakDB.isShowLowAlert);
-  const [opacity, setOpacity] = useState<number>(GeneralQuantityBreakDB.opacity);
-  const [sizeValue, setSizeValue] = useState(GeneralQuantityBreakDB.sizeValue);
-  const [selected, setSelected] = useState(GeneralQuantityBreakDB.selected);
-  const [boxUpSells, setBoxUpSells] = useState(GeneralQuantityBreakDB.boxUpSells);
-  // send parent component(choose.tsx) by onDataObjChange
-  const [title, setTitle] = useState(GeneralQuantityBreakDB.title);
-  const [subtitle, setSubtitle] = useState(GeneralQuantityBreakDB.subtitle);
-  const [bagdeText, setBagdeText] = useState(GeneralQuantityBreakDB.bagdeText);
-  const [barLabelText, setBarLabelText] = useState(GeneralQuantityBreakDB.barLabelText);
-  const [badgeSelected, setBadgeSelected] = useState(GeneralQuantityBreakDB.badgeSelected);
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState(GeneralQuantityBreakDB.barDefaultQualityalue);
-  const [discountValue, setDiscountValue] = useState(GeneralQuantityBreakDB.discountValue);
+  const loaderData = useLoaderData<typeof loader>();
+  const upsellItemConf = loaderData.upsellItemConf;
+  const filteredUpsellItem = upsellItemConf.filter(item => item.qbId && item.qbId === id);
+
+  const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault);
+  const [isShowAsSoldOut, setIsShowAsSoldOut] = useState(itemData.isShowAsSoldOut);
+  const [opacity, setOpacity] = useState<number>(itemData.opacity);
+  const [labelSize, setLabelSize] = useState(itemData.labelSize);
+  const [selectPrice, setSelectPrice] = useState(itemData.selectPrice);
+  const [boxUpsells, setBoxUpsells] = useState(filteredUpsellItem ?? []);
+  const [title, setTitle] = useState(itemData.title);
+  const [subtitle, setSubtitle] = useState(itemData.subtitle);
+  const [badgeText, setBadgeText] = useState(itemData.badgeText);
+  const [labelText, setLabelText] = useState(itemData.labelText);
+  const [badgeStyle, setBadgeStyle] = useState(itemData.badgeStyle);
+  const [quantity, setQuantity] = useState(itemData.quantity);
+  const [discountPrice, setDiscountPrice] = useState(itemData.discountPrice);
+  const [labelTitle, setLabelTitle] = useState(itemData.labelTitle);
+  const [bgColor, setBgColor] = useState(itemData.bgColor);
+  const [textColor, setTextColor] = useState(itemData.textColor);
 
   useEffect(() => {
-    const quantity = Number(barDefaultQualityalue ?? 1);
-    const basePrice = 702.45;
-    const discountPercent = Number(discountValue ?? 0);
-
+    const basePrice = 500;
+    const discountPercent = Number(discountPrice ?? 0);
     let base = quantity * basePrice;
     let calc = base;
-
-    if (selected === "discounted%") {
+    if (selectPrice === "discounted%") {
       const safeDiscount = isNaN(discountPercent) ? 0 : discountPercent;
       calc = quantity * basePrice * (1 - safeDiscount / 100);
-    } else if (selected === "discounted$") {
+    } else if (selectPrice === "discounted$") {
       const safeDiscount = isNaN(discountPercent) ? 0 : discountPercent;
       calc = quantity * basePrice - quantity * safeDiscount;
-    } else if (selected === "specific") {
-      const specific = Number(discountValue);
+    } else if (selectPrice === "specific") {
+      const specific = Number(discountPrice);
       calc = isNaN(specific) ? base : specific;
     } else {
       calc = quantity * basePrice;
     }
-
     if (isNaN(base)) base = 0;
     if (isNaN(calc)) calc = 0;
 
     const qbObjectData = () => ({
       id,
+      quantity,
       title,
       subtitle,
-      badgeSelected,
-      bagdeText,
-      barLabelText,
-      barDefaultQualityalue,
-      discountValue,
+      selectPrice,
+      discountPrice,
+      badgeText,
+      badgeStyle,
+      labelText,
+      isSelectedByDefault,
+      isShowAsSoldOut,
+      labelTitle,
+      opacity,
+      bgColor,
+      textColor,
+      labelSize,
+      upsellItems: boxUpsells,
       base: Number(base.toFixed(2)),
       calc: Number(calc.toFixed(2)),
     });
-
     onDataObjChange?.(id, qbObjectData());
   }, [
-    id,
+    quantity,
     title,
     subtitle,
-    badgeSelected,
-    bagdeText,
-    barLabelText,
-    barDefaultQualityalue,
-    discountValue,
-    selected,
+    badgeText,
+    badgeStyle,
+    selectPrice,
+    discountPrice,
+    badgeText,
+    labelText,
+    isSelectedByDefault,
+    isShowAsSoldOut,
+    labelTitle,
+    opacity,
+    bgColor,
+    textColor,
+    boxUpsells,
     onDataObjChange,
   ]);
 
-  const addBoxUpSell = () => {
-    const newId = Date.now();
-    const newUpsell = { id: newId };
+  useEffect(() => {
+    return () => {
+      // cleanup: tell parent to remove this child
+      onDataObjChange?.(id, null);
+    };
+  }, []);
 
-    setBoxUpSells((prev) => [...prev, newUpsell]); // local child state if needed
-    onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
-  };
+  const addBoxUpsell = useCallback(() => {
+    const newId = Math.random().toString(36).substr(2, 9);
+    const newUpsell = {
+      id: newId,
+      qbId: id,
+      isSelectedProduct: "upsellSelectedproduct",
+      selectedVariants: "",
+      selectPrice: "Specific (e.g. $29)",
+      discountPrice: 20,
+      priceText: "+ Add at 20% discount",
+      imageSize: 20,
+      isSelectedByDefault: false,
+      isVisibleOnly: false,
+      isShowAsSoldOut: false,
+      labelTitle: "labelTitle",
+      opacity: 0.5,
+      bgColor: "#FF0000",
+      textColor: "#00FF00",
+      labelSize: 15,
+    };
+    setBoxUpsells(prev => [...prev, newUpsell]);
+    onAddUpsell?.(barId, newUpsell);
+  }, [onAddUpsell]);
 
-  const deleteBoxUpsell = (bundleIdValue: string | number, upsellId: any) => {
-    setBoxUpSells((prev) => prev.filter((item) => item.id !== upsellId));
-    onDeleteUpsell(bundleIdValue, upsellId);
-  };
+  // Delete upsell
+  const deleteBoxUpsell = useCallback((barId, upsellId) => {
+    setBoxUpsells(prev => prev.filter(item => item.id !== upsellId));
+    onDeleteUpsell?.(barId, upsellId);
+  }, [onDeleteUpsell]);
+
+  const onBoxUpsellDataChange = useCallback((childId, childBarId, data) => {
+    setBoxUpsells(prev => {
+      const updated = [...prev];
+      updated[childId] = { ...updated[childId], ...data };
+      return updated;
+    });
+  }, []);
 
   const handleUpsellSelectChange = useCallback((value: string) => {
-    setSelected(value);
+    setSelectPrice(value);
   }, []);
 
   const handleSizeChange = useCallback((newValue: string) => {
-    setSizeValue(newValue);
+    setLabelSize(parseInt(newValue, 10));
   }, []);
 
-  const handleDiscountValueChange = useCallback((value: string) => {
+  const handleDiscountPriceChange = useCallback((value: string) => {
     const numeric = Number(value);
-    setDiscountValue(Number.isFinite(numeric) ? numeric : 0);
+    setDiscountPrice(Number.isFinite(numeric) ? numeric : 0);
   }, []);
+
+  const handleBgColor = (newColor: string) => {
+    setBgColor(newColor);
+  };
+
+  const handleTextColor = (newColor: string) => {
+    setTextColor(newColor);
+  };
 
   const upsellsOptions = [
     { label: "Default", value: "default" },
@@ -155,15 +219,7 @@ export function GeneralQuantityBreack({
     { label: "Most Popular", value: "mostpopular" },
   ];
 
-  const QuantityBackground = "#00FF00";
-  const handleColorQuantityBackground = (newColor: string) => {
-    void newColor; // placeholder for future state
-  };
 
-  const QuantityText = "#FF0000";
-  const handleColorQuantityText = (newColor: string) => {
-    void newColor; // placeholder for future state
-  };
 
   return (
     <Card>
@@ -203,10 +259,10 @@ export function GeneralQuantityBreack({
                   <TextField
                     label=""
                     type="number"
-                    value={String(barDefaultQualityalue ?? "")}
+                    value={String(quantity ?? "")}
                     onChange={(val) => {
                       const newValue = Number(val);
-                      setBarDefaultQualityalue(
+                      setQuantity(
                         Number.isFinite(newValue) ? newValue : 1,
                       );
                     }}
@@ -243,17 +299,17 @@ export function GeneralQuantityBreack({
                   label="Price"
                   options={upsellsOptions}
                   onChange={handleUpsellSelectChange}
-                  value={selected}
+                  value={selectPrice}
                 />
               </Grid.Cell>
 
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 5 }}>
-                {selected === "discounted%" && (
+                {selectPrice === "discounted%" && (
                   <TextField
                     label="Discount per item"
                     type="number"
-                    value={String(discountValue)}
-                    onChange={handleDiscountValueChange}
+                    value={String(discountPrice)}
+                    onChange={handleDiscountPriceChange}
                     autoComplete="off"
                     min={1}
                     max={100}
@@ -261,12 +317,12 @@ export function GeneralQuantityBreack({
                   />
                 )}
 
-                {selected === "discounted$" && (
+                {selectPrice === "discounted$" && (
                   <TextField
                     label="Discount per item"
                     type="number"
-                    value={String(discountValue)}
-                    onChange={handleDiscountValueChange}
+                    value={String(discountPrice)}
+                    onChange={handleDiscountPriceChange}
                     autoComplete="off"
                     min={1}
                     max={100}
@@ -275,12 +331,12 @@ export function GeneralQuantityBreack({
                   />
                 )}
 
-                {selected === "specific" && (
+                {selectPrice === "specific" && (
                   <TextField
                     label="Total price"
                     type="number"
-                    value={String(discountValue)}
-                    onChange={handleDiscountValueChange}
+                    value={String(discountPrice)}
+                    onChange={handleDiscountPriceChange}
                     autoComplete="off"
                     min={1}
                     max={100}
@@ -296,9 +352,9 @@ export function GeneralQuantityBreack({
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
                 <PopUpover
                   title="Badge text"
-                  defaultPopText={bagdeText}
-                  upPopTextChange={setBagdeText}
-                  badgeSelected={badgeSelected}
+                  defaultPopText={badgeText}
+                  upPopTextChange={setBadgeText}
+                  badgeSelected={badgeStyle}
                 />
               </Grid.Cell>
 
@@ -308,8 +364,8 @@ export function GeneralQuantityBreack({
                   <Select
                     label=""
                     options={badgeStyleOption}
-                    onChange={setBadgeSelected}
-                    value={badgeSelected}
+                    onChange={setBadgeStyle}
+                    value={badgeStyle}
                   />
                 </BlockStack>
               </Grid.Cell>
@@ -321,34 +377,35 @@ export function GeneralQuantityBreack({
                 <PopUpover
                   title="Label"
                   defaultPopText=""
-                  upPopTextChange={setBarLabelText}
-                  badgeSelected={barLabelText}
+                  upPopTextChange={setLabelText}
+                  badgeSelected={labelText}
                 />
               </Grid.Cell>
 
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
                 <Checkbox
                   label="Selected by default"
-                  checked={showPriceDecimal}
-                  onChange={setShowPriceDecimal}
+                  checked={isSelectedByDefault}
+                  onChange={setIsSelectedByDefault}
                 />
               </Grid.Cell>
             </Grid>
 
             {/* Upsell section */}
             <BlockStack gap="300">
-              <Button fullWidth onClick={addBoxUpSell} icon={ProductAddIcon}>
+              <Button fullWidth onClick={addBoxUpsell} icon={ProductAddIcon}>
                 Add upsell
               </Button>
 
               <BlockStack gap="300">
-                {boxUpSells.map((upsellItem) => (
+                {boxUpsells.map((upsellItem) => (
                   <BoxUpSellItem
                     key={upsellItem.id}
                     id={upsellItem.id}
-                    bundleId={bundleId}
+                    upsellItemData={upsellItem}
+                    barId={barId}
                     deleteSection={deleteBoxUpsell}
-                    onDataAddUpsellChange={onDataAddUpsellChange}
+                    onDataAddUpsellChange={onBoxUpsellDataChange}
                   />
                 ))}
               </BlockStack>
@@ -362,15 +419,15 @@ export function GeneralQuantityBreack({
                 <Text as="span" variant="bodyMd" fontWeight="semibold">
                   Show as Sold out
                 </Text>
-                <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
+                <SwitchIcon checked={isShowAsSoldOut} onChange={setIsShowAsSoldOut} />
               </InlineStack>
 
-              {isShowLowAlert && (
+              {isShowAsSoldOut && (
                 <BlockStack gap="300">
                   <PopUpover
                     title="Label title"
-                    defaultPopText="Sold out"
-                    upPopTextChange={undefined}
+                    defaultPopText={labelTitle}
+                    upPopTextChange={setLabelTitle}
                     badgeSelected=""
                   />
 
@@ -392,18 +449,18 @@ export function GeneralQuantityBreack({
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <ColorPickerPopoverItem
                         subtitle="Background"
-                        defaultColorSetting={QuantityBackground}
+                        defaultColorSetting={bgColor}
                         colorWidth="100%"
-                        onColorChange={handleColorQuantityBackground}
+                        onColorChange={handleBgColor}
                       />
                     </Grid.Cell>
 
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <ColorPickerPopoverItem
                         subtitle="Text"
-                        defaultColorSetting={QuantityText}
+                        defaultColorSetting={textColor}
                         colorWidth="100%"
-                        onColorChange={handleColorQuantityText}
+                        onColorChange={handleTextColor}
                       />
                     </Grid.Cell>
 
@@ -413,7 +470,7 @@ export function GeneralQuantityBreack({
                         <TextField
                           label=""
                           type="number"
-                          value={sizeValue}
+                          value={labelSize}
                           onChange={handleSizeChange}
                           autoComplete="off"
                           min={10}
@@ -432,3 +489,4 @@ export function GeneralQuantityBreack({
     </Card>
   );
 }
+

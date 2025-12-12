@@ -21,109 +21,183 @@ import {
 } from "@shopify/polaris-icons";
 import { useCallback, useEffect, useState } from "react";
 import { useLoaderData } from "@remix-run/react";
-
 import type { loader } from "../product/ProductList";
 import { PopUpover } from "../common/PopUpover";
 import { BoxUpSellItem } from "../common/BoxUpSellItem";
 import { SwitchIcon } from "../common/SwitchIcon";
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
+import type { BuyXGetY, } from "../../models/types";
+
+export function createNewBuyXGetY(): BuyXGetY {
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    buyQuantity: 3,
+    getQuantity: 1,
+    title: 'Buy 3 Get Y', //title
+    subtitle: 'bogo', //subtitle
+    badgeText: '',//badgetext
+    badgeStyle: 'simple',//badgestyle
+    isSelectedByDefault: false,//isSelectedByDefault
+    isShowAsSoldOut: false,//isShowAsSoldOut
+    labelText: '',//labelText
+    labelTitle: "",//labeltitle
+    opacity: 20,//opacity
+    bgColor: "#eeeeee",
+    textColor: "#222222",
+    labelSize: 13, //labelSize
+  }
+}
 
 export function GeneralBuyXgetYfree({
   id,
-  bundleId,
-  deleteSection,
+  barId,
   open,
+  itemData,
   onToggle,
   heading,
   onAddUpsell,
   onDeleteUpsell,
   onDataObjChange,
-  onDataAddUpsellChange,
+  deleteSection
+  // onDataAddUpsellChange,
 }) {
 
   const GeneralBuyXgetYfreeDB = {
-    showPriceDecimal: false,
-    isShowLowAlert: false,
-    buyQualityalue: 3,
-    getQualityalue: 1,
-    opacity: 20,
-    sizeValue: 13,
+    isSelectedByDefault: false,//isSelectedByDefault
+    isShowAsSoldOut: false,//isShowAsSoldOut
+    buyQuantity: 3,//buyQuantity
+    getQuantity: 1,//getQuantity
+    opacity: 20,//opacity
+    labelSize: 13,//labelSize
     selected: 'default',
-    badgeSelected: 'simple',
-    title: '',
-    subtitle: '',
-    bagdeText: '',
-    barLabelText: '',
-    boxUpSells: [],
+    badgeStyle: 'simple',//badgeStyle
+    title: '',//
+    subtitle: '',//
+    badgeText: '',//badgeText
+    labelText: '',//labelText
+    labelTitle: "",//
+    bgColor: "#eeeeee",
+    textColor: "#222222",
+    boxUpsells: [],
   }
-
-  const [showPriceDecimal, setShowPriceDecimal] = useState(GeneralBuyXgetYfreeDB.showPriceDecimal);
-  const [isShowLowAlert, setIsShowLowAlert] = useState(GeneralBuyXgetYfreeDB.isShowLowAlert);
-  const [buyQualityalue, setBuyQualityalue] = useState(GeneralBuyXgetYfreeDB.buyQualityalue);
-  const [getQualityalue, setGetQualityalue] = useState(GeneralBuyXgetYfreeDB.getQualityalue);
-  const [opacity, setOpacity] = useState(GeneralBuyXgetYfreeDB.opacity);
-  const [sizeValue, setSizeValue] = useState(GeneralBuyXgetYfreeDB.sizeValue);
-  const [selected, setSelected] = useState(GeneralBuyXgetYfreeDB.selected);
-  const [badgeSelected, setBadgeSelected] = useState(GeneralBuyXgetYfreeDB.badgeSelected);
-  const [title, setTitle] = useState(GeneralBuyXgetYfreeDB.title);
-  const [subtitle, setSubtitle] = useState(GeneralBuyXgetYfreeDB.subtitle);
-  const [bagdeText, setBagdeText] = useState(GeneralBuyXgetYfreeDB.bagdeText);
-  const [barLabelText, setBarLabelText] = useState(GeneralBuyXgetYfreeDB.barLabelText);
-  const [boxUpSells, setBoxUpSells] = useState(GeneralBuyXgetYfreeDB.boxUpSells);
+  const loaderData = useLoaderData<typeof loader>();
+  const upsellItemConf = loaderData.upsellItemConf;
+  const filteredUpsellItem = upsellItemConf.filter(item => item.bxGyId && item.bxGyId === id);
+  const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault);
+  const [isShowAsSoldOut, setIsShowAsSoldOut] = useState(itemData.isShowAsSoldOut);
+  const [buyQuantity, setBuyQuantity] = useState(itemData.buyQuantity);
+  const [getQuantity, setGetQuantity] = useState(itemData.getQuantity);
+  const [opacity, setOpacity] = useState(itemData.opacity);
+  const [labelSize, setLabelSize] = useState(itemData.labelSize);
+  const [selected, setSelected] = useState(itemData.selected);
+  const [badgeStyle, setBadgeStyle] = useState(itemData.badgeStyle);
+  const [title, setTitle] = useState(itemData.title);
+  const [subtitle, setSubtitle] = useState(itemData.subtitle);
+  const [badgeText, setBadgeText] = useState(itemData.badgeText);
+  const [labelText, setLabelText] = useState(itemData.labelText);
+  const [labelTitle, setLabelTitle] = useState(itemData.labelTitle);
+  const [boxUpsells, setBoxUpsells] = useState(itemData?.upsellItems ?? []);
+  const [bgColor, setBgColor] = useState(itemData.bgColor);
+  const [textColor, setTextColor] = useState(itemData.textColor);
+  console.log("itemData>>>", itemData);
 
   const barDefaultPrice = 204.32;
 
   useEffect(() => {
-    const bQuantity = buyQualityalue;
-    const gQuantity = getQualityalue;
+    const bQuantity = buyQuantity;
+    const gQuantity = getQuantity;
     const tQuantity = bQuantity + gQuantity;
     const basePrice = barDefaultPrice;
-
     const base = tQuantity * basePrice;
     const calc = bQuantity * basePrice;
 
     const xyObjectData = () => ({
       id,
+      buyQuantity,
+      getQuantity,
       title,
       subtitle,
-      badgeSelected,
-      bagdeText,
-      barLabelText,
-      buyQualityalue,
-      getQualityalue,
+      badgeText,
+      badgeStyle,
+      isSelectedByDefault,
+      isShowAsSoldOut,
+      labelText,
+      labelTitle,
+      opacity,
+      bgColor,
+      textColor,
+      labelSize,
+      upsellItems: boxUpsells,
       base: Number(base.toFixed(2)),
       calc: Number(calc.toFixed(2)),
     });
-
     onDataObjChange?.(id, xyObjectData());
   }, [
-    id,
+    buyQuantity,
+    getQuantity,
     title,
     subtitle,
-    badgeSelected,
-    bagdeText,
-    barLabelText,
-    buyQualityalue,
-    getQualityalue,
+    badgeText,
+    badgeStyle,
+    isSelectedByDefault,
+    isShowAsSoldOut,
+    labelText,
+    labelTitle,
+    opacity,
+    bgColor,
+    textColor,
+    labelSize,
+    boxUpsells,
     onDataObjChange,
   ]);
 
+  useEffect(() => {
+    return () => {
+      // cleanup: tell parent to remove this child
+      onDataObjChange?.(id, null);
+    };
+  }, []);
   // add / delete upsell items
-  const addBoxUpSell = () => {
-    const newId = Date.now();
-    const newUpsell = { id: newId };
+  const addBoxUpsell = useCallback(() => {
+    const newId = Math.random().toString(36).substr(2, 9);
+    const newUpsell = {
+      id: newId,
+      bxGyId: id,
+      isSelectedProduct: "upsellSelectedproduct",
+      selectedVariants: "",
+      selectPrice: "Specific (e.g. $29)",
+      discountPrice: 20,
+      priceText: "+ Add at 20% discount",
+      imageSize: 20,
+      isSelectedByDefault: false,
+      isVisibleOnly: false,
+      isShowAsSoldOut: false,
+      labelTitle: "labelTitle",
+      opacity: 0.5,
+      bgColor: "#FF0000",
+      textColor: "#00FF00",
+      labelSize: 15,
+    };
+    setBoxUpsells((prev) => [...prev, newUpsell]);
+    onAddUpsell?.(barId, newUpsell);
+  }, [onAddUpsell]);
 
-    setBoxUpSells((prev) => [...prev, newUpsell]);
-    onAddUpsell(bundleId, newUpsell);
-  };
+  // Delete upsell
+  const deleteBoxUpsell = useCallback((barId, upsellId) => {
+    setBoxUpsells(prev => prev.filter(item => item.id !== upsellId));
+    onDeleteUpsell?.(barId, upsellId);
+  }, [onDeleteUpsell]);
 
-  const deleteBoxUpsell = (bundleIdValue: string | number, upsellId: any) => {
-    setBoxUpSells((prev) => prev.filter((item) => item.id !== upsellId));
-    onDeleteUpsell(bundleIdValue, upsellId);
-  };
+  const onBoxUpsellDataChange = useCallback((childId, childBarId, data) => {
+    setBoxUpsells(prev => {
+      const updated = [...prev];
+      updated[childId] = { ...updated[childId], ...data };
+      return updated;
+    });
+  }, []);
 
   const handleSizeChange = useCallback((newValue: string) => {
-    setSizeValue(newValue);
+    setLabelSize(newValue);
   }, []);
 
   const upsellsOptions = [
@@ -137,16 +211,6 @@ export function GeneralBuyXgetYfree({
     { label: "Simple", value: "simple" },
     { label: "Most Popular", value: "mostpopular" },
   ];
-
-  const QuantityBackground = "#FF0000";
-  const handleColorQuantityBackground = (newColor: string) => {
-    void newColor;
-  };
-
-  const QuantityText = "#FF0000";
-  const handleColorQuantityText = (newColor: string) => {
-    void newColor;
-  };
 
   return (
     <Card>
@@ -189,10 +253,10 @@ export function GeneralBuyXgetYfree({
                   <TextField
                     label="Quantity"
                     type="number"
-                    value={String(buyQualityalue)}
+                    value={String(buyQuantity)}
                     onChange={(val) => {
                       const newValue = Number(val);
-                      setBuyQualityalue(
+                      setBuyQuantity(
                         Number.isFinite(newValue) ? newValue : 1,
                       );
                     }}
@@ -216,10 +280,10 @@ export function GeneralBuyXgetYfree({
                   <TextField
                     label="Quantity"
                     type="number"
-                    value={String(getQualityalue)}
+                    value={String(getQuantity)}
                     onChange={(val) => {
                       const newValue = Number(val);
-                      setGetQualityalue(
+                      setGetQuantity(
                         Number.isFinite(newValue) ? newValue : 1,
                       );
                     }}
@@ -280,9 +344,9 @@ export function GeneralBuyXgetYfree({
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
                 <PopUpover
                   title="Badge text"
-                  defaultPopText={bagdeText}
-                  upPopTextChange={setBagdeText}
-                  badgeSelected={badgeSelected}
+                  defaultPopText={badgeText}
+                  upPopTextChange={setBadgeText}
+                  badgeSelected={badgeStyle}
                 />
               </Grid.Cell>
 
@@ -292,8 +356,8 @@ export function GeneralBuyXgetYfree({
                   <Select
                     label=""
                     options={badgeStyleOption}
-                    onChange={setBadgeSelected}
-                    value={badgeSelected}
+                    onChange={setBadgeStyle}
+                    value={badgeStyle}
                   />
                 </BlockStack>
               </Grid.Cell>
@@ -305,16 +369,16 @@ export function GeneralBuyXgetYfree({
                 <PopUpover
                   title="Label"
                   defaultPopText=""
-                  upPopTextChange={setBarLabelText}
-                  badgeSelected={barLabelText}
+                  upPopTextChange={setLabelText}
+                  badgeSelected={labelText}
                 />
               </Grid.Cell>
 
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
                 <Checkbox
                   label="Selected by default"
-                  checked={showPriceDecimal}
-                  onChange={setShowPriceDecimal}
+                  checked={isSelectedByDefault}
+                  onChange={setIsSelectedByDefault}
                 />
               </Grid.Cell>
             </Grid>
@@ -322,19 +386,20 @@ export function GeneralBuyXgetYfree({
             {/* Upsells */}
             <BlockStack gap="300">
               <InlineGrid columns={1} gap="200">
-                <Button onClick={addBoxUpSell} icon={ProductAddIcon}>
+                <Button onClick={addBoxUpsell} icon={ProductAddIcon}>
                   Add upsell
                 </Button>
               </InlineGrid>
 
               <BlockStack gap="300">
-                {boxUpSells.map((upsellItem) => (
+                {boxUpsells.map((upsellItem) => (
                   <BoxUpSellItem
                     key={upsellItem.id}
                     id={upsellItem.id}
-                    bundleId={bundleId}
+                    barId={barId}
+                    upsellItemData={upsellItem}
                     deleteSection={deleteBoxUpsell}
-                    onDataAddUpsellChange={onDataAddUpsellChange}
+                    onDataAddUpsellChange={onBoxUpsellDataChange}
                   />
                 ))}
               </BlockStack>
@@ -349,17 +414,17 @@ export function GeneralBuyXgetYfree({
                   Show as Sold out
                 </Text>
                 <SwitchIcon
-                  checked={isShowLowAlert}
-                  onChange={setIsShowLowAlert}
+                  checked={isShowAsSoldOut}
+                  onChange={setIsShowAsSoldOut}
                 />
               </InlineStack>
 
-              {isShowLowAlert && (
+              {isShowAsSoldOut && (
                 <BlockStack gap="300">
                   <PopUpover
                     title="Label title"
-                    defaultPopText="Sold out"
-                    upPopTextChange={undefined}
+                    defaultPopText={labelTitle}
+                    upPopTextChange={setLabelTitle}
                     badgeSelected=""
                   />
 
@@ -381,18 +446,18 @@ export function GeneralBuyXgetYfree({
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <ColorPickerPopoverItem
                         subtitle="Background"
-                        defaultColorSetting={QuantityBackground}
+                        defaultColorSetting={bgColor}
                         colorWidth="100%"
-                        onColorChange={handleColorQuantityBackground}
+                        onColorChange={setBgColor}
                       />
                     </Grid.Cell>
 
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <ColorPickerPopoverItem
                         subtitle="Text"
-                        defaultColorSetting={QuantityText}
+                        defaultColorSetting={textColor}
                         colorWidth="100%"
-                        onColorChange={handleColorQuantityText}
+                        onColorChange={setTextColor}
                       />
                     </Grid.Cell>
 
@@ -402,7 +467,7 @@ export function GeneralBuyXgetYfree({
                         <TextField
                           label=""
                           type="number"
-                          value={sizeValue}
+                          value={labelSize}
                           onChange={handleSizeChange}
                           autoComplete="off"
                           min={10}

@@ -23,11 +23,11 @@ export async function updateBuyXGetY(data) {
     subtitle: data.subtitle || "",
     badgeText: data.badgeText || "",
     badgeStyle: data.badgeStyle || "",
-    label: data.label || "",
+    labelText: data.labelText || "",
     isSelectedByDefault: data.isSelectedByDefault === "true",
     isShowAsSoldOut: data.isShowAsSoldOut === "true",
     labelTitle: data.labelTitle || "",
-    opacity: data.opacity ? parseFloat(data.opacity) : 1,
+    opacity: data.opacity ? parseInt(data.opacity, 10) : 1,
     bgColor: data.bgColor || "",
     textColor: data.textColor || "",
     labelSize: data.labelSize ? parseInt(data.labelSize, 10) : 12,
@@ -37,17 +37,19 @@ export async function updateBuyXGetY(data) {
 
   if (data.upsellItems) {
     try {
-      buyXGetYData.upsellItems = JSON.parse(data.upsellItems).map((u: any) => ({
+      buyXGetYData.upsellItems = data.upsellItems.map((u: any) => ({
         id: u.id || null,
         qbId: u.qbId || null,
         bxGyId: u.bxGyId || null,
         buId: u.buId || null,
-        isSelectedProduct: u.isSelectedProduct === true || u.isSelectedProduct === "true",
+        isSelectedProduct: u.isSelectedProduct || "",
         selectedVariants: u.selectedVariants || "",
+        quantity: parseInt(u.quantity, 10) || 1,
         selectPrice: u.selectPrice || "",
         discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : null,
         priceText: u.priceText || "",
         isSelectedByDefault: u.isSelectedByDefault === true || u.isSelectedByDefault === "true",
+        imageSize: u.imageSize || 20,
         isVisibleOnly: u.isVisibleOnly === true || u.isVisibleOnly === "true",
         isShowAsSoldOut: u.isShowAsSoldOut === true || u.isShowAsSoldOut === "true",
         labelTitle: u.labelTitle || "",
@@ -88,7 +90,7 @@ export async function updateBuyXGetY(data) {
       subtitle: buyXGetYData.subtitle,
       badgeText: buyXGetYData.badgeText,
       badgeStyle: buyXGetYData.badgeStyle,
-      label: buyXGetYData.label,
+      labelText: buyXGetYData.labelText,
       isSelectedByDefault: buyXGetYData.isSelectedByDefault,
       isShowAsSoldOut: buyXGetYData.isShowAsSoldOut,
       labelTitle: buyXGetYData.labelTitle,
@@ -107,7 +109,7 @@ export async function updateBuyXGetY(data) {
       subtitle: buyXGetYData.subtitle,
       badgeText: buyXGetYData.badgeText,
       badgeStyle: buyXGetYData.badgeStyle,
-      label: buyXGetYData.label,
+      labelText: buyXGetYData.labelText,
       isSelectedByDefault: buyXGetYData.isSelectedByDefault,
       isShowAsSoldOut: buyXGetYData.isShowAsSoldOut,
       labelTitle: buyXGetYData.labelTitle,
@@ -147,9 +149,11 @@ export async function updateBuyXGetY(data) {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
+        quantity: u.quantity,
         discountPrice: u.discountPrice,
         priceText: u.priceText,
         isSelectedByDefault: u.isSelectedByDefault,
+        imageSize: u.imageSize,
         isVisibleOnly: u.isVisibleOnly,
         isShowAsSoldOut: u.isShowAsSoldOut,
         labelTitle: u.labelTitle,
@@ -169,9 +173,11 @@ export async function updateBuyXGetY(data) {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
+        quantity: u.quantity,
         discountPrice: u.discountPrice,
         priceText: u.priceText,
         isSelectedByDefault: u.isSelectedByDefault,
+        imageSize: u.imageSize,
         isVisibleOnly: u.isVisibleOnly,
         isShowAsSoldOut: u.isShowAsSoldOut,
         labelTitle: u.labelTitle,
@@ -193,5 +199,11 @@ export async function updateBuyXGetY(data) {
 }
 
 export async function updateBuyXGetYs(buyXGetYList) {
+  const newIds = buyXGetYList.map(r => r.id);
+  await db.buyXGetY.deleteMany({
+    where: {
+      id: { notIn: newIds }
+    }
+  });
   return Promise.all(buyXGetYList.map(buyXGetY => updateBuyXGetY(buyXGetY)));
 }

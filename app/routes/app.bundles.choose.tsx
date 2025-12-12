@@ -29,11 +29,11 @@ import { GeneralStylePanel } from "app/components/bundles/GeneralStylePanel";
 import { GeneralVolumePanel } from "app/components/bundles/GeneralVolumePanel";
 import { GeneralCheckboxUpsell } from "app/components/bundles/GeneralCheckboxUpsell";
 import { GeneralStickyAddToCart } from "app/components/bundles/GeneralStickyAddToCart";
-import { GeneralQuantityBreack } from "app/components/bundles/GeneralQuantityBreack";
 import { CountDownPanel } from "app/components/bundles/CountDownPanel";
 import { MostPopularfancy } from "app/components/common/MostPopularfancy";
 import { getCountdownTimer, updateCountdownTimer } from "app/models/countdownTimer.server";
-import { GeneralBuyXgetYfree } from "app/components/bundles/GeneralBuyXgetYfree";
+import { GeneralQuantityBreack, createNewQuantityBreak } from "app/components/bundles/GeneralQuantityBreack";
+import { GeneralBuyXgetYfree, createNewBuyXGetY } from "app/components/bundles/GeneralBuyXgetYfree";
 import { GeneralBundleUpsell } from "app/components/bundles/GeneralBundleUpsell";
 import { getGeneralStyle, updateGeneralStyle } from "app/models/generalStyle.server";
 import { getVolumeDiscount, updateVolumeDiscount } from "app/models/volumeDiscount.server";
@@ -43,6 +43,16 @@ import { getGeneralSetting, updateGeneralSetting } from "app/models/generalSetti
 import { getQuantityBreaks, updateQuantityBreak, updateQuantityBreaks } from "app/models/quantityBreak.server";
 import { getBuyXGetYs, updateBuyXGetY, updateBuyXGetYs } from "app/models/buyXGetY.server";
 import { getBundleUpsells, updateBundleUpsell, updateBundleUpsells } from "app/models/bundleUpsell.server";
+import { getUpsellItems } from "app/models/upsellItem.server";
+import type { QuantityBreak, BuyXGetY, BundleUpsell } from "../models/types";
+import {
+  GET_DISCOUNT_QUERY,
+  CREATE_DISCOUNT_QUERY,
+  UPDATE_DISCOUNT_QUERY
+} from "../graphql/discount";
+import {
+  ADD_METAFIELD_QUERY
+} from "../graphql/metafield";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
@@ -145,7 +155,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       generalSettingConf,
       quantityBreakConf,
       buyXGetYConf,
-      bundleUpsellConf
+      bundleUpsellConf,
+      upsellItemConf
     ] = await Promise.all([
       getCountdownTimer(),
       getGeneralStyle(),
@@ -155,7 +166,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       getGeneralSetting(),
       getQuantityBreaks(),
       getBuyXGetYs(),
-      getBundleUpsells()
+      getBundleUpsells(),
+      getUpsellItems()
     ]);
 
     // Handle error, but note that Promise.all rejects on first error
@@ -172,7 +184,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         generalSettingConf,
         quantityBreakConf,
         buyXGetYConf,
-        bundleUpsellConf
+        bundleUpsellConf,
+        upsellItemConf
       }
     );
   }
@@ -186,21 +199,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 async function getAutomaticAppDiscount(admin: any, discountId: string) {
-  const getDiscountQuery = `
-    query getAutomaticAppDiscount($id: ID!) {
-    automaticDiscountNode(id: $id) {
-      id
-      automaticDiscount {
-        __typename
-        ... on DiscountAutomaticApp {
-          title
-          startsAt
-          endsAt
-          appDiscountType { functionId }
-        }
-      }
-    }
-  }`;
+  const getDiscountQuery = GET_DISCOUNT_QUERY;
   const getDiscountVariables = {
     id: discountId
   };
@@ -216,33 +215,7 @@ async function getAutomaticAppDiscount(admin: any, discountId: string) {
 }
 
 async function createDiscountAutomaticApp(admin: any, variables: any) {
-  const createDiscountQuery = `
-    mutation discountAutomaticAppCreate($automaticAppDiscount: DiscountAutomaticAppInput!) {
-    discountAutomaticAppCreate(automaticAppDiscount: $automaticAppDiscount) {
-      userErrors {
-        field
-        message
-      }
-      automaticAppDiscount {
-        discountId
-        title
-        startsAt
-        endsAt
-        status
-        appDiscountType {
-          appKey
-          functionId
-          title
-          description
-          }
-        combinesWith {
-        orderDiscounts
-        productDiscounts
-        shippingDiscounts
-        }
-      }
-    }
-  }`;
+  const createDiscountQuery = CREATE_DISCOUNT_QUERY;
   try {
     const graphqlResult = await admin.graphql(createDiscountQuery, { variables: variables });
     const body = await graphqlResult.json();
@@ -259,18 +232,7 @@ async function createDiscountAutomaticApp(admin: any, variables: any) {
 }
 
 async function updateDiscountAutomaticApp(admin: any, discountId: string, discountData: any) {
-  const updateDiscountQuery = `
-    mutation discountAutomaticAppUpdate($automaticAppDiscount: DiscountAutomaticAppInput!, $id: ID!) {
-    discountAutomaticAppUpdate(automaticAppDiscount: $automaticAppDiscount, id: $id) {
-      automaticAppDiscount {
-        title
-      }
-      userErrors {
-        field
-        message
-      }
-    }
-  }`;
+  const updateDiscountQuery = UPDATE_DISCOUNT_QUERY;
   const updateVariables = {
     id: discountId,
     automaticAppDiscount: {
@@ -307,20 +269,7 @@ async function updateDiscountAutomaticApp(admin: any, discountId: string, discou
 
 async function addMetafield(admin: any, variables: any) {
   try {
-    const addMetafieldQuery = `
-    mutation metafieldsSet($metafields: [MetafieldsSetInput!]!) {
-      metafieldsSet(metafields: $metafields) {
-        metafields {
-          id
-          key
-          value
-        }
-        userErrors {
-          field
-          message
-        }
-      }
-    }`;
+    const addMetafieldQuery = ADD_METAFIELD_QUERY;
     const response = await admin.graphql(addMetafieldQuery, { variables: variables });
     const json = await response.json?.() || response;
     if (json.errors?.length) {
@@ -401,7 +350,7 @@ export async function action({ request, params }) {
         updateGeneralStyle(generalStyle.id, generalStyle),
         updateQuantityBreaks(quantityBreak),
         updateBuyXGetYs(buyXGetY),
-        updateBundleUpsells(bundleUpsell)
+        // updateBundleUpsells(bundleUpsell)
       ]);
       return json({ success: true, automaticAppDiscount });
     } catch (err) {
@@ -434,12 +383,36 @@ export async function action({ request, params }) {
         productList = [];
         collectionList = [];
     }
-    // productList = productList === "undefined" ? [] : JSON.parse(productList);
-    // collectionList = collectionList === "undefined" ? [] : JSON.parse(collectionList);
 
     productList = safeParse(productList);
     collectionList = safeParse(collectionList);
-
+    // discountConf type: quantity_break, buyx_gety, bundle_upsell
+    // discout Type: default, percent, fixed_amount, total_price
+    const discountConf = [{
+      "type": "quantity_break",
+      "quantity": 3,
+      "discountType": "total_price",
+      "discountPricePerItem": 100
+    }, {
+      "type": "buyx_gety",
+      "buyQuantity": 3,
+      "getQuantity": 1
+    }, {
+      "type": "bundle_upsell",
+      "defaultProduct": {
+        "id": "gid://shopify/Product/10110757798167",
+        "quantity": 1,
+        "discountType": "fixed_amount",
+        "discountPricePerItem": 50
+      },
+      "addedProducts": [
+        {
+          "id": "gid://shopify/Product/10110757142807",
+          "quantity": 2,
+          "discountType": "percent",
+          "discountPricePerItem": 50
+        }]
+    }];
     const automaticAppDiscount = await updateDiscountAutomaticApp(admin, discountId, discountData);
     if (automaticAppDiscount == null) {
       return json(
@@ -459,7 +432,8 @@ export async function action({ request, params }) {
           value: JSON.stringify({
             productScope: productScope,
             productList: productList,
-            selectedCollectionIds: collectionList
+            selectedCollectionIds: collectionList,
+            discountConf: discountConf
           })
         }
       ]
@@ -478,7 +452,7 @@ export async function action({ request, params }) {
           updateGeneralStyle(generalStyle.id, generalStyle),
           updateQuantityBreaks(quantityBreak),
           updateBuyXGetYs(buyXGetY),
-          updateBundleUpsells(bundleUpsell)
+          // updateBundleUpsells(bundleUpsell)
         ]);
         return json({ success: true, result });
       } catch (err) {
@@ -570,9 +544,9 @@ export default function BundleSettingsAdvanced() {
   const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
   const [generalStickyAddData, setGeneralStickyAddData] = useState(loaderData.generalStickyAddConf);
   const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf);
-  const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf);
-  const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf);
-  const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf);
+  // const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf);
+  // const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf);
+  // const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf);
 
 
   const handleCountdownTimerChange = useCallback((updated: any) => {
@@ -590,9 +564,6 @@ export default function BundleSettingsAdvanced() {
   const handleGeneralSetting = useCallback((updated: any) => {
     setGeneralSettingData(prev => ({ ...prev, ...updated }));
   }, []);
-  console.log("qb", quantityBreakData);
-  console.log("xy", buyXGetYData);
-  console.log("bu", bundleUpsellData);
 
   // const upsellItemList = [{
   //   isSelectedProduct: true,
@@ -761,63 +732,45 @@ export default function BundleSettingsAdvanced() {
     submit(fd, { method: "post" });
   }
   /***************Database Migration Part************/
+  const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf);
+  const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf);
+  const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf);
 
   const [selectedId, setSelectedId] = useState(null);
-  const [quantityBreaks, setQuantityBreaks] = useState<BoxQuantity[]>([]);
-  const [buyXGetYs, setBuyXGetYs] = useState<BoxQuantity[]>([]);
+  // const [quantityBreaks, setQuantityBreaks] = useState<QuantityBreak[]>(quantityBreakConf);
+  // const [buyXGetYs, setBuyXGetYs] = useState<BoxQuantity[]>([]);
   const [bundleUpsells, setBundleUpsells] = useState<BoxQuantity[]>([]);
 
   // right layout add upsell and delete upsell
   const addQuantityBreak = () => [
-    setQuantityBreaks(prev => [...prev, { id: Date.now() }])
-  ]
+    setQuantityBreakData(prev => [...prev, createNewQuantityBreak()])
+  ];
   const deleteQuantityBreak = (id: any) => {
-    setQuantityBreaks(prev => prev.filter(item => item.id !== id))
+    setQuantityBreakData(prev => prev.filter(item => item.id !== id));
   }
   const addBuyXGetY = () => [
-    setBuyXGetYs(prev => [...prev, { id: Date.now() }])
-  ]
+    setBuyXGetYData(prev => [...prev, createNewBuyXGetY()])
+  ];
   const deleteBuyXGetY = (id: any) => {
-    setBuyXGetYs(prev => prev.filter(item => item.id !== id))
+    setBuyXGetYData(prev => prev.filter(item => item.id !== id));
   }
   const addBundleUpsell = () => [
     setBundleUpsells(prev => [...prev, { id: Date.now() }])
-  ]
+  ];
   const deleteBundleUpsell = (id: any) => {
     setBundleUpsells(prev => prev.filter(item => item.id !== id))
   }
   ///////////////////////////////////////////////////////////////// quantity break////////////////////////////////////////////////
   const [openPanel, setOpenPanel] = useState(null);
-  const [upsells, setUpsells] = useState<{ [bundleId: string]: any[] }>({});
+  const [upsells, setUpsells] = useState<{ [barId: string]: any[] }>({});
   const [products, setProducts] = useState<{ [bundleId: string]: any[] }>({});
   const [selectedProduct, setSelectedProduct] = useState(loaderData.selectedProduct);
   const [selectedCountry, setSelectedCountry] = useState(loaderData.selectedCountry);
   const [showOriginal, setShowOriginal] = useState(true)
   const [badgeSelected, setBadgeSelected] = useState({});
-  const [qbDataObj, setQbDataObj] = useState({});
   const [addUpsells, setAddUpsells] = useState<Record<number, Record<number, AddUpsellData>>>({});
   const [addProducts, setAddProducts] = useState<Record<number, Record<number, AddUpsellData>>>({});
 
-  type QbData = any;
-
-  const handleQbDataObj = useCallback(
-    (id: number, updated: QbData) => {
-      setQbDataObj(prev => ({
-        ...prev,
-        [id]: {
-          ...(prev[id] ?? {}),
-          ...updated,
-        },
-      }));
-    },
-    [setQbDataObj],
-  );
-
-  useEffect(() => {
-    console.log('qbDataObj ==>', qbDataObj);
-  }, [qbDataObj]);
-
-  type AddUpsellData = any;
   const handleDataAddUpsellChange = useCallback(
     (id: number, bundleId: number, updated: AddUpsellData) => {
       setAddUpsells(prev => ({
@@ -830,51 +783,79 @@ export default function BundleSettingsAdvanced() {
           },
         },
       }));
+
     },
     [setAddUpsells],
   );
-
   useEffect(() => {
     Object.keys(addUpsells).forEach((itemId) => {
       console.log('addUpsells for item:', itemId, addUpsells[itemId]);
     });
   }, [addUpsells]);
 
+  const handleQbDataObj = useCallback((id, updated) => {
+    setQuantityBreakData(prev => {
+      // CASE 1: child removed → updated === null
+      if (updated === null) {
+        return prev.filter(item => item.id !== id);
+      }
+      const exists = prev.findIndex(item => item.id === id);
+      // CASE 2: update existing
+      if (exists !== -1) {
+        const copy = [...prev];
+        copy[exists] = { ...copy[exists], ...updated };
+        return copy;
+      }
+      // CASE 3: add new
+      return [...prev, { id, ...updated }];
+    });
+  }, []);
 
-
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////buy x,get y free
-
-
-  //buy x and get y free
+  // useEffect(() => {
+  // }, [quantityBreakData]);
+  //////////////////////////////////////////////////////////////////////////////buy x,get y free
   const [defaultBasePrice, setDefaultBasePrice] = useState({});
   const [xyDataObj, setXyDataObj] = useState({});
 
-  type xyData = any;
+  console.log("confData>>>", buyXGetYData);
 
-  const handleXyDataObj = useCallback(
-    (id: number, updated: xyData) => {
-      setXyDataObj(prev => ({
-        ...prev,
-        [id]: {
-          ...(prev[id] ?? {}),
-          ...updated,
-        },
-      }));
-    },
-    [setXyDataObj],
-  );
+  const handleXyDataObj = useCallback((id, updated) => {
+    setBuyXGetYData(prev => {
+      // CASE 1: child removed → updated === null
+      if (updated === null) {
+        return prev.filter(item => item.id !== id);
+      }
+      const exists = prev.findIndex(item => item.id === id);
+      // CASE 2: update existing
+      if (exists !== -1) {
+        const copy = [...prev];
+        copy[exists] = { ...copy[exists], ...updated };
+        return copy;
+      }
+      // CASE 3: add new
+      return [...prev, { id, ...updated }];
+    });
+  }, []);
+  // const handleXyDataObj = useCallback(
+  //   (id: number, updated: xyData) => {
+  //     setXyDataObj(prev => ({
+  //       ...prev,
+  //       [id]: {
+  //         ...(prev[id] ?? {}),
+  //         ...updated,
+  //       },
+  //     }));
+  //   },
+  //   [setXyDataObj],
+  // );
 
-  useEffect(() => {
-    console.log('xyDataObj ==>', xyDataObj);
-  }, [xyDataObj]);
+  // useEffect(() => {
+  // }, [xyDataObj]);
   ///////////////////////////////////////////////////////////////////////////////////////////// bundleUpsell 
 
   //Bundle Upsell
   const [buDataObj, setBuDataObj] = useState({});
-
   type buData = any;
-
   const handleBuDataObj = useCallback(
     (id: number, updated: buData) => {
       setBuDataObj(prev => ({
@@ -893,9 +874,9 @@ export default function BundleSettingsAdvanced() {
   }, [buDataObj]);
 
 
-  type AddPorductData = any;
+  type AddProductData = any;
   const handleDataAddProductChange = useCallback(
-    (id: number, bundleId: number, updated: AddPorductData) => {
+    (id: number, bundleId: number, updated: AddProductData) => {
       setAddProducts(prev => ({
         ...prev,
         [bundleId]: {
@@ -933,20 +914,19 @@ export default function BundleSettingsAdvanced() {
   const [selectedStyle, setSelectedStyle] = useState("layout1");
 
   // right layout add upsell and delete Upsell
-  const handelonAddUpsellChange = (bundleId: string | number, item: any) => {
+  const handelonAddUpsellChange = (barId: string | number, item: any) => {
     setUpsells(prev => ({
       ...prev,
-      [bundleId]: [...(prev[bundleId] || []), item]
+      [barId]: [...(prev[barId] || []), item]
     }));
-  };
 
-  const handleonDeleteUpsellChange = (bundleId: string | number, upsellId: any) => {
+  };
+  const handleonDeleteUpsellChange = (barId: string | number, upsellId: any) => {
     setUpsells(prev => ({
       ...prev,
-      [bundleId]: (prev[bundleId] || []).filter(item => item.id !== upsellId)
+      [barId]: (prev[barId] || []).filter(item => item.id !== upsellId)
     }));
   };
-
   //add and delete bundleUpsell
   const hanldeonAddProductChange = (bundleId: string | number, item: any) => {
     setProducts(prev => ({
@@ -1114,12 +1094,13 @@ export default function BundleSettingsAdvanced() {
                   onDataChange={handleGeneralStickyAddChange}
                 />
 
-                {quantityBreaks.map((item) => (
+                {quantityBreakData.map((item) => (
                   <GeneralQuantityBreack
                     key={item.id}
                     id={item.id}
-                    bundleId={item.id}
+                    barId={item.id}
                     open={openPanel === item.id}
+                    itemData={item}
                     onToggle={() =>
                       setOpenPanel(openPanel === item.id ? null : item.id)
                     }
@@ -1128,16 +1109,16 @@ export default function BundleSettingsAdvanced() {
                     onAddUpsell={handelonAddUpsellChange}
                     onDeleteUpsell={handleonDeleteUpsellChange}
                     onDataObjChange={handleQbDataObj}
-                    onDataAddUpsellChange={handleDataAddUpsellChange}
+                  // onDataAddUpsellChange={handleDataAddUpsellChange}
                   />
                 ))}
-
-                {buyXGetYs.map((item) => (
+                {buyXGetYData.map((item) => (
                   <GeneralBuyXgetYfree
                     key={item.id}
                     id={item.id}
-                    bundleId={item.id}
+                    barId={item.id}
                     open={openPanel === item.id}
+                    itemData={item}
                     onToggle={() =>
                       setOpenPanel(openPanel === item.id ? null : item.id)
                     }
@@ -1146,7 +1127,7 @@ export default function BundleSettingsAdvanced() {
                     onAddUpsell={handelonAddUpsellChange}
                     onDeleteUpsell={handleonDeleteUpsellChange}
                     onDataObjChange={handleXyDataObj}
-                    onDataAddUpsellChange={handleDataAddUpsellChange}
+                  // onDataAddUpsellChange={handleDataAddUpsellChange}
                   />
                 ))}
 
@@ -1293,8 +1274,8 @@ export default function BundleSettingsAdvanced() {
                             </div>
                           )}
                           {/* {add quantity Breaks} */}
-                          {quantityBreaks.map((item) => {
-                            const qbData = qbDataObj[item.id];
+                          {quantityBreakData.map((item) => {
+                            const qbData = quantityBreakData[item.id];
                             const currentIsSelected = selectedId === item.id;
 
                             const qbCalc = qbData?.calc != null ? Number(qbData.calc) : 0;
@@ -1564,7 +1545,7 @@ export default function BundleSettingsAdvanced() {
                             );
                           })}
                           {/* {add buy x, get y free!} */}
-                          {buyXGetYs.map((item) => {
+                          {buyXGetYData.map((item) => {
                             const xyData = xyDataObj[item.id];
 
                             const currentIsSelected = selectedId === item.id;

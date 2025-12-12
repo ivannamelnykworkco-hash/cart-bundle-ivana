@@ -9,11 +9,33 @@ import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 import type { loader } from "../product/ProductList";
 import { useLoaderData } from "@remix-run/react";
 import { SelectableImageButton } from "../common/SelectableImageButton";
-
 import { SelectProductModal } from "../common/SelectProductModal";
 import { SelectVariantModal } from "../common/SelectVariantModal";
 import { BoxProductItem } from "../common/BoxProductItem";
+import type { BundleUpsell } from "../../models/types";
 
+export function createNewBundleUpsell(): BundleUpsell {
+  return {
+    id: Math.random().toString(36).substr(2, 9),
+    layoutOption: "",
+    title: 'Single', //title
+    subtitle: 'standard price', //subtitle
+    badgeText: '',//badgetext
+    badgeStyle: 'simple',//badgestyle
+    labelText: '',//labelText
+    isSelectedByDefault: false,//isSelectedByDefault
+    isShowQuantitySelector: false,
+    productCounts: 1,
+    selectPrice: "Disocounted %",
+    discountPrice: 20,
+    isShowAsSoldOut: false,//isShowAsSoldOut
+    labelTitle: "",//labeltitle
+    opacity: 20,//opacity
+    bgColor: "#ffffff",
+    textColor: "#000000",
+    labelSize: 13, //labelSize
+  }
+}
 
 export function GeneralBundleUpsell({
   id,
@@ -35,6 +57,28 @@ export function GeneralBundleUpsell({
   onDataAddUpsellChange,
   onDataAddProductItemChange }) {
 
+  const initData = {
+    layoutOption: "",
+    title: 'Single', //title
+    subtitle: 'standard price', //subtitle
+    badgeText: '',//bagdeText
+    badgeStyle: 'simple',//badgeSelected
+    labelText: '',//barLabelText
+    isSelectedByDefault: false,//
+    isShowQuantitySelector: false,//showQuantityChecked
+    productCounts: 1,//barDefaultQualityalue
+    selectPrice: "Disocounted %",//selected
+    discountPrice: 20,//discountValue
+    isShowAsSoldOut: false,//isShowLowAlert
+    labelTitle: "",//
+    opacity: 20,//*
+    bgColor: "#ffffff",
+    textColor: "#000000",
+    labelSize: 13, //sizeValue
+    boxUpsells: [],
+    productItems: []
+  }
+
   const loaderData = useLoaderData<typeof loader>();
 
   const productArray = loaderData?.products?.map((product: any) => ({
@@ -50,21 +94,19 @@ export function GeneralBundleUpsell({
 
   // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [discountValue, setDiscountValue] = useState('20');
-  const [opacity, setOpacity] = useState<number>(20);
-  const [sizeValue, setSizeValue] = useState('13');
-  const [selected, setSelected] = useState("default");
-  const [badgeSelected, setBadgeSelected] = useState("simple");
-  const [title, setTitle] = useState((loaderData as any).bundleUpsellTitle || "");
-  const [subtitle, setSubtitle] = useState((loaderData as any).bundleUpsellSubtitle || "");
-  const [bagdeText, setBagdeText] = useState((loaderData as any).bundleUpsellBagdeText || "");
+  const [discountValue, setDiscountValue] = useState('20');//
+  const [opacity, setOpacity] = useState<number>(20);//
+  const [sizeValue, setSizeValue] = useState('13');//
+  const [selected, setSelected] = useState("default");//
+  const [badgeSelected, setBadgeSelected] = useState("simple");//
+  const [title, setTitle] = useState((loaderData as any).bundleUpsellTitle || "");//
+  const [subtitle, setSubtitle] = useState((loaderData as any).bundleUpsellSubtitle || "");//
+  const [bagdeText, setBagdeText] = useState((loaderData as any).bundleUpsellBagdeText || "");//
   const [barLabelText, setBarLabelText] = useState((loaderData as any).bunldeUpsellLabelText || "");
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
   const [barDefaultQualityalue, setBarDefaultQualityalue] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState({});
   const barDefaultPrice = selectedProduct;
-  console.log("selectedProduct==>", selectedProduct);
-
 
   // { add upsellitem and delete}
   const addBoxUpSell = () => {
@@ -74,9 +116,9 @@ export function GeneralBundleUpsell({
     setBoxUpSells(prev => [...prev, newUpsell]); // local child state if needed
     onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
   };
-  const deleteBoxUpsell = (bundleId: string | number, upsellId: any) => {
+  const deleteBoxUpsell = (barId: string | number, upsellId: any) => {
     setBoxUpSells(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
-    onDeleteUpsell(bundleId, upsellId);
+    onDeleteUpsell(barId, upsellId);
   };
   // add product select button and delete product
   const [products, setProducts] = useState<BoxUpSells[]>([]);
@@ -110,7 +152,7 @@ export function GeneralBundleUpsell({
   );
 
   useEffect(() => {
-    const quantity = barDefaultQualityalue;
+    const quantity = defaultQuantityValue;
     const basePrice = parseFloat(barDefaultPrice || "0");
     const discountPercent = parseFloat(discountValue || "0");
 

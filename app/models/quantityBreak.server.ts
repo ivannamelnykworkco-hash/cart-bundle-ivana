@@ -1,4 +1,5 @@
 import db from "../db.server";
+import type { QuantityBreak } from "./types";
 
 export async function getQuantityBreaks() {
   return db.quantityBreak.findMany({
@@ -14,7 +15,7 @@ export async function getQuantityBreaks() {
 export async function updateQuantityBreak(data) {
   // prepare data for update
   const qbData: any = {
-    id: data.id || null,
+    id: String(data.id) || null,
     bundleId: data.bundleId || "",
     title: data.title || "",
     subtitle: data.subtitle || "",
@@ -24,11 +25,11 @@ export async function updateQuantityBreak(data) {
     discountPrice: data.discountPrice ? parseFloat(data.discountPrice) : 0,
     badgeText: data.badgeText || "",
     badgeStyle: data.badgeStyle || "",
-    label: data.label || "",
+    labelText: data.labelText || "",
     isSelectedByDefault: data.isSelectedByDefault === "true",
     isShowAsSoldOut: data.isShowAsSoldOut === "true",
     labelTitle: data.labelTitle || "",
-    opacity: data.opacity ? parseFloat(data.opacity) : 1,
+    opacity: data.opacity ? parseInt(data.opacity, 10) : 1,
     bgColor: data.bgColor || "",
     textColor: data.textColor || "",
     labelSize: data.labelSize ? parseInt(data.labelSize, 10) : 12,
@@ -38,16 +39,19 @@ export async function updateQuantityBreak(data) {
 
   if (data.upsellItems) {
     try {
-      qbData.upsellItems = JSON.parse(data.upsellItems).map((u: any) => ({
-        id: u.id || null,
+      // qbData.upsellItems = JSON.parse(data.upsellItems).map((u: any) => ({
+      qbData.upsellItems = data.upsellItems.map((u: any) => ({
+        id: String(u.id) || null,
         qbId: u.qbId || null,
         bxGyId: u.bxGyId || null,
         buId: u.buId || null,
-        isSelectedProduct: u.isSelectedProduct === true || u.isSelectedProduct === "true",
+        isSelectedProduct: u.isSelectedProduct || "",
         selectedVariants: u.selectedVariants || "",
         selectPrice: u.selectPrice || "",
+        quantity: parseInt(u.quantity, 10) || 1,
         discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : 0,
         priceText: u.priceText || "",
+        imageSize: parseInt(u.imageSize, 10) || 12,
         isSelectedByDefault: u.isSelectedByDefault === true || u.isSelectedByDefault === "true",
         isVisibleOnly: u.isVisibleOnly === true || u.isVisibleOnly === "true",
         isShowAsSoldOut: u.isShowAsSoldOut === true || u.isShowAsSoldOut === "true",
@@ -90,7 +94,7 @@ export async function updateQuantityBreak(data) {
       discountPrice: qbData.discountPrice,
       badgeText: qbData.badgeText,
       badgeStyle: qbData.badgeStyle,
-      label: qbData.label,
+      labelText: qbData.labelText,
       isSelectedByDefault: qbData.isSelectedByDefault,
       isShowAsSoldOut: qbData.isShowAsSoldOut,
       labelTitle: qbData.labelTitle,
@@ -101,6 +105,7 @@ export async function updateQuantityBreak(data) {
       updatedAt: new Date().toISOString()
     },
     create: {
+      id: qbData.id,
       bundleId: qbData.bundleId,
       title: qbData.title,
       subtitle: qbData.subtitle,
@@ -110,7 +115,7 @@ export async function updateQuantityBreak(data) {
       discountPrice: qbData.discountPrice,
       badgeText: qbData.badgeText,
       badgeStyle: qbData.badgeStyle,
-      label: qbData.label,
+      labelText: qbData.labelText,
       isSelectedByDefault: qbData.isSelectedByDefault,
       isShowAsSoldOut: qbData.isShowAsSoldOut,
       labelTitle: qbData.labelTitle,
@@ -150,9 +155,11 @@ export async function updateQuantityBreak(data) {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
+        quantity: u.quantity,
         discountPrice: u.discountPrice,
         priceText: u.priceText,
         isSelectedByDefault: u.isSelectedByDefault,
+        imageSize: u.imageSize,
         isVisibleOnly: u.isVisibleOnly,
         isShowAsSoldOut: u.isShowAsSoldOut,
         labelTitle: u.labelTitle,
@@ -172,9 +179,11 @@ export async function updateQuantityBreak(data) {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
+        quantity: u.quantity,
         discountPrice: u.discountPrice,
         priceText: u.priceText,
         isSelectedByDefault: u.isSelectedByDefault,
+        imageSize: u.imageSize,
         isVisibleOnly: u.isVisibleOnly,
         isShowAsSoldOut: u.isShowAsSoldOut,
         labelTitle: u.labelTitle,
@@ -196,5 +205,12 @@ export async function updateQuantityBreak(data) {
 }
 
 export async function updateQuantityBreaks(qbList) {
+  const newIds = qbList.map(r => r.id);
+  await db.quantityBreak.deleteMany({
+    where: {
+      id: { notIn: newIds }
+    }
+  });
   return Promise.all(qbList.map(qb => updateQuantityBreak(qb)));
 }
+

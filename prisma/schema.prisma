@@ -247,11 +247,11 @@ model QuantityBreak {
   discountPrice         Float?
   badgeText             String
   badgeStyle            String
-  label                 String
+  labelText             String @default("")
   isSelectedByDefault   Boolean
   isShowAsSoldOut       Boolean
   labelTitle            String
-  opacity               Float
+  opacity               Int
   bgColor               String
   textColor             String
   labelSize             Int
@@ -270,11 +270,42 @@ model BuyXGetY {
   subtitle    String
   badgeText   String
   badgeStyle  String
-  label       String
+  labelText       String @default("")
   isSelectedByDefault   Boolean
-  
+  isShowAsSoldOut       Boolean
+  labelTitle      String
+  opacity         Int
+  bgColor         String
+  textColor       String
+  labelSize       Int
+  upsellItems         UpsellItem[]    @relation("BxGyUpsell")
+  createdAt       String
+  updatedAt       String
+}
 
-
+model BundleUpsell {
+  id          String @id @default(cuid())
+  bundleId    String
+  isOpen      Boolean
+  layoutOption    String
+  title       String     
+  subtitle    String
+  badgeText   String
+  badgeStyle  String
+  labelText       String @default("")
+  isSelectedByDefault     Boolean
+  isShowQuantitySelector  Boolean
+  productCounts           Int
+  selectPrice             String
+  discountPrice           Float?
+  productItems            ProductItem[]   
+  isShowAsSoldOut         Boolean
+  labelTitle      String
+  opacity         Int
+  bgColor         String
+  textColor       String
+  labelSize       Int
+  upsellItems         UpsellItem[]  @relation("BundlesUpsell")
   createdAt String
   updatedAt String
 }
@@ -284,11 +315,13 @@ model UpsellItem {
   qbId        String?
   bxGyId      String?
   buId        String?
-  isSelectedProduct   Boolean
+  isSelectedProduct   String
   selectedVariants    String
+  quantity            Int 
   selectPrice         String
   discountPrice       Float?
   priceText           String
+  imageSize           Int     
   isSelectedByDefault Boolean
   isVisibleOnly       Boolean
   isShowAsSoldOut     Boolean
@@ -296,7 +329,7 @@ model UpsellItem {
   opacity             Float
   bgColor             String
   textColor           String
-  labelSize           Int
+  labelSize           Int             
   quantityBreak       QuantityBreak?   @relation("QbUpsell", fields: [qbId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   buyXGetY            BuyXGetY?        @relation("BxGyUpsell", fields: [bxGyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   bundleUpsell        BundleUpsell?    @relation("BundlesUpsell", fields: [buId], references: [id], onDelete: Cascade, onUpdate: Cascade)
