@@ -7,35 +7,33 @@
   border-color: var(--border-color);
   border-radius: var(--corner-radius);
   background-color: var(--cardsBg-color);
-}
-.xcart-bundle-checkbox-wrapper {
-  width: 20px;
-  height: 20px;
-  border: 1px solid;
-  border-color: var(--border-color);
-  border-radius: 50px;
-  position: relative;
-}
-.xcart-bundle-checkbox-body {
-  width: 15px;
-  height: 15px;
-  background-color: var(--border-color);
-  border-radius: 50px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  opacity: 0.5;
+  cursor: pointer;
 }
 .xcart-bundle-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: calc(100% - 40px);
+  width: 100%;
+}
+.xcart-bundle-checkbox-body {
+  display: flex;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #fff;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 2px var(--border-color, rgba(0, 0, 0, .3));
 }
 .xcart-bundle-text {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 20px;
+  flex-direction: row;
+  align-items: center;
+  width: 80%;
 }
 .xcart-bundle-title-with-label {
   display: flex;
@@ -86,7 +84,6 @@
 .xcart-bundle-app--header span {
   color: var(--blockTitle-color);
   font-size: var(--barBlock-title);
-  margin-bottom: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -110,34 +107,36 @@
   padding-right: var(--spacing);
 }
 
-.xcart-add-upsell--wrapper {
+.xcart-upsell-container {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: var(--barUpsellBack-color);
   padding: 7px;
+  border-bottom-left-radius: var(--corner-radius);
+  border-bottom-right-radius: var(--corner-radius);
 }
-.xcart-add-upsell-text {
+.xcart-upsell-product-title {
   font-size: var(--upsell-size);
   color: var(--barUpsellText-color);
 }
-.xcart-add-upsell-discounted-price {
+.xcart-upsell-original-price {
   font-size: var(--upsell-size);
   color: var(--barPrice-color);
 }
-.xcart-add-upsell-full-price {
+.xcart-upsell-current-price {
   font-size: var(--upsell-size);
   color: var(--barFullPrice-color);
 }
-.xcart-add-upsell-product--img {
-  width: 50px;
-  height: 50px;
-}
-.xcart-add-upsell-product--img img {
-  width: 100%;
-  height: 100%;
+.xcart-upsell-img{
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
+}
+.xcart-upsell-img img {
+  width: 40px;
+  height: 40px;
 }
 .xcart-upsell-checkbox-with-product--info {
   display: flex;
@@ -153,11 +152,176 @@
 .countdown-timer-container {
   background: var(--msgBg-color);
   text-align: var(--msg-alignment);
-  padding: 10px 20px;
+  padding: 5px 20px;
   border-radius: var(--corner-radius);
 }
 
 .xcart-line-wrapper {
   display: flex;
   flex-direction: column;
+}
+
+.xcart-qty-with-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.xcart-bundle-left {
+  width: calc(100% - 40px);
+}
+#xcart-bundle-app {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.xcart-bundle_bar_most_popular_fancy {
+  position: absolute;
+  top: 20px;
+  right: 0;
+}
+
+.xcart-bundles__bundle-products {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    border: 1px solid black;
+    border-radius: 5px;
+    width: 90%;
+}
+.xcart-bundles__bunlde-products--product {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+    gap: 5px;
+    padding: 12px;
+}
+.xcart-bundles__bundle-products__link {
+    display: flex;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+.xcart-bundles__bundle-products__image {
+  flex-shrink: 0;
+  height: 50px;
+  width: auto;
+  max-width: 100%;
+  border-radius: 5px;
+}
+.xcart-bundles__bundle-products__link {
+    display: flex;
+    flex-shrink: 0;
+    text-decoration: none;
+}
+.xcart-bundles__bundle-products__title {
+      overflow-wrap: break-word;
+    text-align: center;
+    font-size: 13px;
+    color: black;
+    font-weight: 700;
+    font-style: normal;
+}
+.xcart-bundles__bundle-products__pricing {
+      display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+.xcart-bundles__bundle-products__price {
+  font-size: 13px;
+    font-weight: 700;
+    color: black;
+}
+.xcart-bundles__bundle-products__full-price {
+      text-decoration: line-through;
+    font-size: 12px;
+    color: #555;
+}
+.xcart-bundles__bundle-products__divider {
+  display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 0;
+    overflow: visible;
+}
+.xcart-bundles__bundle-products__divider-line {
+  display: flex !important;
+  flex: 1;
+  width: 1px;
+  background-color: black;
+}
+.xcart-bundles__bundle-products__divider-icon {
+  display: flex;
+}
+.xcart-bundles__bundle-products__divider:last-child {
+  display: none;
+}
+.xcart-qty-input::-webkit-outer-spin-button,
+.xcart-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.xcart-line-wrapper.is-loading .xcart-line-total {
+  color: transparent;        
+}
+
+.xcart-line-wrapper.is-loading .xcart-line-total::after {
+  content: "";
+  position: absolute;
+  right: 0;                  
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  border-top-color: #000;    
+  animation: xcart-spin 0.6s linear infinite;
+}
+
+@keyframes xcart-spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+
+.xcart-remove.is-loading svg {
+  opacity: 0;
+}
+
+/* Spinner on top of the button */
+.xcart-remove.is-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent; /* creates the "gap" */
+  animation: xcart-spin 0.6s linear infinite;
+}
+
+/* Re-use / define keyframes if not already there */
+@keyframes xcart-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.xcart-main-quantity-break.is-selected .xcart-main-section--container {
+  background-color: var(--selectedBg-color);
+  opacity: 1;
+}
+.xcart-main-quantity-break.is-selected .xcart-bundle-checkbox-body {
+  background: var(--border-color, #000);
+  box-shadow: 0 0 0 2px var(--border-color, #000);
 }

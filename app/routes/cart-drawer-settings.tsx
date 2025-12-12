@@ -1,6 +1,10 @@
 import { authenticate } from "../shopify.server";
 import { getGeneralStyle } from "app/models/generalStyle.server";
 import { getCountdownTimer } from "app/models/countdownTimer.server";
+import { getQuantityBreaks } from "app/models/quantityBreak.server";
+import { getBuyXGetYs } from "app/models/buyXGetY.server";
+import { getBundleUpsells } from "app/models/bundleUpsell.server";
+import { getGeneralSetting } from "app/models/generalSetting.server";
 import { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 
 
@@ -43,7 +47,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const msgSize = Number(countdownTimerConfig?.msgSize) || '14';
   const msgBgColor = String(countdownTimerConfig?.msgBgColor) || '';
   const msgTextColor = String(countdownTimerConfig?.msgTextColor) || '';
-
 
   const css = `
       :root {
@@ -92,98 +95,112 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 
-// export const action = async ({ request }: ActionFunctionArgs) => {
-//   const { admin } = await authenticate.public.appProxy(request);
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const { admin } = await authenticate.public.appProxy(request);
 
-//   // Fetch products and countdown config in parallel
-//   const [response, countdownTimerConfig] = await Promise.all([
-//     admin.graphql(`
-//       query getProducts {
-//         products(first: 2, query: "id:7769186762830 OR id:7769222676558") {
-//           edges {
-//             node {
-//               id
-//               title
-//               featuredImage {
-//                 url
-//               }
-//               metafields(first: 1) {
-//                 edges {
-//                   node {
-//                     id
-//                     namespace
-//                     key
-//                     value
-//                     type
-//                   }
-//                 }
-//               }
-//               variants(first: 1) {
-//                 edges {
-//                   node {
-//                     id
-//                     title
-//                     price
-//                     inventoryQuantity
-//                     compareAtPrice
-//                     selectedOptions {
-//                       name
-//                       value
-//                     }
-//                   }
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     `),
-//     getCountdownTimer().catch(() => null),
-//   ]);
+  // const upsellConfig = await getBundleUpsells().catch(() => null);
 
-//   const body = await response.json();
-//   const nodes = body?.data?.products?.edges?.map(edge => edge.node) ?? [];
+  // quantity Break
+  const qbList = await getQuantityBreaks().catch(() => null);
+  // get x, buy Y free
+  const xyList = await getBuyXGetYs().catch(() => null);
+  // bundle upsell
+  const buList = await getBundleUpsells().catch(() => null);
+  // generalsetting 
+  const gsList = await getGeneralSetting();
 
-//   if (!nodes.length) {
-//     return new Response(JSON.stringify({ error: "Products not found" }), {
-//       headers: { "Content-Type": "application/json" },
-//       status: 404,
-//     });
-//   }
+  // Fetch products and countdown config in parallel
+  const [response, countdownTimerConfig] = await Promise.all([
+    admin.graphql(`
+      query getProducts {
+        products(first: 3) {
+          edges {
+            node {
+              id
+              title
+              featuredImage {
+                url
+              }
+              metafields(first: 1) {
+                edges {
+                  node {
+                    id
+                    namespace
+                    key
+                    value
+                    type
+                  }
+                }
+              }
+              variants(first: 1) {
+                edges {
+                  node {
+                    id
+                    title
+                    price
+                    inventoryQuantity
+                    compareAtPrice
+                    selectedOptions {
+                      name
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `),
+    getCountdownTimer().catch(() => null),
+  ]);
 
-//   // Normalize countdown config once
-//   const isCountdown = Boolean(countdownTimerConfig?.isCountdown);
-//   const visibility = String(countdownTimerConfig?.visibility || "");
-//   const fixedDurationTime = Number(countdownTimerConfig?.fixedDurationTime) || 0;
-//   const endDateTime = countdownTimerConfig?.endDateTime || "";
-//   const msgText = String(countdownTimerConfig?.msgText || "");
+  const body = await response.json();
+  const nodes = body?.data?.products?.edges?.map(edge => edge.node) ?? [];
 
-//   const products = nodes.map(node => {
-//     const firstVariant = node.variants?.edges?.[0]?.node ?? null;
+  if (!nodes.length) {
+    return new Response(JSON.stringify({ error: "Products not found" }), {
+      headers: { "Content-Type": "application/json" },
+      status: 404,
+    });
+  }
 
-//     return {
-//       id: node.id,
-//       title: node.title,
-//       imageUrl: node.featuredImage?.url ?? "",
-//       price: firstVariant?.price ?? null,
-//       compareAtPrice: firstVariant?.compareAtPrice ?? null,
-//       variants: node.variants?.edges ?? [],
-//       metafields: node.metafields?.edges ?? [],
+  // Normalize countdown config once
+  const isCountdown = Boolean(countdownTimerConfig?.isCountdown);
+  const visibility = String(countdownTimerConfig?.visibility || "");
+  const fixedDurationTime = Number(countdownTimerConfig?.fixedDurationTime) || 0;
+  const endDateTime = countdownTimerConfig?.endDateTime || "";
+  const msgText = String(countdownTimerConfig?.msgText || "");
 
-//       countdownTimerConfig: {
-//         isCountdown,
-//         visibility,
-//         fixedDurationTime,
-//         endDateTime,
-//         msgText,
-//       },
-//     };
-//   });
 
-//   return new Response(JSON.stringify(products), {
-//     headers: {
-//       "Content-Type": "application/json",
-//       "Cache-Control": "no-store",
-//     },
-//   });
-// };
+  const products = nodes.map(node => {
+    // const firstVariant = node.variants?.edges?.[0]?.node ?? null;
+
+    return {
+      node,
+
+      countdownTimerConfig: {
+        isCountdown,
+        visibility,
+        fixedDurationTime,
+        endDateTime,
+        msgText,
+      },
+      qbList: Array.isArray(qbList) ? qbList : [],
+      xyList: Array.isArray(xyList) ? xyList : [],
+      buList: Array.isArray(buList) ? buList : [],
+      gsList: gsList ? [gsList] : [],
+    };
+  });
+
+  return new Response(JSON.stringify(products), {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    },
+  });
+};
+// function QuantityBreak() {
+//   throw new Error("Function not implemented.");
+// }
+
