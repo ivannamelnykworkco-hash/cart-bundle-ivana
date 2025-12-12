@@ -272,9 +272,40 @@ model BuyXGetY {
   badgeStyle  String
   labelText       String @default("")
   isSelectedByDefault   Boolean
-  
+  isShowAsSoldOut       Boolean
+  labelTitle      String
+  opacity         Int
+  bgColor         String
+  textColor       String
+  labelSize       Int
+  upsellItems         UpsellItem[]    @relation("BxGyUpsell")
+  createdAt       String
+  updatedAt       String
+}
 
-
+model BundleUpsell {
+  id          String @id @default(cuid())
+  bundleId    String
+  isOpen      Boolean
+  layoutOption    String
+  title       String     
+  subtitle    String
+  badgeText   String
+  badgeStyle  String
+  labelText       String @default("")
+  isSelectedByDefault     Boolean
+  isShowQuantitySelector  Boolean
+  productCounts           Int
+  selectPrice             String
+  discountPrice           Float?
+  productItems            ProductItem[]   
+  isShowAsSoldOut         Boolean
+  labelTitle      String
+  opacity         Int
+  bgColor         String
+  textColor       String
+  labelSize       Int
+  upsellItems         UpsellItem[]  @relation("BundlesUpsell")
   createdAt String
   updatedAt String
 }

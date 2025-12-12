@@ -45,6 +45,7 @@ import { getBuyXGetYs, updateBuyXGetY, updateBuyXGetYs } from "app/models/buyXGe
 import { getBundleUpsells, updateBundleUpsell, updateBundleUpsells } from "app/models/bundleUpsell.server";
 import { getUpsellItems } from "app/models/upsellItem.server";
 import type { QuantityBreak, BuyXGetY, BundleUpsell } from "../models/types";
+
 import {
   GET_DISCOUNT_QUERY,
   CREATE_DISCOUNT_QUERY,
@@ -383,36 +384,59 @@ export async function action({ request, params }) {
         productList = [];
         collectionList = [];
     }
-
     productList = safeParse(productList);
     collectionList = safeParse(collectionList);
     // discountConf type: quantity_break, buyx_gety, bundle_upsell
     // discout Type: default, percent, fixed_amount, total_price
-    const discountConf = [{
-      "type": "quantity_break",
-      "quantity": 3,
-      "discountType": "total_price",
-      "discountPricePerItem": 100
-    }, {
-      "type": "buyx_gety",
-      "buyQuantity": 3,
-      "getQuantity": 1
-    }, {
-      "type": "bundle_upsell",
-      "defaultProduct": {
-        "id": "gid://shopify/Product/10110757798167",
-        "quantity": 1,
-        "discountType": "fixed_amount",
-        "discountPricePerItem": 50
-      },
-      "addedProducts": [
-        {
-          "id": "gid://shopify/Product/10110757142807",
-          "quantity": 2,
-          "discountType": "percent",
-          "discountPricePerItem": 50
-        }]
-    }];
+    let discountConf = [];
+    buyXGetY.forEach(record => {
+      discountConf.push({
+        type: "buyx_gety",
+        buyQuantity: record.buyQuantity,
+        getQuantity: record.getQuantity
+      });
+    });
+
+    const priceTypeMap = {
+      "discounted%": "percentage",
+      "discounted$": "fixed_amount",
+      "specific": "total_price"
+    };
+
+    quantityBreak.forEach(record => {
+      discountConf.push({
+        type: "quantity_break",
+        quantity: record.quantity,
+        discountType: priceTypeMap[record.selectPrice] || "default",
+        discountPricePerItem: record.discountPrice
+      });
+    });
+
+    // const discountConf = [{
+    //   "type": "quantity_break",
+    //   "quantity": 3,
+    //   "discountType": "total_price",
+    //   "discountPricePerItem": 100
+    // }, {
+    //   "type": "buyx_gety",
+    //   "buyQuantity": 3,
+    //   "getQuantity": 1
+    // }, {
+    //   "type": "bundle_upsell",
+    //   "defaultProduct": {
+    //     "id": "gid://shopify/Product/10110757798167",
+    //     "quantity": 1,
+    //     "discountType": "fixed_amount",
+    //     "discountPricePerItem": 50
+    //   },
+    //   "addedProducts": [
+    //     {
+    //       "id": "gid://shopify/Product/10110757142807",
+    //       "quantity": 2,
+    //       "discountType": "percent",
+    //       "discountPricePerItem": 50
+    //     }]
+    // }];
     const automaticAppDiscount = await updateDiscountAutomaticApp(admin, discountId, discountData);
     if (automaticAppDiscount == null) {
       return json(
