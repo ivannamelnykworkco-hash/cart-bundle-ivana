@@ -1,5 +1,4 @@
 import db from "../db.server";
-//npm run prisma migrate dev -- --name add-qrcode-table
 export async function getBundleUpsells() {
   return db.bundleUpsell.findMany({
     include: {
@@ -167,7 +166,7 @@ export async function updateBundleUpsell(data) {
 
   // DELETE upsellItems removed from frontend
   if (bundleUpsellData.upsellItemsToDeleteIds.length > 0) {
-    await db.upsellItem.deleteMany({
+    await db.bundleUpsellItem.deleteMany({
       where: { id: { in: bundleUpsellData.upsellItemsToDeleteIds } }
     });
   }
@@ -203,21 +202,10 @@ export async function updateBundleUpsell(data) {
   }
   // UPSERT each upsell
   for (const u of bundleUpsellData.upsellItems) {
-    const relationData: any = {};
-    // only one relation should be attached
-    if (u.qbId) {
-      relationData.qbId = u.qbId;
-    }
-    if (u.bxGyId) {
-      relationData.bxGyId = u.bxGyId;
-    }
-    if (u.buId) {
-      relationData.buId = bundleUpsell.id;
-    }
-    await db.upsellItem.upsert({
+
+    await db.bundleUpsellItem.upsert({
       where: { id: u.id ?? crypto.randomUUID() },
       update: {
-        ...relationData,
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
@@ -233,15 +221,12 @@ export async function updateBundleUpsell(data) {
         bgColor: u.bgColor,
         textColor: u.textColor,
         labelSize: u.labelSize,
-        quantityBreak: {},
-        buyXGetY: {},
         bundleUpsell: {
           connect: { id: bundleUpsell.id }
         },
         updatedAt: new Date().toISOString()
       },
       create: {
-        ...relationData,
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
@@ -257,8 +242,6 @@ export async function updateBundleUpsell(data) {
         bgColor: u.bgColor,
         textColor: u.textColor,
         labelSize: u.labelSize,
-        quantityBreak: {},
-        buyXGetY: {},
         bundleUpsell: {
           connect: { id: bundleUpsell.id }
         },

@@ -38,22 +38,22 @@ export function createNewBundleUpsell(): BundleUpsell {
 }
 
 export function GeneralBundleUpsell({
-  id,
-  bundleId,
+  id,//
+  bundleId,//
   deleteSection,
-  heading,
-  open,
-  onToggle,
-  onAddUpsell,
+  heading,//
+  open,//
+  onToggle,//
+  onAddUpsell,//
   onAddProduct,
-  onDeleteUpsell,
-  onDeleteProducts,
-  upSeletedProduct,
+  onDeleteUpsell,//
+  onDeleteProducts,//
+  upSeletedProduct,//
   upBadgeSelectedChange,
   styleOptions,
   selectedStyle,
   onChangeStyle,
-  onDataObjChange,
+  onDataObjChange,//
   onDataAddUpsellChange,
   onDataAddProductItemChange }) {
 

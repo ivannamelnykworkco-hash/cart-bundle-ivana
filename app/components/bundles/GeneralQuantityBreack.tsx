@@ -58,16 +58,12 @@ export function GeneralQuantityBreack({
   // onDataAddUpsellChange,
 }) {
 
-  const loaderData = useLoaderData<typeof loader>();
-  const upsellItemConf = loaderData.upsellItemConf;
-  const filteredUpsellItem = upsellItemConf.filter(item => item.qbId && item.qbId === id);
-
   const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault);
   const [isShowAsSoldOut, setIsShowAsSoldOut] = useState(itemData.isShowAsSoldOut);
   const [opacity, setOpacity] = useState<number>(itemData.opacity);
   const [labelSize, setLabelSize] = useState(itemData.labelSize);
   const [selectPrice, setSelectPrice] = useState(itemData.selectPrice);
-  const [boxUpsells, setBoxUpsells] = useState(filteredUpsellItem ?? []);
+  const [boxUpsells, setBoxUpsells] = useState(itemData.upsellItems ?? []);
   const [title, setTitle] = useState(itemData.title);
   const [subtitle, setSubtitle] = useState(itemData.subtitle);
   const [badgeText, setBadgeText] = useState(itemData.badgeText);

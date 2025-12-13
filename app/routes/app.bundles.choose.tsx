@@ -54,71 +54,15 @@ import {
 import {
   ADD_METAFIELD_QUERY
 } from "../graphql/metafield";
+import {
+  GET_PRODUCT_QUERY
+} from "../graphql/product";
+
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
 
-  const response = await admin.graphql(`
-  query getProducts {
-  products(first: 100) {
-    edges {
-      node {
-        id
-        title
-        featuredImage {
-          url
-        }
-        metafields(first: 5) {
-        edges {
-          node {
-            id
-            namespace
-            key
-            value
-            type
-          }
-        }
-      }
-        variants(first: 10) {
-          edges {
-            node {
-              id
-              title
-              price
-              inventoryQuantity
-              compareAtPrice
-              selectedOptions {
-                name
-                value
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  collections(first: 20) {
-    edges {
-      node {
-        id
-        title
-        image {
-          url
-        }
-      }
-    }
-  }
-  shopifyFunctions(first: 10) {
-    edges {
-      node {
-        id
-        apiType
-        title
-      }
-    }
-  }
-}
-`);
+  const response = await admin.graphql(GET_PRODUCT_QUERY);
   const body = await response.json();
   //Product data from backend
   const productEdges = body?.data?.products?.edges ?? [];
@@ -157,7 +101,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       quantityBreakConf,
       buyXGetYConf,
       bundleUpsellConf,
-      upsellItemConf
     ] = await Promise.all([
       getCountdownTimer(),
       getGeneralStyle(),
@@ -168,7 +111,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       getQuantityBreaks(),
       getBuyXGetYs(),
       getBundleUpsells(),
-      getUpsellItems()
     ]);
 
     // Handle error, but note that Promise.all rejects on first error
@@ -186,7 +128,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         quantityBreakConf,
         buyXGetYConf,
         bundleUpsellConf,
-        upsellItemConf
       }
     );
   }
@@ -398,7 +339,7 @@ export async function action({ request, params }) {
     });
 
     const priceTypeMap = {
-      "discounted%": "percentage",
+      "discounted%": "percent",
       "discounted$": "fixed_amount",
       "specific": "total_price"
     };
@@ -756,9 +697,9 @@ export default function BundleSettingsAdvanced() {
     submit(fd, { method: "post" });
   }
   /***************Database Migration Part************/
-  const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf);
-  const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf);
-  const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf);
+  const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf ?? []);
+  const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf ?? []);
+  const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf ?? []);
 
   const [selectedId, setSelectedId] = useState(null);
   // const [quantityBreaks, setQuantityBreaks] = useState<QuantityBreak[]>(quantityBreakConf);

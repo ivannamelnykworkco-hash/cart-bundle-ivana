@@ -130,7 +130,7 @@ export async function updateQuantityBreak(data) {
 
   // DELETE upsellItems removed from frontend
   if (qbData.upsellItemsToDeleteIds.length > 0) {
-    await db.upsellItem.deleteMany({
+    await db.qbUpsellItem.deleteMany({
       where: { id: { in: qbData.upsellItemsToDeleteIds } }
     });
   }
@@ -138,20 +138,9 @@ export async function updateQuantityBreak(data) {
   // UPSERT each upsell
   for (const u of qbData.upsellItems) {
     const relationData: any = {};
-    // only one relation should be attached
-    if (u.qbId) {
-      relationData.qbId = quantityBreak.id;
-    }
-    if (u.bxGyId) {
-      relationData.bxGyId = u.bxGyId;
-    }
-    if (u.buId) {
-      relationData.buId = u.buId;
-    }
-    await db.upsellItem.upsert({
+    await db.qbUpsellItem.upsert({
       where: { id: u.id ?? crypto.randomUUID() },
       update: {
-        ...relationData,
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
@@ -170,12 +159,9 @@ export async function updateQuantityBreak(data) {
         quantityBreak: {
           connect: { id: quantityBreak.id }
         },
-        buyXGetY: {},
-        bundleUpsell: {},
         updatedAt: new Date().toISOString()
       },
       create: {
-        ...relationData,
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
@@ -194,8 +180,6 @@ export async function updateQuantityBreak(data) {
         quantityBreak: {
           connect: { id: quantityBreak.id }
         },
-        buyXGetY: {},
-        bundleUpsell: {},
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }

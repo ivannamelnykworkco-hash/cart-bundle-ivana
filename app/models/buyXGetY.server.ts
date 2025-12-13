@@ -124,28 +124,16 @@ export async function updateBuyXGetY(data) {
 
   // DELETE upsellItems removed from frontend
   if (buyXGetYData.upsellItemsToDeleteIds.length > 0) {
-    await db.upsellItem.deleteMany({
+    await db.bxGyUpsellItem.deleteMany({
       where: { id: { in: buyXGetYData.upsellItemsToDeleteIds } }
     });
   }
 
   // UPSERT each upsell
   for (const u of buyXGetYData.upsellItems) {
-    const relationData: any = {};
-    // only one relation should be attached
-    if (u.qbId) {
-      relationData.qbId = u.qbId;
-    }
-    if (u.bxGyId) {
-      relationData.bxGyId = buyXGetY.id;
-    }
-    if (u.buId) {
-      relationData.buId = u.buId;
-    }
-    await db.upsellItem.upsert({
+    await db.bxGyUpsellItem.upsert({
       where: { id: u.id ?? crypto.randomUUID() },
       update: {
-        ...relationData,
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
@@ -161,15 +149,12 @@ export async function updateBuyXGetY(data) {
         bgColor: u.bgColor,
         textColor: u.textColor,
         labelSize: u.labelSize,
-        quantityBreak: {},
         buyXGetY: {
           connect: { id: buyXGetY.id }
         },
-        bundleUpsell: {},
         updatedAt: new Date().toISOString()
       },
       create: {
-        ...relationData,
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectPrice: u.selectPrice,
@@ -185,11 +170,9 @@ export async function updateBuyXGetY(data) {
         bgColor: u.bgColor,
         textColor: u.textColor,
         labelSize: u.labelSize,
-        quantityBreak: {},
         buyXGetY: {
           connect: { id: buyXGetY.id }
         },
-        bundleUpsell: {},
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }

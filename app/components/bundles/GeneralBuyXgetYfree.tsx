@@ -59,7 +59,6 @@ export function GeneralBuyXgetYfree({
   onDeleteUpsell,
   onDataObjChange,
   deleteSection
-  // onDataAddUpsellChange,
 }) {
 
   const GeneralBuyXgetYfreeDB = {
@@ -80,9 +79,6 @@ export function GeneralBuyXgetYfree({
     textColor: "#222222",
     boxUpsells: [],
   }
-  const loaderData = useLoaderData<typeof loader>();
-  const upsellItemConf = loaderData.upsellItemConf;
-  const filteredUpsellItem = upsellItemConf.filter(item => item.bxGyId && item.bxGyId === id);
   const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault);
   const [isShowAsSoldOut, setIsShowAsSoldOut] = useState(itemData.isShowAsSoldOut);
   const [buyQuantity, setBuyQuantity] = useState(itemData.buyQuantity);

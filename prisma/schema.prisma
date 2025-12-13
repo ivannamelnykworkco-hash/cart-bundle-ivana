@@ -1,6 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// To add or update a model in prisma
+// npm run prisma migrate dev -- --name add-YourTableName-table
+//
 generator client {
   provider = "prisma-client-js"
 }
@@ -247,7 +249,7 @@ model QuantityBreak {
   discountPrice         Float?
   badgeText             String
   badgeStyle            String
-  labelText             String @default("")
+  labelText             String 
   isSelectedByDefault   Boolean
   isShowAsSoldOut       Boolean
   labelTitle            String
@@ -255,7 +257,7 @@ model QuantityBreak {
   bgColor               String
   textColor             String
   labelSize             Int
-  upsellItems           UpsellItem[]  @relation("QbUpsell")
+  upsellItems           QbUpsellItem[]  
   createdAt             String
   updatedAt             String
 }
@@ -270,7 +272,7 @@ model BuyXGetY {
   subtitle    String
   badgeText   String
   badgeStyle  String
-  labelText       String @default("")
+  labelText   String  
   isSelectedByDefault   Boolean
   isShowAsSoldOut       Boolean
   labelTitle      String
@@ -278,7 +280,7 @@ model BuyXGetY {
   bgColor         String
   textColor       String
   labelSize       Int
-  upsellItems         UpsellItem[]    @relation("BxGyUpsell")
+  upsellItems         BxGyUpsellItem[]    
   createdAt       String
   updatedAt       String
 }
@@ -305,16 +307,14 @@ model BundleUpsell {
   bgColor         String
   textColor       String
   labelSize       Int
-  upsellItems         UpsellItem[]  @relation("BundlesUpsell")
+  upsellItems         BundleUpsellItem[]  
   createdAt String
   updatedAt String
 }
 
-model UpsellItem {
+model QbUpsellItem {
   id          String @id @default(cuid())
-  qbId        String?
-  bxGyId      String?
-  buId        String?
+  qbId        String
   isSelectedProduct   String
   selectedVariants    String
   quantity            Int 
@@ -330,9 +330,53 @@ model UpsellItem {
   bgColor             String
   textColor           String
   labelSize           Int             
-  quantityBreak       QuantityBreak?   @relation("QbUpsell", fields: [qbId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  buyXGetY            BuyXGetY?        @relation("BxGyUpsell", fields: [bxGyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  bundleUpsell        BundleUpsell?    @relation("BundlesUpsell", fields: [buId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  quantityBreak       QuantityBreak?   @relation(fields: [qbId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt           String
+  updatedAt           String
+}
+
+model BxGyUpsellItem {
+  id          String @id @default(cuid())
+  bxGyId      String
+  isSelectedProduct   String
+  selectedVariants    String
+  quantity            Int 
+  selectPrice         String
+  discountPrice       Float?
+  priceText           String
+  imageSize           Int     
+  isSelectedByDefault Boolean
+  isVisibleOnly       Boolean
+  isShowAsSoldOut     Boolean
+  labelTitle          String
+  opacity             Float
+  bgColor             String
+  textColor           String
+  labelSize           Int             
+  buyXGetY            BuyXGetY?        @relation(fields: [bxGyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt           String
+  updatedAt           String
+}
+
+model BundleUpsellItem {
+  id          String @id @default(cuid())
+  buId      String
+  isSelectedProduct   String
+  selectedVariants    String
+  quantity            Int 
+  selectPrice         String
+  discountPrice       Float?
+  priceText           String
+  imageSize           Int     
+  isSelectedByDefault Boolean
+  isVisibleOnly       Boolean
+  isShowAsSoldOut     Boolean
+  labelTitle          String
+  opacity             Float
+  bgColor             String
+  textColor           String
+  labelSize           Int             
+  bundleUpsell        BundleUpsell?        @relation(fields: [buId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   createdAt           String
   updatedAt           String
 }
