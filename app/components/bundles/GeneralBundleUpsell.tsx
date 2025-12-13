@@ -87,24 +87,23 @@ export function GeneralBundleUpsell({
     id: product.id,
     variants: product.variants
   }));
-  const [showQuantityChecked, setShowQuantityChecked] = useState(false);
-  const [defaultQuantityValue, setDefaultQuantityValue] = useState(1);
-  const [showPriceDecimal, setShowPriceDecimal] = useState(false);
-  const [isShowLowAlert, setIsShowLowAlert] = useState(false);
+  const [isShowQuantitySelector, setIsShowQuantitySelector] = useState(false);
+  const [productCounts, setProductCounts] = useState(1);
+  const [isSelectedByDefault, setIsSelectedByDefault] = useState(false);
+  const [isShowAsSoldOut, setIsShowAsSoldOut] = useState(false);
 
   // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [discountValue, setDiscountValue] = useState('20');//
+  const [discountPrice, setDiscountPrice] = useState('20');//
   const [opacity, setOpacity] = useState<number>(20);//
-  const [sizeValue, setSizeValue] = useState('13');//
-  const [selected, setSelected] = useState("default");//
+  const [labelSize, setLabelSize] = useState('13');//
+  const [selectPrice, setSelectPrice] = useState("default");//
   const [badgeSelected, setBadgeSelected] = useState("simple");//
   const [title, setTitle] = useState((loaderData as any).bundleUpsellTitle || "");//
   const [subtitle, setSubtitle] = useState((loaderData as any).bundleUpsellSubtitle || "");//
   const [bagdeText, setBagdeText] = useState((loaderData as any).bundleUpsellBagdeText || "");//
-  const [barLabelText, setBarLabelText] = useState((loaderData as any).bunldeUpsellLabelText || "");
+  const [labelText, setLabelText] = useState((loaderData as any).bunldeUpsellLabelText || "");
   const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState({});
   const barDefaultPrice = selectedProduct;
 
@@ -152,19 +151,19 @@ export function GeneralBundleUpsell({
   );
 
   useEffect(() => {
-    const quantity = defaultQuantityValue;
+    const quantity = productCounts;
     const basePrice = parseFloat(barDefaultPrice || "0");
-    const discountPercent = parseFloat(discountValue || "0");
+    const discountPercent = parseFloat(discountPrice || "0");
 
     let calc = 0;
     let base = quantity * basePrice;
 
-    if (selected === 'discounted%') {
+    if (selectPrice === 'discounted%') {
       calc = quantity * basePrice * (1 - discountPercent / 100);
-    } else if (selected === 'discounted$') {
+    } else if (selectPrice === 'discounted$') {
       calc = quantity * basePrice - (quantity * discountPercent);
-    } else if (selected === 'specific') {
-      calc = parseFloat(discountValue || "0");
+    } else if (selectPrice === 'specific') {
+      calc = parseFloat(discountPrice || "0");
     } else {
       calc = quantity * basePrice;
     }
@@ -175,8 +174,8 @@ export function GeneralBundleUpsell({
       subtitle,
       badgeSelected,
       bagdeText,
-      barLabelText,
-      barDefaultQualityalue,
+      labelText,
+      productCounts,
       selectedProduct,
       base: Number(base.toFixed(2)),
       calc: Number(calc.toFixed(2)),
@@ -189,8 +188,8 @@ export function GeneralBundleUpsell({
     subtitle,
     badgeSelected,
     bagdeText,
-    barDefaultQualityalue,
-    barLabelText,
+    productCounts,
+    labelText,
     selectedProduct,
     onDataObjChange
   ]);
@@ -292,20 +291,20 @@ export function GeneralBundleUpsell({
             {/* {Label} */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 7 }}>
-                <PopUpover title='Label' defaultPopText='' upPopTextChange={setBarLabelText} badgeSelected={barLabelText} />
+                <PopUpover title='Label' defaultPopText='' upPopTextChange={setLabelText} badgeSelected={labelText} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
                 <Checkbox
                   label="Selected by default"
-                  checked={showPriceDecimal}
-                  onChange={setShowPriceDecimal}
+                  checked={isSelectedByDefault}
+                  onChange={setIsSelectedByDefault}
                 />
               </Grid.Cell>
             </Grid>
             <Checkbox
               label="Show quantity selector"
-              checked={showQuantityChecked}
-              onChange={setShowQuantityChecked}
+              checked={isShowQuantitySelector}
+              onChange={setIsShowQuantitySelector}
             />
 
             <Divider />
@@ -321,8 +320,8 @@ export function GeneralBundleUpsell({
                   <TextField
                     label
                     type="number"
-                    value={String(defaultQuantityValue)}
-                    onChange={(value: string) => setDefaultQuantityValue(Number(value))}
+                    value={String(productCounts)}
+                    onChange={(value: string) => setProductCounts(Number(value))}
                     autoComplete="off"
                   />
                 </Box>
@@ -335,28 +334,28 @@ export function GeneralBundleUpsell({
                     label="Price"
                     options={upsellsOptions}
                     onChange={handleUpsellSelectChange}
-                    value={selected}
+                    value={selectPrice}
                   />
                 </Grid.Cell>
                 <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
-                  {selected === 'discounted%' && (
+                  {selectPrice === 'discounted%' && (
                     <TextField
                       label="Discount per item"
                       type="number"
-                      value={discountValue}
-                      onChange={setDiscountValue}
+                      value={discountPrice}
+                      onChange={setDiscountPrice}
                       autoComplete="off"
                       min={1}
                       max={100}
                       suffix="%"
                     />
                   )}
-                  {selected === 'discounted$' && (
+                  {selectPrice === 'discounted$' && (
                     <TextField
                       label="Discount per item"
                       type="number"
-                      value={discountValue}
-                      onChange={setDiscountValue}
+                      value={discountPrice}
+                      onChange={setDiscountPrice}
                       autoComplete="off"
                       min={1}
                       max={100}
@@ -364,12 +363,12 @@ export function GeneralBundleUpsell({
                       prefix="$"
                     />
                   )}
-                  {selected === 'specific' && (
+                  {selectPrice === 'specific' && (
                     <TextField
                       label="Total price"
                       type="number"
-                      value={discountValue}
-                      onChange={setDiscountValue}
+                      value={discountPrice}
+                      onChange={setDiscountPrice}
                       autoComplete="off"
                       min={1}
                       max={100}
@@ -432,9 +431,9 @@ export function GeneralBundleUpsell({
                 <Text as="span" variant="bodyMd" fontWeight="semibold">
                   Show as Sold out
                 </Text>
-                <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
+                <SwitchIcon checked={isShowAsSoldOut} onChange={setIsShowAsSoldOut} />
               </InlineStack>
-              {isShowLowAlert && (
+              {isShowAsSoldOut && (
                 <BlockStack gap="300">
                   <PopUpover title='Label title' defaultPopText='Sold out' upPopTextChange={undefined} badgeSelected={""} />
                   <Grid>
@@ -469,8 +468,8 @@ export function GeneralBundleUpsell({
                         <TextField
                           label
                           type="number"
-                          value={sizeValue}
-                          onChange={setSizeValue}
+                          value={labelSize}
+                          onChange={setLabelSize}
                           autoComplete="off"
                           min={10}
                           max={50}

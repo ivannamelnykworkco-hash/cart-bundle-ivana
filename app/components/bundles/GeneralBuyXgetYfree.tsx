@@ -185,11 +185,14 @@ export function GeneralBuyXgetYfree({
   }, [onDeleteUpsell]);
 
   const onBoxUpsellDataChange = useCallback((childId, childBarId, data) => {
-    setBoxUpsells(prev => {
-      const updated = [...prev];
-      updated[childId] = { ...updated[childId], ...data };
-      return updated;
-    });
+    setBoxUpsells(prev =>
+      prev.map(item =>
+        item.id === childId
+          ? { ...item, ...data }
+          : item
+      )
+    );
+
   }, []);
 
   const handleSizeChange = useCallback((newValue: string) => {

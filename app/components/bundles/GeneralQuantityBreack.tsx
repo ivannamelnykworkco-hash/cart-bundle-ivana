@@ -55,7 +55,7 @@ export function GeneralQuantityBreack({
   onAddUpsell,
   onDeleteUpsell,
   onDataObjChange,
-  // onDataAddUpsellChange,
+  onDataAddUpsellChange,
 }) {
 
   const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault);
@@ -175,30 +175,33 @@ export function GeneralQuantityBreack({
   }, [onDeleteUpsell]);
 
   const onBoxUpsellDataChange = useCallback((childId, childBarId, data) => {
-    setBoxUpsells(prev => {
-      const updated = [...prev];
-      updated[childId] = { ...updated[childId], ...data };
-      return updated;
-    });
-  }, []);
+    setBoxUpsells(prev =>
+      prev.map(item =>
+        item.id === childId
+          ? { ...item, ...data }
+          : item
+      )
+    );
 
+    // setBoxUpsells(prev => {
+    //   const updated = [...prev];
+    //   updated[childId] = { ...updated[childId], ...data };
+    //   return updated;
+    // });
+  }, []);
   const handleUpsellSelectChange = useCallback((value: string) => {
     setSelectPrice(value);
   }, []);
-
   const handleSizeChange = useCallback((newValue: string) => {
     setLabelSize(parseInt(newValue, 10));
   }, []);
-
   const handleDiscountPriceChange = useCallback((value: string) => {
     const numeric = Number(value);
     setDiscountPrice(Number.isFinite(numeric) ? numeric : 0);
   }, []);
-
   const handleBgColor = (newColor: string) => {
     setBgColor(newColor);
   };
-
   const handleTextColor = (newColor: string) => {
     setTextColor(newColor);
   };

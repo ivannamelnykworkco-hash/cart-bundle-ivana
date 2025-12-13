@@ -128,6 +128,16 @@ export async function updateBuyXGetY(data) {
       where: { id: { in: buyXGetYData.upsellItemsToDeleteIds } }
     });
   }
+  const incomingIds = buyXGetYData.upsellItems
+    .map(u => u.id)
+    .filter(Boolean);
+
+  await db.bxGyUpsellItem.deleteMany({
+    where: {
+      bxGyId: buyXGetY.id,
+      id: { notIn: incomingIds },
+    },
+  });
 
   // UPSERT each upsell
   for (const u of buyXGetYData.upsellItems) {

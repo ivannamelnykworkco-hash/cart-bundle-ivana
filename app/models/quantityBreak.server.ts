@@ -135,9 +135,19 @@ export async function updateQuantityBreak(data) {
     });
   }
 
+  const incomingIds = qbData.upsellItems
+    .map(u => u.id)
+    .filter(Boolean);
+
+  await db.qbUpsellItem.deleteMany({
+    where: {
+      qbId: quantityBreak.id,
+      id: { notIn: incomingIds },
+    },
+  });
   // UPSERT each upsell
   for (const u of qbData.upsellItems) {
-    const relationData: any = {};
+
     await db.qbUpsellItem.upsert({
       where: { id: u.id ?? crypto.randomUUID() },
       update: {
