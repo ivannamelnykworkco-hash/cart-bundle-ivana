@@ -118,6 +118,7 @@ export function GeneralQuantityBreack({
     });
     onDataObjChange?.(id, qbObjectData());
   }, [
+    id,
     quantity,
     title,
     subtitle,
@@ -151,6 +152,7 @@ export function GeneralQuantityBreack({
       qbId: id,
       isSelectedProduct: "upsellSelectedproduct",
       selectedVariants: "",
+      selectedProduct: "",
       selectPrice: "Specific (e.g. $29)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
@@ -174,21 +176,22 @@ export function GeneralQuantityBreack({
     onDeleteUpsell?.(barId, upsellId);
   }, [onDeleteUpsell]);
 
-  const onBoxUpsellDataChange = useCallback((childId, childBarId, data) => {
-    setBoxUpsells(prev =>
-      prev.map(item =>
-        item.id === childId
-          ? { ...item, ...data }
-          : item
-      )
-    );
+  const onBoxUpsellDataChange = useCallback(
+    (childId: string | number, barId: string | number, data: any) => {
+      if (!data) return;
 
-    // setBoxUpsells(prev => {
-    //   const updated = [...prev];
-    //   updated[childId] = { ...updated[childId], ...data };
-    //   return updated;
-    // });
-  }, []);
+      setBoxUpsells(prev => {
+        const updated = Array.isArray(prev)
+          ? prev.map(item => (item.id === childId ? { ...item, ...data } : item))
+          : [];
+        console.log("Updated boxUpsells:"); // log here
+        return updated;
+      });
+    },
+    []
+  );
+
+
   const handleUpsellSelectChange = useCallback((value: string) => {
     setSelectPrice(value);
   }, []);

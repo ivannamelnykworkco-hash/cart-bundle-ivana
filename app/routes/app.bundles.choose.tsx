@@ -733,51 +733,58 @@ export default function BundleSettingsAdvanced() {
   const [selectedCountry, setSelectedCountry] = useState(loaderData.selectedCountry);
   const [showOriginal, setShowOriginal] = useState(true)
   const [badgeSelected, setBadgeSelected] = useState({});
-  const [addUpsells, setAddUpsells] = useState<Record<number, Record<number, AddUpsellData>>>({});
+  // const [addUpsells, setAddUpsells] = useState<Record<number, Record<number, AddUpsellData>>>({});
   const [addProducts, setAddProducts] = useState<Record<number, Record<number, AddUpsellData>>>({});
 
-  const handleDataAddUpsellChange = useCallback(
-    (id: number, bundleId: number, updated: AddUpsellData) => {
-      setAddUpsells(prev => ({
-        ...prev,
-        [bundleId]: {
-          ...(prev[bundleId] ?? {}),
-          [id]: {
-            ...(prev[bundleId]?.[id] ?? {}),
-            ...updated,
-          },
-        },
-      }));
+  // const handleDataAddUpsellChange = useCallback(
+  //   (id: number, bundleId: number, updated: AddUpsellData) => {
+  //     setAddUpsells(prev => ({
+  //       ...prev,
+  //       [bundleId]: {
+  //         ...(prev[bundleId] ?? {}),
+  //         [id]: {
+  //           ...(prev[bundleId]?.[id] ?? {}),
+  //           ...updated,
+  //         },
+  //       },
+  //     }));
 
-    },
-    [setAddUpsells],
-  );
-  useEffect(() => {
-    Object.keys(addUpsells).forEach((itemId) => {
-      console.log('addUpsells for item:', itemId, addUpsells[itemId]);
-    });
-  }, [addUpsells]);
+  //   },
+  //   [setAddUpsells],
+  // );
+  // useEffect(() => {
+  //   Object.keys(addUpsells).forEach((itemId) => {
+  //     console.log('addUpsells for item:', itemId, addUpsells[itemId]);
+  //   });
+  // }, [addUpsells]);
 
   const handleQbDataObj = useCallback((id, updated) => {
+    console.log("handleQbDataObj called with:", updated);
+
     setQuantityBreakData(prev => {
-      // CASE 1: child removed → updated === null
+      // CASE 1: child removed
       if (updated === null) {
         return prev.filter(item => item.id !== id);
       }
-      const exists = prev.findIndex(item => item.id === id);
+
       // CASE 2: update existing
-      if (exists !== -1) {
-        const copy = [...prev];
-        copy[exists] = { ...copy[exists], ...updated };
-        return copy;
+      const found = prev.some(item => item.id === id);
+      if (found) {
+        return prev.map(item =>
+          item.id === id ? { ...item, ...updated } : item
+        );
       }
+
       // CASE 3: add new
-      return [...prev, { id, ...updated }];
+      return [...prev, updated];
     });
   }, []);
 
-  // useEffect(() => {
-  // }, [quantityBreakData]);
+  // Log quantityBreakData whenever it changes
+  useEffect(() => {
+    console.log("quantityBreakData:", quantityBreakData);
+  }, [quantityBreakData]);
+
   //////////////////////////////////////////////////////////////////////////////buy x,get y free
   const [defaultBasePrice, setDefaultBasePrice] = useState({});
   const [xyDataObj, setXyDataObj] = useState({});
@@ -1116,7 +1123,7 @@ export default function BundleSettingsAdvanced() {
                     onDeleteProducts={handleonDeleteProductChange}
                     onChangeStyle={setSelectedStyle}
                     onDataObjChange={handleBuDataObj}
-                    onDataAddUpsellChange={handleDataAddUpsellChange}
+                    // onDataAddUpsellChange={handleDataAddUpsellChange}
                     onDataAddProductItemChange={handleDataAddProductChange}
                   />
                 ))}
@@ -1240,9 +1247,8 @@ export default function BundleSettingsAdvanced() {
                           )}
                           {/* {add quantity Breaks} */}
                           {quantityBreakData.map((item) => {
-                            const qbData = quantityBreakData[item.id];
+                            const qbData = item;
                             const currentIsSelected = selectedId === item.id;
-
                             const qbCalc = qbData?.calc != null ? Number(qbData.calc) : 0;
                             const qbBase = qbData?.base != null ? Number(qbData.base) : 0;
 
@@ -1253,7 +1259,7 @@ export default function BundleSettingsAdvanced() {
                                 onClick={() => setSelectedId(item.id)}
                               >
                                 <Box position="relative">
-                                  {(qbData?.badgeSelected || "") === "simple" && qbData?.bagdeText && (
+                                  {(qbData?.badgeStyle || "") === "simple" && qbData?.badgeText && (
                                     <div className="bundle_bar_most_popular">
                                       <div
                                         className="bundle_bar_most_popular_content"
@@ -1263,13 +1269,13 @@ export default function BundleSettingsAdvanced() {
                                         }}
                                       >
                                         <span style={{ color: barBadgeTextColor }}>
-                                          {qbData?.bagdeText || ""}
+                                          {qbData?.badgeText || ""}
                                         </span>
                                       </div>
                                     </div>
                                   )}
 
-                                  {(qbData?.badgeSelected || "") === "mostpopular" && (
+                                  {(qbData?.badgeStyle || "") === "mostpopular" && (
                                     <div className="bundle_bar_most_popular_fancy">
                                       <MostPopularfancy
                                         barBadgeTextColor={barBadgeTextColor}
@@ -1366,7 +1372,7 @@ export default function BundleSettingsAdvanced() {
                                                   fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                               }}
                                             >
-                                              {qbData?.barLabelText || ""}
+                                              {qbData?.labelTitle || ""}
                                             </span>
                                           </div>
                                         </InlineStack>
@@ -1431,15 +1437,15 @@ export default function BundleSettingsAdvanced() {
                                     </div>
                                   </div>
 
-                                  {/* Add Upsell */}
+                                  {/* Add Upsell qb */}
                                   <div className="bar-upsell-container-main">
-                                    {upsells[item.id]?.map((upsell, index) => {
-                                      const upsellData = addUpsells[item.id]?.[upsell.id];
-                                      const imageSize = upsellData?.imageSizeValue || 50;
-                                      const upsellCalc =
-                                        upsellData?.calc != null ? Number(upsellData.calc) : 0;
-                                      const upsellBase =
-                                        upsellData?.base != null ? Number(upsellData.base) : 0;
+                                    {item?.upsellItems?.map((upsell, index) => {
+                                      const upsellData = upsell;
+                                      console.log("upsellData++>", upsellData);
+                                      const imageSize = upsellData?.imageSize || 40;
+                                      const upsellCalc = upsellData?.calc != null ? Number(upsellData.calc) : 0;
+                                      const upsellBase = upsellData?.base != null ? Number(upsellData.base) : 0;
+                                      const isLastIndex = index === (item?.upsellItems?.length ?? 0) - 1;
 
                                       return (
                                         <div
@@ -1448,11 +1454,11 @@ export default function BundleSettingsAdvanced() {
                                           style={{
                                             background: barUpsellBackColor,
                                             borderBottomRightRadius:
-                                              index === (upsells[item.id]?.length ?? 0) - 1
+                                              isLastIndex
                                                 ? cornerRadius
                                                 : "",
                                             borderBottomLeftRadius:
-                                              index === (upsells[item.id]?.length ?? 0) - 1
+                                              isLastIndex
                                                 ? cornerRadius
                                                 : "",
                                           }}
@@ -1483,7 +1489,7 @@ export default function BundleSettingsAdvanced() {
                                                 />
                                               </div>
                                               <span style={{ color: barUpsellTextColor }}>
-                                                {upsellData?.barUpsellText ?? ""}
+                                                {upsellData?.priceText ?? ""}
                                               </span>
                                             </div>
 
@@ -1708,13 +1714,13 @@ export default function BundleSettingsAdvanced() {
 
                                   {/* Add Upsell */}
                                   <div className="bar-upsell-container-main">
-                                    {upsells[item.id]?.map((upsell, index) => {
-                                      const upsellData = addUpsells[item.id]?.[upsell.id];
-                                      const imageSize = upsellData?.imageSizeValue || 50;
-                                      const upsellCalc =
-                                        upsellData?.calc != null ? Number(upsellData.calc) : 0;
-                                      const upsellBase =
-                                        upsellData?.base != null ? Number(upsellData.base) : 0;
+                                    {item?.upsellItems?.map((upsell, index) => {
+                                      const upsellData = upsell;
+                                      console.log("upsellData++>", upsellData);
+                                      const imageSize = upsellData?.imageSize || 40;
+                                      const upsellCalc = upsellData?.calc != null ? Number(upsellData.calc) : 0;
+                                      const upsellBase = upsellData?.base != null ? Number(upsellData.base) : 0;
+                                      const isLastIndex = index === (item?.upsellItems?.length ?? 0) - 1;
 
                                       return (
                                         <div
@@ -1723,11 +1729,11 @@ export default function BundleSettingsAdvanced() {
                                           style={{
                                             background: barUpsellBackColor,
                                             borderBottomRightRadius:
-                                              index === (upsells[item.id]?.length ?? 0) - 1
+                                              isLastIndex
                                                 ? cornerRadius
                                                 : "",
                                             borderBottomLeftRadius:
-                                              index === (upsells[item.id]?.length ?? 0) - 1
+                                              isLastIndex
                                                 ? cornerRadius
                                                 : "",
                                           }}
@@ -1758,7 +1764,7 @@ export default function BundleSettingsAdvanced() {
                                                 />
                                               </div>
                                               <span style={{ color: barUpsellTextColor }}>
-                                                {upsellData?.barUpsellText ?? ""}
+                                                {upsellData?.priceText ?? ""}
                                               </span>
                                             </div>
 
@@ -2155,13 +2161,13 @@ export default function BundleSettingsAdvanced() {
 
                                   {/* Add Upsell */}
                                   <div className="bar-upsell-container-main">
-                                    {upsells[item.id]?.map((upsell, index) => {
-                                      const upsellData = addUpsells[item.id]?.[upsell.id];
-                                      const imageSize = upsellData?.imageSizeValue || 50;
-                                      const upsellCalc =
-                                        upsellData?.calc != null ? Number(upsellData.calc) : 0;
-                                      const upsellBase =
-                                        upsellData?.base != null ? Number(upsellData.base) : 0;
+                                    {item?.upsellItems?.map((upsell, index) => {
+                                      const upsellData = upsell;
+                                      console.log("upsellData++>", upsellData);
+                                      const imageSize = upsellData?.imageSize || 40;
+                                      const upsellCalc = upsellData?.calc != null ? Number(upsellData.calc) : 0;
+                                      const upsellBase = upsellData?.base != null ? Number(upsellData.base) : 0;
+                                      const isLastIndex = index === (item?.upsellItems?.length ?? 0) - 1;
 
                                       return (
                                         <div
@@ -2170,11 +2176,11 @@ export default function BundleSettingsAdvanced() {
                                           style={{
                                             background: barUpsellBackColor,
                                             borderBottomRightRadius:
-                                              index === (upsells[item.id]?.length ?? 0) - 1
+                                              isLastIndex
                                                 ? cornerRadius
                                                 : "",
                                             borderBottomLeftRadius:
-                                              index === (upsells[item.id]?.length ?? 0) - 1
+                                              isLastIndex
                                                 ? cornerRadius
                                                 : "",
                                           }}
@@ -2205,7 +2211,7 @@ export default function BundleSettingsAdvanced() {
                                                 />
                                               </div>
                                               <span style={{ color: barUpsellTextColor }}>
-                                                {upsellData?.barUpsellText ?? ""}
+                                                {upsellData?.priceText ?? ""}
                                               </span>
                                             </div>
 

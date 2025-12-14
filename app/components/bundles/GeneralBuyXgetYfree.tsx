@@ -161,6 +161,7 @@ export function GeneralBuyXgetYfree({
       bxGyId: id,
       isSelectedProduct: "upsellSelectedproduct",
       selectedVariants: "",
+      selectedProduct: "",
       selectPrice: "Specific (e.g. $29)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
