@@ -12,12 +12,16 @@ import {
 } from "@shopify/polaris";
 import { ImageIcon, VariantIcon } from '@shopify/polaris-icons';
 import { SelectProductModal } from "./SelectProductModal";
+import { useLoaderData } from "@remix-run/react";
 
-export function SetDefaultVariantsModal({ productArray }) {
+export function SetDefaultVariantsModal({ productArray, onSelect }) {
 
+  const loaderData = useLoaderData<typeof loader>();
+  const defaultVariant = JSON.parse(loaderData.generalSettingConf.setDefaultVariant);
+  console.log("defaul==>", defaultVariant);
   const [activeModalSetDefaultVariants, setActiveModalSetDefaultVariants] = useState(false);
   const [bundleType, setBundleType] = useState('singleType');
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any>([defaultVariant] ?? []);
 
   //FUNCTIONS
 
@@ -29,7 +33,12 @@ export function SetDefaultVariantsModal({ productArray }) {
   const handleReceiveProduct = (value) => {
     setSelectedProduct(value); // receive → store
   };
-  const handleShowSetDefaultVariants = useCallback(() => setActiveModalSetDefaultVariants(!activeModalSetDefaultVariants), [activeModalSetDefaultVariants]);
+  const handleShowSetDefaultVariants = useCallback(() => {
+    if (selectedProduct) {
+      onSelect(selectedProduct[0]);
+    }
+    setActiveModalSetDefaultVariants(!activeModalSetDefaultVariants);
+  }, [activeModalSetDefaultVariants]);
   const modalSetDefaultVariantsActivator = <Button icon={VariantIcon} onClick={handleShowSetDefaultVariants}>Set default variants</Button>;
   const row = [
     <Box width="60px">
@@ -53,7 +62,7 @@ export function SetDefaultVariantsModal({ productArray }) {
       />
     </Box>,
     <Text as="span" alignment="start">
-      {product.title}
+      {product?.title}
     </Text>
   ]);
 
@@ -171,27 +180,6 @@ export function SetDefaultVariantsModal({ productArray }) {
                           name="bundleType"
                           onChange={handleBundleType}
                         />
-                        {/* <div
-                          style={{
-                            width: "20px",
-                            height: "20px",
-                            borderRadius: "50%",
-                            border: "2px solid #000",
-                            background: "#000",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: "8px",
-                              height: "8px",
-                              borderRadius: "50%",
-                              background: "#fff",
-                            }}
-                          />
-                        </div> */}
                         <BlockStack gap="050">
                           <InlineStack gap="200" blockAlign="center">
                             <Text
@@ -254,14 +242,20 @@ export function SetDefaultVariantsModal({ productArray }) {
                 </Box>
                 <Box width="30%">
                   <BlockStack align="start">
-                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="single" buttonText='Select a product' />
+                    <SelectProductModal
+                      productArray={productArray}
+                      onSelect={handleReceiveProduct}
+                      title="Select Products"
+                      selectionMode="single"
+                      buttonText='Select a product'
+                    />
                   </BlockStack>
                 </Box>
               </InlineStack>
             </BlockStack>
           </Box>
         </InlineStack>
-      </Modal.Section>
+      </Modal.Section >
     </Modal >
   );
 }

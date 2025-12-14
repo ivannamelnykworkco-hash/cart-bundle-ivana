@@ -485,6 +485,7 @@ export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
   const checkboxUpsellConf = loaderData.checkboxUpsellConf;
   const shopifyFunctions = loaderData.shopifyFunctions;
+  console.log("generalconf>>>", loaderData.generalSettingConf);
   /**************recevie response from action function************/
   const actionData = useActionData();
   useEffect(() => {
@@ -1517,7 +1518,8 @@ export default function BundleSettingsAdvanced() {
                           })}
                           {/* {add buy x, get y free!} */}
                           {buyXGetYData.map((item) => {
-                            const xyData = xyDataObj[item.id];
+                            const xyData = item;
+                            console.log("xyData==>", xyData);
 
                             const currentIsSelected = selectedId === item.id;
                             const xyCalc = xyData?.calc != null ? Number(xyData.calc) : 0;
@@ -1531,7 +1533,7 @@ export default function BundleSettingsAdvanced() {
                               >
                                 <Box position="relative">
                                   {/* simple badge */}
-                                  {(xyData?.badgeSelected || "") === "simple" && xyData?.bagdeText && (
+                                  {(xyData?.badgeStyle || "") === "simple" && xyData?.badgeText && (
                                     <div className="bundle_bar_most_popular">
                                       <div
                                         className="bundle_bar_most_popular_content"
@@ -1541,14 +1543,14 @@ export default function BundleSettingsAdvanced() {
                                         }}
                                       >
                                         <span style={{ color: barBadgeTextColor }}>
-                                          {xyData?.bagdeText || ""}
+                                          {xyData?.badgeText || ""}
                                         </span>
                                       </div>
                                     </div>
                                   )}
 
                                   {/* fancy badge */}
-                                  {(xyData?.badgeSelected || "") === "mostpopular" && (
+                                  {(xyData?.badgeStyle || "") === "mostpopular" && (
                                     <div className="bundle_bar_most_popular_fancy">
                                       <MostPopularfancy
                                         barBadgeTextColor={barBadgeTextColor}
@@ -1633,7 +1635,7 @@ export default function BundleSettingsAdvanced() {
                                           <div
                                             className="bar-label--text-container"
                                             style={{
-                                              background: xyData?.barLabelText ? barLabelBack : null,
+                                              background: xyData?.labelText ? barLabelBack : null,
                                               borderRadius: `${cornerRadius}px`,
                                             }}
                                           >
@@ -1648,7 +1650,7 @@ export default function BundleSettingsAdvanced() {
                                                   fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                               }}
                                             >
-                                              {xyData?.barLabelText || ""}
+                                              {xyData?.labelText || ""}
                                             </span>
                                           </div>
                                         </InlineStack>
@@ -1791,22 +1793,21 @@ export default function BundleSettingsAdvanced() {
                           })}
                           {/* {main bundle Upsell} */}
                           {bundleUpsellData.map((item) => {
-                            const buData = buDataObj[item.id];
-                            const bundleProducts = products[item.id] ?? [];
-
+                            const buData = item;
+                            console.log('buData==>', buData);
+                            const bundleProducts = item?.productItems ?? []; // use the whole array
                             const getBundleUpsellTotalPrice = () => {
-                              const total = bundleProducts.reduce((sum, product) => {
-                                const productData = addProducts[item.id]?.[product.id];
-                                const value = Number(productData?.calc) || 0;
-                                return sum + value;
-                              }, 0);
-                              return total.toFixed(2);
+                              return bundleProducts
+                                .reduce((sum, product) => {
+                                  const value = Number(product?.calc ?? 0); // sum each product's calc
+                                  return sum + value;
+                                }, 0)
+                                .toFixed(2);
                             };
 
                             const getBaseBundleUpsellTotalPrice = () => {
                               const total = bundleProducts.reduce((sum, product) => {
-                                const productData = addProducts[item.id]?.[product.id];
-                                const value = Number(productData?.base) || 0;
+                                const value = Number(product?.base ?? 0); // sum each product's calc
                                 return sum + value;
                               }, 0);
                               return total.toFixed(2);
@@ -1820,7 +1821,7 @@ export default function BundleSettingsAdvanced() {
                               >
                                 <Box position="relative">
                                   {/* simple badge */}
-                                  {(buData?.badgeSelected || "") === "simple" && buData?.bagdeText && (
+                                  {(buData?.badgeStyle || "") === "simple" && buData?.badgeText && (
                                     <div className="bundle_bar_most_popular">
                                       <div
                                         className="bundle_bar_most_popular_content"
@@ -1830,14 +1831,14 @@ export default function BundleSettingsAdvanced() {
                                         }}
                                       >
                                         <span style={{ color: barBadgeTextColor }}>
-                                          {buData?.bagdeText}
+                                          {buData?.badgeText}
                                         </span>
                                       </div>
                                     </div>
                                   )}
 
                                   {/* fancy badge */}
-                                  {(buData?.badgeSelected || "") === "mostpopular" && (
+                                  {(buData?.badgeStyle || "") === "mostpopular" && (
                                     <div className="bundle_bar_most_popular_fancy">
                                       <MostPopularfancy
                                         barBadgeTextColor={barBadgeTextColor}
@@ -1926,7 +1927,7 @@ export default function BundleSettingsAdvanced() {
                                           <div
                                             className="bar-label--text-container"
                                             style={{
-                                              background: buData?.barLabelText ? barLabelBack : null,
+                                              background: buData?.labelText ? barLabelBack : null,
                                               borderRadius: `${cornerRadius}px`,
                                             }}
                                           >
@@ -1941,7 +1942,7 @@ export default function BundleSettingsAdvanced() {
                                                   fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                               }}
                                             >
-                                              {buData?.barLabelText}
+                                              {buData?.labelText}
                                             </span>
                                           </div>
                                         </InlineStack>
@@ -2019,12 +2020,10 @@ export default function BundleSettingsAdvanced() {
                                       borderRadius: cornerRadius,
                                     }}
                                   >
-                                    {bundleProducts.map((product) => {
-                                      const productData = addProducts[item.id]?.[product.id];
-                                      const buDataArray =
-                                        buDataObj[item.id]?.selectedProduct?.[product.id];
-                                      const title = buDataArray?.[0]?.title ?? "";
-                                      const imageSource = buDataArray?.[0]?.imageUrl ?? NoteIcon;
+                                    {item?.productItems?.map((product) => {
+                                      const productData = product;
+                                      const title = product?.selectedProduct?.[0]?.title ?? '';
+                                      const imageSource = product?.selectedProduct?.[0]?.imageUrl ?? NoteIcon;
 
                                       return (
                                         <div
@@ -2100,15 +2099,15 @@ export default function BundleSettingsAdvanced() {
                                             </div>
 
                                             <div className="bundles-products__product--price">
-                                              {productData?.base ? (
+                                              {productData?.calc ? (
                                                 <span className="selected-price-tag">
-                                                  ${Number(productData.base).toFixed(2)}
+                                                  ${Number(productData.calc).toFixed(2)}
                                                 </span>
                                               ) : (
                                                 <div className="selected-price-tags">
                                                   <span className="selected-price-tag">
-                                                    {productData?.calc
-                                                      ? Number(productData.calc).toFixed(2)
+                                                    {productData?.base
+                                                      ? Number(productData.base).toFixed(2)
                                                       : "Selected Product"}
                                                   </span>
                                                   {productData?.base &&
@@ -2146,9 +2145,9 @@ export default function BundleSettingsAdvanced() {
                                                   </select>
                                                 )}
 
-                                              {productData?.calc && (
+                                              {productData?.base && (
                                                 <s className="bundles-produts_product--price-compareprice">
-                                                  ${Number(productData.calc).toFixed(2)}
+                                                  ${Number(productData.base).toFixed(2)}
                                                 </s>
                                               )}
                                             </div>

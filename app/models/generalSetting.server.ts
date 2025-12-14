@@ -76,6 +76,7 @@ export async function updateGeneralSetting(id: string, data: Partial<GeneralSett
     endDateTime: new Date(`${data.endDate}T${data.endTime}`).toISOString(),
     letCustomer: data.variant === "true",
     showVariant: data.variantSingle === "true",
+    setDefaultVariant: data.defaultVariant || "",
     hideTheme: data.hidnPicker === "true",
     showPrices: data.showPricesItem === "true",
     showBothPrices: data.showBothPrices === "true",

@@ -96,6 +96,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   const [isShowLowAlert, setIsShowLowAlert] = useState(conf.showAlert);///
   const [textValue, setTextValue] = useState(conf.msgText);///
   const [textColor, setTextColor] = useState(conf.msgColor);
+  const [defaultVariant, setDefaultVariant] = useState(conf.setDefaultVariant);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [selectedCollection, setSelectedCollection] = useState<any>(null);
   const [excludedProduct, setExcludedProduct] = useState<any>(null);
@@ -148,6 +149,11 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   const handleColorChange = (value) => {
     setTextColor(value);
   }
+  const handleReceiveDefaultVariant = (value) => {
+    setDefaultVariant(value);
+    console.log("defaultvalue>>>", defaultVariant);
+  }
+
   const selectedProductData = visibility === "all" ? [] : selectedProduct?.map(item => item.id);
   const selectedCollectionData = visibility === "all" ? [] : selectedCollection?.map(item => item.id);
   const excludedProductData = visibility === "all" ? [] : excludedProduct?.map(item => item.id);
@@ -169,6 +175,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
     endTime,
     variant,
     variantSingle,
+    defaultVariant,
     hidnPicker,
     showPricesItem,
     showBothPrices,
@@ -216,6 +223,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
     priceRounding,
     roundingValue,
     updatePrice,
+    defaultVariant,
     updatePriceSelect,
     isGoCheckout,
     isShowLowAlert,
@@ -228,7 +236,6 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
     excludedCollection,
     onDataChange
   ]);
-
   return (
     < Card >
       <BlockStack gap="400">
@@ -435,7 +442,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
                 />
                 <ButtonGroup fullWidth>
                   <AddSwatchesModal onSaveSwatch={handleOnSaveSwatch} />
-                  <SetDefaultVariantsModal productArray={productArray} />
+                  <SetDefaultVariantsModal productArray={productArray} onSelect={handleReceiveDefaultVariant} />
                 </ButtonGroup>
               </BlockStack>
             </BlockStack>
@@ -623,6 +630,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
     </Card >
   );
 }
+
 
 
 

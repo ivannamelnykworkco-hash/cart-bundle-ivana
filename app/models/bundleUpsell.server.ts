@@ -46,6 +46,7 @@ export async function updateBundleUpsell(data) {
         selectPrice: u.selectPrice || "",
         discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : 0,
         selectedVariants: u.selectedVariants || "",
+        selectedProduct: u.selectedProduct || "",
         createdAt: u.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }));
@@ -65,6 +66,7 @@ export async function updateBundleUpsell(data) {
         buId: u.buId || null,
         isSelectedProduct: u.isSelectedProduct || "",
         selectedVariants: u.selectedVariants || "",
+        selectedProduct: u.selectedProduct || "",
         selectPrice: u.selectPrice || "",
         quantity: parseInt(u.quantity, 10) || 1,
         discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : 0,
@@ -194,6 +196,7 @@ export async function updateBundleUpsell(data) {
         selectPrice: u.selectPrice,
         discountPrice: u.discountPrice,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         updatedAt: new Date().toISOString()
       },
       create: {
@@ -202,6 +205,7 @@ export async function updateBundleUpsell(data) {
         selectPrice: u.selectPrice,
         discountPrice: u.discountPrice,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         createdAt: u.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -227,6 +231,7 @@ export async function updateBundleUpsell(data) {
       update: {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
         discountPrice: u.discountPrice,
@@ -248,6 +253,7 @@ export async function updateBundleUpsell(data) {
       create: {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
         discountPrice: u.discountPrice,

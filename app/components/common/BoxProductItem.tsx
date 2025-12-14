@@ -8,7 +8,7 @@ export function BoxProductItem({
   barId,
   id,
   deleteSection,
-  selectproductInfo,
+  selectedProduct,
   productItemData,
   onDataAddProductItemChange
 }) {
@@ -17,9 +17,9 @@ export function BoxProductItem({
   const [selectedVariants, setSelectedVariants] = useState(productItemData.selectedVariants ?? "");
   const [discountPrice, setDiscountPrice] = useState(productItemData.discountPrice ?? 20);
   const [quantity, setQuantity] = useState(productItemData.quantity ?? 1);
-  const barAddUpsellDefaultPrice = selectproductInfo[1].price;
+  const barAddUpsellDefaultPrice = selectedProduct[1].price;
   useEffect(() => {
-    if (!selectproductInfo) return;
+    if (!selectedProduct) return;
     const basePrice = Number(barAddUpsellDefaultPrice) || 0;
     const value = Number(discountPrice) || 0;
     let base = quantity * basePrice;
@@ -41,9 +41,10 @@ export function BoxProductItem({
         quantity,
         barAddUpsellDefaultPrice,
         selectedVariants,
+        selectedProduct,
         discountPrice,
         calc: Number(calculated.toFixed(2)),
-        base: Number(basePrice.toFixed(2)),
+        base: Number(base.toFixed(2)),
       }
       );
     }
@@ -54,6 +55,7 @@ export function BoxProductItem({
     quantity,
     barAddUpsellDefaultPrice,
     selectedVariants,
+    selectedProduct,
     discountPrice,
     onDataAddProductItemChange,
   ]);
@@ -70,14 +72,14 @@ export function BoxProductItem({
     <div style={{ borderRadius: "10px", border: '1px solid lightgrey', padding: '15px', gap: "10px", display: 'flex', flexDirection: 'column' }}>
       <InlineStack align="space-between" wrap={false}>
         <InlineStack gap="200">
-          {selectproductInfo && selectproductInfo[0] && (
+          {selectedProduct && selectedProduct[0] && (
             <div style={{ marginBottom: '10px', display: 'flex', gap: '20px' }}>
               <Thumbnail
-                source={selectproductInfo[0].imageUrl}
-                alt={selectproductInfo[0].title}
+                source={selectedProduct[0].imageUrl}
+                alt={selectedProduct[0].title}
               />
               <Text as='span' fontWeight="bold">
-                {selectproductInfo[0].title}
+                {selectedProduct[0].title}
               </Text>
             </div>
           )}
@@ -102,7 +104,7 @@ export function BoxProductItem({
       </InlineStack>
       {/* {change pre-selectd variant} */}
       <SelectProductModal
-        productArray={selectproductInfo}
+        productArray={selectedProduct}
         onSelect={setSelectedVariants}
         title="Add variant"
         selectionMode="singleVariant"

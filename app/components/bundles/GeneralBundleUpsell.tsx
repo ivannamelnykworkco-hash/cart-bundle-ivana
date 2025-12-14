@@ -64,6 +64,8 @@ export function GeneralBundleUpsell({
     id: product.id,
     variants: product.variants
   }));
+  console.log("generalconf>>>", loaderData?.generalSettingConf?.setDefaultVariant);
+  const defaultVariant = JSON.parse(loaderData?.generalSettingConf?.setDefaultVariant);
   const [isShowQuantitySelector, setIsShowQuantitySelector] = useState(itemData.isShowQuantitySelector ?? false);
   const [productCounts, setProductCounts] = useState(itemData.productCounts ?? 1);
   const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault ?? false);
@@ -78,11 +80,19 @@ export function GeneralBundleUpsell({
   const [badgeText, setBadgeText] = useState(itemData.badgeText || "");//
   const [labelText, setLabelText] = useState(itemData.labelText || "");
   const [labelTitle, setLabelTitle] = useState(itemData.labelTitle || "");
-  const [boxUpsells, setBoxUpsells] = useState(itemData.upsellItems ?? []);
-  const [selectedProduct, setSelectedProduct] = useState({});
+  const [boxUpsells, setBoxUpsells] = useState(itemData.upsellItems ?? []); console.log('itemData==>', itemData)
   const [products, setProducts] = useState(itemData.productItems ?? []);
   const [bgColor, setBgColor] = useState(itemData.bgColor);
   const [textColor, setTextColor] = useState(itemData.textColor);
+  const [selectedProduct, setSelectedProduct] = useState(() => {
+    const initialState = {};
+    itemData.productItems?.forEach(item => {
+      if (item.selectedProduct) {
+        initialState[item.id] = item.selectedProduct;
+      }
+    });
+    return initialState;
+  });
 
   const barDefaultPrice = selectedProduct;
 
@@ -167,6 +177,7 @@ export function GeneralBundleUpsell({
       qbId: id,
       isSelectedProduct: "upsellSelectedproduct",
       selectedVariants: "",
+      selectedProduct: "",
       selectPrice: "Specific (e.g. $29)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
@@ -209,7 +220,8 @@ export function GeneralBundleUpsell({
       quantity: 1,
       selectPrice: "Discounted % (e.g. 25% off)",
       discountPrice: 20,
-      selectedVariants: ""
+      selectedVariants: "",
+      selectedProduct: ""
     };
     setProducts(prev => [...prev, newProduct]); // local child state if needed
     onAddProduct?.(barId, newProduct); // send barId + new upsell to parent
@@ -262,9 +274,10 @@ export function GeneralBundleUpsell({
   const handleReceiveProduct = (itemId) => (value) => {
     setSelectedProduct(prev => ({
       ...prev,
-      [itemId]: value,   // store product for that item
+      [itemId]: value,
     }));
-    upSeletedProduct(barId, { [itemId]: value });
+
+    // upSeletedProduct(barId, { [itemId]: value });
   };
 
   return (
@@ -356,8 +369,12 @@ export function GeneralBundleUpsell({
             <BlockStack gap="300">
               <InlineStack align="space-between" blockAlign="center">
                 <InlineStack align="center" blockAlign="center" gap='200'>
-                  <Thumbnail source={NoteIcon} size="small" alt="Small document" />
-                  <Text as="span" fontWeight="bold">Default product</Text>
+                  <Thumbnail
+                    source={defaultVariant?.imageUrl ?? NoteIcon}
+                    size="small"
+                    alt={defaultVariant?.title ?? "Default product"}
+                  />
+                  <Text as="span" fontWeight="bold">{defaultVariant?.title ?? "Default "}</Text>
                 </InlineStack>
                 <Box width='20%'>
                   <TextField
@@ -441,7 +458,7 @@ export function GeneralBundleUpsell({
                       key={item.id}
                       barId={barId}
                       productItemData={item}
-                      selectproductInfo={selectedProduct[item.id]}
+                      selectedProduct={selectedProduct[item.id]}
                       deleteSection={deleteProduct}
                       onDataAddProductItemChange={onProductDataChange}
                     />

@@ -110,7 +110,7 @@ model GeneralSetting {
   swatchType String
   swatchSize    Int
   swatchShape   String
-  setDefaultVariant   String
+  setDefaultVariant   Json?
   showPrices  Boolean
   showBothPrices  Boolean
   unitLabel   String
@@ -365,6 +365,7 @@ model BundleUpsellItem {
   buId      String
   isSelectedProduct   String
   selectedVariants    String
+  selectedProduct     Json?
   quantity            Int 
   selectPrice         String
   discountPrice       Float?
@@ -390,6 +391,7 @@ model ProductItem {
   selectPrice     String
   discountPrice   Float?
   selectedVariants         String
+  selectedProduct     Json?
   createdAt           String
   updatedAt           String
   bundleUpsell        BundleUpsell    @relation(fields: [buId], references: [id], onDelete: Cascade, onUpdate: Cascade)

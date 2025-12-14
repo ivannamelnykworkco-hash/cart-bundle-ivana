@@ -47,7 +47,7 @@ export function BoxUpSellItem({
   const [isVisibleOnly, setIsVisibleOnly] = useState(upsellItemData.isVisibleOnly);
   const [selectedProduct, setSelectedProduct] = useState(upsellItemData.selectedProduct);
   const [priceText, setPriceText] = useState(upsellItemData.priceText);
-  const [quantity, setQuantity] = useState(upsellItemData.quantity);
+  const [quantity, setQuantity] = useState(upsellItemData.quantity); console.log("upsellItemData==>", upsellItemData);
   const [discountPrice, setDiscountPrice] = useState(upsellItemData.discountPrice);
   const productArray =
     loaderData?.products?.map((product: any) => ({
@@ -66,13 +66,13 @@ export function BoxUpSellItem({
   useEffect(() => {
     const basePerUnit = Number(barAddUpsellDefaultPrice);
     const safeBasePerUnit = Number.isFinite(basePerUnit) ? basePerUnit : 10;
-    const safeQuantity = Number.isFinite(quantity) ? quantity : 1;
+    const safeQuantity = Number.isFinite(quantity) ? quantity : 0;
     // 2. Safe discount value
     const rawValue = Number(discountPrice);
     const safeValue = Number.isFinite(rawValue) ? rawValue : 0;
     // 3. Base price for quantity
-    const basePrice = safeBasePerUnit * safeQuantity || 0;  // 4. Calculate final price based on selectPrice
-
+    const basePrice = safeBasePerUnit * safeQuantity || 0; // 4. Calculate final price based on selectPrice
+    console.log("basePrice==>", safeQuantity);
 
 
     let calculated = basePrice;
@@ -129,9 +129,10 @@ export function BoxUpSellItem({
     setImageSize(value);
   }, []);
 
-  const handleQuantityChange = useCallback((value: string) => {
-    setQuantity(value);
-  }, []);
+  const handleQuantityChange = (value: string) => {
+    const nextQuantity = Math.max(0, Number(value) || 0);
+    setQuantity(nextQuantity);
+  };
 
   const handleDiscountPriceChange = useCallback((value: string) => {
     setDiscountPrice(value);
@@ -214,7 +215,7 @@ export function BoxUpSellItem({
                       type="number"
                       min={0}
                       max={100}
-                      value={quantity}
+                      value={String(quantity)}
                       onChange={handleQuantityChange}
                       autoComplete="off"
                     />
