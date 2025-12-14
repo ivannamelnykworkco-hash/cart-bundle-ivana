@@ -47,6 +47,7 @@ export async function updateQuantityBreak(data) {
         buId: u.buId || null,
         isSelectedProduct: u.isSelectedProduct || "",
         selectedVariants: u.selectedVariants || "",
+        selectedProduct: u.selectedProduct || "",
         selectPrice: u.selectPrice || "",
         quantity: parseInt(u.quantity, 10) || 1,
         discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : 0,
@@ -153,6 +154,7 @@ export async function updateQuantityBreak(data) {
       update: {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
         discountPrice: u.discountPrice,
@@ -174,6 +176,7 @@ export async function updateQuantityBreak(data) {
       create: {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
         discountPrice: u.discountPrice,

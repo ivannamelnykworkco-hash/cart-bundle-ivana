@@ -317,6 +317,7 @@ model QbUpsellItem {
   qbId        String
   isSelectedProduct   String
   selectedVariants    String
+  selectedProduct     Json?
   quantity            Int 
   selectPrice         String
   discountPrice       Float?
@@ -340,6 +341,7 @@ model BxGyUpsellItem {
   bxGyId      String
   isSelectedProduct   String
   selectedVariants    String
+  selectedProduct     Json?
   quantity            Int 
   selectPrice         String
   discountPrice       Float?

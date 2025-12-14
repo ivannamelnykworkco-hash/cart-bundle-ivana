@@ -44,6 +44,7 @@ export async function updateBuyXGetY(data) {
         buId: u.buId || null,
         isSelectedProduct: u.isSelectedProduct || "",
         selectedVariants: u.selectedVariants || "",
+        selectedProduct: u.selectedProduct || "",
         quantity: parseInt(u.quantity, 10) || 1,
         selectPrice: u.selectPrice || "",
         discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : null,
@@ -146,6 +147,7 @@ export async function updateBuyXGetY(data) {
       update: {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
         discountPrice: u.discountPrice,
@@ -167,6 +169,7 @@ export async function updateBuyXGetY(data) {
       create: {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
+        selectedProduct: u.selectedProduct,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
         discountPrice: u.discountPrice,

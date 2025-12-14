@@ -59,25 +59,30 @@ export function BoxUpSellItem({
 
   // price of first variant of the selected product
   const barAddUpsellDefaultPrice =
-    selectedProduct?.[0]?.variants?.[0]?.price ??
+    selectedProduct?.[1]?.price ??
     selectedProduct?.variants?.[0]?.price ??
     undefined;
 
   useEffect(() => {
-    const basePerUnitRaw = Number(barAddUpsellDefaultPrice);
-    const basePerUnit = Number.isFinite(basePerUnitRaw) ? basePerUnitRaw : 10;
-    const valueRaw = Number(discountPrice);
-    const value = Number.isFinite(valueRaw) ? valueRaw : 0;
-    let basePrice = basePerUnit * quantity;
-    if (!Number.isFinite(basePrice)) basePrice = 0;
+    const basePerUnit = Number(barAddUpsellDefaultPrice);
+    const safeBasePerUnit = Number.isFinite(basePerUnit) ? basePerUnit : 10;
+    const safeQuantity = Number.isFinite(quantity) ? quantity : 1;
+    // 2. Safe discount value
+    const rawValue = Number(discountPrice);
+    const safeValue = Number.isFinite(rawValue) ? rawValue : 0;
+    // 3. Base price for quantity
+    const basePrice = safeBasePerUnit * safeQuantity || 0;  // 4. Calculate final price based on selectPrice
+
+
+
     let calculated = basePrice;
 
     if (selectPrice === "discounted%") {
-      calculated = basePrice * (1 - value / 100);
+      calculated = basePrice * (1 - safeValue / 100);
     } else if (selectPrice === "discounted$") {
-      calculated = basePrice - value * quantity;
+      calculated = basePrice - safeValue * safeQuantity;
     } else if (selectPrice === "specific") {
-      calculated = value * quantity;
+      calculated = safeValue;
     }
     if (!Number.isFinite(calculated) || calculated < 0) {
       calculated = 0;
@@ -97,6 +102,7 @@ export function BoxUpSellItem({
       base: Number(basePrice.toFixed(2)),
     });
   }, [
+    id,
     barId,
     priceText,
     selectedProduct,
