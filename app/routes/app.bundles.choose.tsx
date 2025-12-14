@@ -34,7 +34,7 @@ import { MostPopularfancy } from "app/components/common/MostPopularfancy";
 import { getCountdownTimer, updateCountdownTimer } from "app/models/countdownTimer.server";
 import { GeneralQuantityBreack, createNewQuantityBreak } from "app/components/bundles/GeneralQuantityBreack";
 import { GeneralBuyXgetYfree, createNewBuyXGetY } from "app/components/bundles/GeneralBuyXgetYfree";
-import { GeneralBundleUpsell } from "app/components/bundles/GeneralBundleUpsell";
+import { GeneralBundleUpsell, createNewBundleUpsell } from "app/components/bundles/GeneralBundleUpsell";
 import { getGeneralStyle, updateGeneralStyle } from "app/models/generalStyle.server";
 import { getVolumeDiscount, updateVolumeDiscount } from "app/models/volumeDiscount.server";
 import { getStickyAdd, updateStickyAdd } from "app/models/stickyAdd.server";
@@ -292,7 +292,7 @@ export async function action({ request, params }) {
         updateGeneralStyle(generalStyle.id, generalStyle),
         updateQuantityBreaks(quantityBreak),
         updateBuyXGetYs(buyXGetY),
-        // updateBundleUpsells(bundleUpsell)
+        updateBundleUpsells(bundleUpsell)
       ]);
       return json({ success: true, automaticAppDiscount });
     } catch (err) {
@@ -329,46 +329,66 @@ export async function action({ request, params }) {
     collectionList = safeParse(collectionList);
     // discountConf type: quantity_break, buyx_gety, bundle_upsell
     // discout Type: default, percent, fixed_amount, total_price
-    let discountConf = [];
-    buyXGetY.forEach(record => {
-      discountConf.push({
-        type: "buyx_gety",
-        buyQuantity: record.buyQuantity,
-        getQuantity: record.getQuantity
-      });
-    });
-
+    const discountConf: any[] = [];
     const priceTypeMap = {
       "discounted%": "percent",
       "discounted$": "fixed_amount",
       "specific": "total_price"
     };
-
     quantityBreak.forEach(record => {
       discountConf.push({
         type: "quantity_break",
         quantity: record.quantity,
         discountType: priceTypeMap[record.selectPrice] || "default",
-        discountPricePerItem: record.discountPrice
+        discountPricePerItem: record.discountPrice,
+        upsellItems: record.upsellItems.map(item => ({
+          id: "", // item.selectedProduct
+          quantity: item.quantity,
+          discountType: priceTypeMap[item.selectPrice] || "default",
+          discountPricePerItem: item.discountPricePerItem
+        }))
       });
     });
 
-    // const discountConf = [{
-    //   "type": "quantity_break",
-    //   "quantity": 3,
-    //   "discountType": "total_price",
-    //   "discountPricePerItem": 100
-    // }, {
-    //   "type": "buyx_gety",
-    //   "buyQuantity": 3,
-    //   "getQuantity": 1
-    // }, {
+    buyXGetY.forEach(record => {
+      discountConf.push({
+        type: "buyx_gety",
+        buyQuantity: record.buyQuantity,
+        getQuantity: record.getQuantity,
+        upsellItems: record.upsellItems.map(item => ({
+          id: "", // item.selectedProduct
+          quantity: item.quantity,
+          discountType: priceTypeMap[item.selectPrice] || "default",
+          discountPricePerItem: item.discountPricePerItem
+        }))
+      });
+    });
+
+    bundleUpsell.forEach(record => {
+      discountConf.push({
+        type: "bundle_upsell",
+        defaultProduct: {
+          id: "gid://shopify/Product/10110757142807", // record.defaultProduct
+          quantity: record.quantity,
+          discountType: priceTypeMap[record.selectPrice] || "default",
+          discountPricePerItem: record.discountPrice
+        },
+        addedProducts: record.productItems.map(product => ({
+          id: "", // product.selectedProduct
+          quantity: product.quantity,
+          discountType: priceTypeMap[product.selectPrice] || "default",
+          discountPricePerItem: product.discountPricePerItem
+        }))
+      });
+    });
+
+    // {
     //   "type": "bundle_upsell",
-    //   "defaultProduct": {
+    //     "defaultProduct": {
     //     "id": "gid://shopify/Product/10110757798167",
-    //     "quantity": 1,
-    //     "discountType": "fixed_amount",
-    //     "discountPricePerItem": 50
+    //       "quantity": 1,
+    //         "discountType": "fixed_amount",
+    //           "discountPricePerItem": 50
     //   },
     //   "addedProducts": [
     //     {
@@ -377,7 +397,8 @@ export async function action({ request, params }) {
     //       "discountType": "percent",
     //       "discountPricePerItem": 50
     //     }]
-    // }];
+    // }
+
     const automaticAppDiscount = await updateDiscountAutomaticApp(admin, discountId, discountData);
     if (automaticAppDiscount == null) {
       return json(
@@ -417,7 +438,7 @@ export async function action({ request, params }) {
           updateGeneralStyle(generalStyle.id, generalStyle),
           updateQuantityBreaks(quantityBreak),
           updateBuyXGetYs(buyXGetY),
-          // updateBundleUpsells(bundleUpsell)
+          updateBundleUpsells(bundleUpsell)
         ]);
         return json({ success: true, result });
       } catch (err) {
@@ -720,10 +741,10 @@ export default function BundleSettingsAdvanced() {
     setBuyXGetYData(prev => prev.filter(item => item.id !== id));
   }
   const addBundleUpsell = () => [
-    setBundleUpsells(prev => [...prev, { id: Date.now() }])
+    setBundleUpsellData(prev => [...prev, createNewBundleUpsell()])
   ];
   const deleteBundleUpsell = (id: any) => {
-    setBundleUpsells(prev => prev.filter(item => item.id !== id))
+    setBundleUpsellData(prev => prev.filter(item => item.id !== id))
   }
   ///////////////////////////////////////////////////////////////// quantity break////////////////////////////////////////////////
   const [openPanel, setOpenPanel] = useState(null);
@@ -775,14 +796,9 @@ export default function BundleSettingsAdvanced() {
       return [...prev, { id, ...updated }];
     });
   }, []);
-
-  // useEffect(() => {
-  // }, [quantityBreakData]);
   //////////////////////////////////////////////////////////////////////////////buy x,get y free
   const [defaultBasePrice, setDefaultBasePrice] = useState({});
   const [xyDataObj, setXyDataObj] = useState({});
-
-  console.log("confData>>>", buyXGetYData);
 
   const handleXyDataObj = useCallback((id, updated) => {
     setBuyXGetYData(prev => {
@@ -801,57 +817,47 @@ export default function BundleSettingsAdvanced() {
       return [...prev, { id, ...updated }];
     });
   }, []);
-  // const handleXyDataObj = useCallback(
-  //   (id: number, updated: xyData) => {
-  //     setXyDataObj(prev => ({
-  //       ...prev,
-  //       [id]: {
-  //         ...(prev[id] ?? {}),
-  //         ...updated,
-  //       },
-  //     }));
-  //   },
-  //   [setXyDataObj],
-  // );
-
-  // useEffect(() => {
-  // }, [xyDataObj]);
   ///////////////////////////////////////////////////////////////////////////////////////////// bundleUpsell 
 
   //Bundle Upsell
   const [buDataObj, setBuDataObj] = useState({});
   type buData = any;
   const handleBuDataObj = useCallback(
-    (id: number, updated: buData) => {
-      setBuDataObj(prev => ({
-        ...prev,
-        [id]: {
-          ...(prev[id] ?? {}),
-          ...updated,
-        },
-      }));
-    },
-    [setBuDataObj],
-  );
-
+    (id, updated) => {
+      setBundleUpsellData(prev => {
+        // CASE 1: child removed → updated === null
+        if (updated === null) {
+          return prev.filter(item => item.id !== id);
+        }
+        const exists = prev.findIndex(item => item.id === id);
+        // CASE 2: update existing
+        if (exists !== -1) {
+          const copy = [...prev];
+          copy[exists] = { ...copy[exists], ...updated };
+          return copy;
+        }
+        // CASE 3: add new
+        return [...prev, { id, ...updated }];
+      });
+    }, []);
   useEffect(() => {
-    console.log('buDataObj ==>', buDataObj);
-  }, [buDataObj]);
-
+    console.log('bundleUpsellData ==>', bundleUpsellData);
+  }, [bundleUpsellData]);
 
   type AddProductData = any;
   const handleDataAddProductChange = useCallback(
-    (id: number, bundleId: number, updated: AddProductData) => {
+    (id: number, barId: number, updated: AddProductData) => {
       setAddProducts(prev => ({
         ...prev,
-        [bundleId]: {
-          ...(prev[bundleId] ?? {}),
+        [barId]: {
+          ...(prev[barId] ?? {}),
           [id]: {
-            ...(prev[bundleId]?.[id] ?? {}),
+            ...(prev[barId]?.[id] ?? {}),
             ...updated,
           },
         },
       }));
+      console.log("product>>>", products);
     },
     [setAddProducts],
   );
@@ -893,10 +899,10 @@ export default function BundleSettingsAdvanced() {
     }));
   };
   //add and delete bundleUpsell
-  const hanldeonAddProductChange = (bundleId: string | number, item: any) => {
+  const hanldeonAddProductChange = (barId: string | number, item: any) => {
     setProducts(prev => ({
       ...prev,
-      [bundleId]: [...(prev[bundleId] || []), item]
+      [barId]: [...(prev[barId] || []), item]
     }));
   };
 
@@ -1096,18 +1102,18 @@ export default function BundleSettingsAdvanced() {
                   />
                 ))}
 
-                {bundleUpsells.map((item) => (
+                {bundleUpsellData.map((item) => (
                   <GeneralBundleUpsell
                     key={item.id}
                     id={item.id}
-                    bundleId={item.id}
+                    barId={item.id}
                     open={openPanel === item.id}
                     onToggle={() =>
                       setOpenPanel(openPanel === item.id ? null : item.id)
                     }
                     deleteSection={deleteBundleUpsell}
                     heading="Complete the bundle"
-                    loaderData={loaderData}
+                    itemData={item}
                     styleOptions={styleOptions}
                     selectedStyle={selectedStyle}
                     onAddUpsell={handelonAddUpsellChange}
@@ -1785,7 +1791,7 @@ export default function BundleSettingsAdvanced() {
                             );
                           })}
                           {/* {main bundle Upsell} */}
-                          {bundleUpsells.map((item) => {
+                          {bundleUpsellData.map((item) => {
                             const buData = buDataObj[item.id];
                             const bundleProducts = products[item.id] ?? [];
 

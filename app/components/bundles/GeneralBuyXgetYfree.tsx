@@ -95,7 +95,6 @@ export function GeneralBuyXgetYfree({
   const [boxUpsells, setBoxUpsells] = useState(itemData?.upsellItems ?? []);
   const [bgColor, setBgColor] = useState(itemData.bgColor);
   const [textColor, setTextColor] = useState(itemData.textColor);
-  console.log("itemData>>>", itemData);
 
   const barDefaultPrice = 204.32;
 

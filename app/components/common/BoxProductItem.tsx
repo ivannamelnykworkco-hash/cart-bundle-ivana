@@ -3,47 +3,45 @@ import { useCallback, useEffect, useState } from "react";
 import { DeleteIcon } from '@shopify/polaris-icons';
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "../product/ProductList";
-import { SelectVariantModal } from "./SelectVariantModal";
 import { SelectProductModal } from "./SelectProductModal";
 export function BoxProductItem({
-  bundleId,
+  barId,
   id,
   deleteSection,
   selectproductInfo,
+  productItemData,
   onDataAddProductItemChange
 }) {
 
-  const [selected, setSelected] = useState("default");
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [productItemValue, setProductItemValue] = useState("20");
-  const [barDefaultQualityalue, setBarDefaultQualityalue] = useState<number>(1);
+  const [selectPrice, setSelectPrice] = useState(productItemData.selectPrice ?? "");
+  const [selectedVariants, setSelectedVariants] = useState(productItemData.selectedVariants ?? "");
+  const [discountPrice, setDiscountPrice] = useState(productItemData.discountPrice ?? 20);
+  const [quantity, setQuantity] = useState(productItemData.quantity ?? 1);
   const barAddUpsellDefaultPrice = selectproductInfo[1].price;
   useEffect(() => {
     if (!selectproductInfo) return;
-    const quantity = barDefaultQualityalue;
     const basePrice = Number(barAddUpsellDefaultPrice) || 0;
-    const value = Number(productItemValue) || 0;
-
+    const value = Number(discountPrice) || 0;
     let base = quantity * basePrice;
-
     let calculated = base;
-
-    if (selected === "discounted%") {
+    if (selectPrice === "discounted%") {
       calculated = base * (1 - value / 100);
-    } else if (selected === "discounted$") {
+    } else if (selectPrice === "discounted$") {
       calculated = base - value;
-    } else if (selected === "specific") {
+    } else if (selectPrice === "specific") {
       calculated = value;
     }
 
-    if (calculated < 0) calculated = 0;
+    if (calculated < 0)
+      calculated = 0;
     // IMPORTANT → Add upsell.id here
     if (onDataAddProductItemChange) {
-      onDataAddProductItemChange(id, bundleId, {
-        selected,
-        barDefaultQualityalue,
+      onDataAddProductItemChange(id, barId, {
+        selectPrice,
+        quantity,
         barAddUpsellDefaultPrice,
-        selectedProduct,
+        selectedVariants,
+        discountPrice,
         calc: Number(calculated.toFixed(2)),
         base: Number(basePrice.toFixed(2)),
       }
@@ -51,10 +49,12 @@ export function BoxProductItem({
     }
   }, [
     id,
-    bundleId,
-    selected,
-    productItemValue,
-    selectedProduct,
+    barId,
+    selectPrice,
+    quantity,
+    barAddUpsellDefaultPrice,
+    selectedVariants,
+    discountPrice,
     onDataAddProductItemChange,
   ]);
 
@@ -87,15 +87,15 @@ export function BoxProductItem({
             <TextField
               label
               type="number"
-              value={barDefaultQualityalue}
-              onChange={setBarDefaultQualityalue}
+              value={quantity}
+              onChange={setQuantity}
               autoComplete="off"
             />
           </Box>
           <Button
             variant="plain"
             textAlign="left"
-            onClick={() => deleteSection(bundleId, id)}
+            onClick={() => deleteSection(barId, id)}
             icon={DeleteIcon} // pass both
           ></Button>
         </InlineStack>
@@ -103,7 +103,7 @@ export function BoxProductItem({
       {/* {change pre-selectd variant} */}
       <SelectProductModal
         productArray={selectproductInfo}
-        onSelect={setSelectedProduct}
+        onSelect={setSelectedVariants}
         title="Add variant"
         selectionMode="singleVariant"
         buttonText="Select pre-selected variant"
@@ -113,27 +113,27 @@ export function BoxProductItem({
         <Select
           label="Price"
           options={upsellsOptions}
-          onChange={setSelected}
-          value={selected}
+          onChange={setSelectPrice}
+          value={selectPrice}
         />
-        {selected === 'discounted%' && (
+        {selectPrice === 'discounted%' && (
           <TextField
             label="Discount per item"
             type="number"
-            value={productItemValue}
-            onChange={setProductItemValue}
+            value={discountPrice}
+            onChange={setDiscountPrice}
             autoComplete="off"
             min={1}
             max={100}
             suffix="%"
           />
         )}
-        {selected === 'discounted$' && (
+        {selectPrice === 'discounted$' && (
           <TextField
             label="Discount per item"
             type="number"
-            value={productItemValue}
-            onChange={setProductItemValue}
+            value={discountPrice}
+            onChange={setDiscountPrice}
             autoComplete="off"
             min={1}
             max={100}
@@ -141,12 +141,12 @@ export function BoxProductItem({
             prefix="$"
           />
         )}
-        {selected === 'specific' && (
+        {selectPrice === 'specific' && (
           <TextField
             label="Total price"
             type="number"
-            value={productItemValue}
-            onChange={setProductItemValue}
+            value={discountPrice}
+            onChange={setDiscountPrice}
             autoComplete="off"
             min={1}
             max={100}

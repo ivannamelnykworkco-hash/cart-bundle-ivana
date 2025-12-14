@@ -26,7 +26,7 @@ export function createNewBundleUpsell(): BundleUpsell {
     isSelectedByDefault: false,//isSelectedByDefault
     isShowQuantitySelector: false,
     productCounts: 1,
-    selectPrice: "Disocounted %",
+    selectPrice: "default",
     discountPrice: 20,
     isShowAsSoldOut: false,//isShowAsSoldOut
     labelTitle: "",//labeltitle
@@ -39,116 +39,54 @@ export function createNewBundleUpsell(): BundleUpsell {
 
 export function GeneralBundleUpsell({
   id,//
-  bundleId,//
+  barId,//
   deleteSection,
   heading,//
   open,//
+  itemData,
   onToggle,//
   onAddUpsell,//
   onAddProduct,
   onDeleteUpsell,//
   onDeleteProducts,//
-  upSeletedProduct,//
-  upBadgeSelectedChange,
   styleOptions,
   selectedStyle,
   onChangeStyle,
   onDataObjChange,//
+  upBadgeStyleChange,
   onDataAddUpsellChange,
   onDataAddProductItemChange }) {
 
-  const initData = {
-    layoutOption: "",
-    title: 'Single', //title
-    subtitle: 'standard price', //subtitle
-    badgeText: '',//bagdeText
-    badgeStyle: 'simple',//badgeSelected
-    labelText: '',//barLabelText
-    isSelectedByDefault: false,//
-    isShowQuantitySelector: false,//showQuantityChecked
-    productCounts: 1,//barDefaultQualityalue
-    selectPrice: "Disocounted %",//selected
-    discountPrice: 20,//discountValue
-    isShowAsSoldOut: false,//isShowLowAlert
-    labelTitle: "",//
-    opacity: 20,//*
-    bgColor: "#ffffff",
-    textColor: "#000000",
-    labelSize: 13, //sizeValue
-    boxUpsells: [],
-    productItems: []
-  }
-
   const loaderData = useLoaderData<typeof loader>();
-
   const productArray = loaderData?.products?.map((product: any) => ({
     title: product.title,
     imageUrl: product.imageUrl,
     id: product.id,
     variants: product.variants
   }));
-  const [isShowQuantitySelector, setIsShowQuantitySelector] = useState(false);
-  const [productCounts, setProductCounts] = useState(1);
-  const [isSelectedByDefault, setIsSelectedByDefault] = useState(false);
-  const [isShowAsSoldOut, setIsShowAsSoldOut] = useState(false);
-
-  // barDefaultPrice can be updated via setBarDefaultPrice, and the useEffect will recalculate the price
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [discountPrice, setDiscountPrice] = useState('20');//
-  const [opacity, setOpacity] = useState<number>(20);//
-  const [labelSize, setLabelSize] = useState('13');//
-  const [selectPrice, setSelectPrice] = useState("default");//
-  const [badgeSelected, setBadgeSelected] = useState("simple");//
-  const [title, setTitle] = useState((loaderData as any).bundleUpsellTitle || "");//
-  const [subtitle, setSubtitle] = useState((loaderData as any).bundleUpsellSubtitle || "");//
-  const [bagdeText, setBagdeText] = useState((loaderData as any).bundleUpsellBagdeText || "");//
-  const [labelText, setLabelText] = useState((loaderData as any).bunldeUpsellLabelText || "");
-  const [boxUpSells, setBoxUpSells] = useState<BoxUpSells[]>([]);
+  const [isShowQuantitySelector, setIsShowQuantitySelector] = useState(itemData.isShowQuantitySelector ?? false);
+  const [productCounts, setProductCounts] = useState(itemData.productCounts ?? 1);
+  const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault ?? false);
+  const [isShowAsSoldOut, setIsShowAsSoldOut] = useState(itemData.isShowAsSoldOut ?? false);
+  const [discountPrice, setDiscountPrice] = useState(itemData.discountPrice ?? 20);//
+  const [opacity, setOpacity] = useState(itemData.opacity ?? 100);//
+  const [labelSize, setLabelSize] = useState(itemData.labelSize ?? 12);//
+  const [selectPrice, setSelectPrice] = useState(itemData.selectPrice ?? "");//
+  const [badgeStyle, setBadgeStyle] = useState(itemData.badgeStyle ?? "");//
+  const [title, setTitle] = useState(itemData.title ?? "");//
+  const [subtitle, setSubtitle] = useState(itemData.subtitle || "");//
+  const [badgeText, setBadgeText] = useState(itemData.badgeText || "");//
+  const [labelText, setLabelText] = useState(itemData.labelText || "");
+  const [labelTitle, setLabelTitle] = useState(itemData.labelTitle || "");
+  const [boxUpsells, setBoxUpsells] = useState(itemData.upsellItems ?? []);
   const [selectedProduct, setSelectedProduct] = useState({});
+  const [products, setProducts] = useState(itemData.productItems ?? []);
+  const [bgColor, setBgColor] = useState(itemData.bgColor);
+  const [textColor, setTextColor] = useState(itemData.textColor);
+
   const barDefaultPrice = selectedProduct;
 
   // { add upsellitem and delete}
-  const addBoxUpSell = () => {
-    const newId = Date.now();
-    const newUpsell = { id: newId };
-
-    setBoxUpSells(prev => [...prev, newUpsell]); // local child state if needed
-    onAddUpsell(bundleId, newUpsell); // send bundleId + new upsell to parent
-  };
-  const deleteBoxUpsell = (barId: string | number, upsellId: any) => {
-    setBoxUpSells(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
-    onDeleteUpsell(barId, upsellId);
-  };
-  // add product select button and delete product
-  const [products, setProducts] = useState<BoxUpSells[]>([]);
-  const addProduct = () => {
-    const newId = Date.now();
-    const newUpsell = { id: newId };
-    setProducts(prev => [...prev, newUpsell]); // local child state if needed
-    onAddProduct(bundleId, newUpsell); // send bundleId + new upsell to parent
-  };
-  const deleteProduct = (bundleId: string | number, upsellId: any) => {
-    setProducts(prev => prev.filter(item => item.id !== upsellId)); // remove from child array
-    onDeleteProducts(bundleId, upsellId);
-  };
-
-
-
-  const handleUpsellSelectChange = useCallback(
-    (value: string) => {
-      setSelected(value);
-    },
-    [],
-  );
-  const handleBadgeSelectChange = useCallback(
-    (value: string) => {
-      setBadgeSelected(value);
-      if (upBadgeSelectedChange) {
-        upBadgeSelectedChange(id, value);
-      }
-    },
-    [id, upBadgeSelectedChange],
-  );
 
   useEffect(() => {
     const quantity = productCounts;
@@ -170,13 +108,24 @@ export function GeneralBundleUpsell({
 
     const buObjectData = () => ({
       id,
+      layoutOption: "",
       title,
       subtitle,
-      badgeSelected,
-      bagdeText,
+      badgeText,
+      badgeStyle,
       labelText,
+      isSelectedByDefault,
+      isShowQuantitySelector,
       productCounts,
-      selectedProduct,
+      selectPrice,
+      discountPrice,
+      isShowAsSoldOut,
+      labelTitle,
+      opacity,
+      bgColor,
+      textColor,
+      upsellItems: boxUpsells,
+      productItems: products,
       base: Number(base.toFixed(2)),
       calc: Number(calc.toFixed(2)),
 
@@ -186,14 +135,117 @@ export function GeneralBundleUpsell({
     id,
     title,
     subtitle,
-    badgeSelected,
-    bagdeText,
-    productCounts,
+    badgeText,
+    badgeStyle,
     labelText,
-    selectedProduct,
+    isSelectedByDefault,
+    isShowQuantitySelector,
+    productCounts,
+    selectPrice,
+    discountPrice,
+    isShowAsSoldOut,
+    labelTitle,
+    opacity,
+    bgColor,
+    textColor,
+    boxUpsells,
+    products,
     onDataObjChange
   ]);
 
+  useEffect(() => {
+    return () => {
+      // cleanup: tell parent to remove this child
+      onDataObjChange?.(id, null);
+    };
+  }, []);
+
+  const addBoxUpsell = useCallback(() => {
+    const newId = Math.random().toString(36).substr(2, 9);
+    const newUpsell = {
+      id: newId,
+      qbId: id,
+      isSelectedProduct: "upsellSelectedproduct",
+      selectedVariants: "",
+      selectPrice: "Specific (e.g. $29)",
+      discountPrice: 20,
+      priceText: "+ Add at 20% discount",
+      imageSize: 20,
+      isSelectedByDefault: false,
+      isVisibleOnly: false,
+      isShowAsSoldOut: false,
+      labelTitle: "labelTitle",
+      opacity: 50,
+      bgColor: "#FF0000",
+      textColor: "#00FF00",
+      labelSize: 15,
+    };
+    setBoxUpsells(prev => [...prev, newUpsell]);
+    onAddUpsell?.(barId, newUpsell);
+  }, [onAddUpsell]);
+
+  // Delete upsell
+  const deleteBoxUpsell = useCallback((barId, upsellId) => {
+    setBoxUpsells(prev => prev.filter(item => item.id !== upsellId));
+    onDeleteUpsell?.(barId, upsellId);
+  }, [onDeleteUpsell]);
+  // Send Upselldata Change
+  const onBoxUpsellDataChange = useCallback((childId, childBarId, data) => {
+    setBoxUpsells(prev =>
+      prev.map(item =>
+        item.id === childId
+          ? { ...item, ...data }
+          : item
+      )
+    );
+  }, []);
+
+  // add product select button and delete product
+  const addProduct = useCallback(() => {
+    const newId = Math.random().toString(36).substr(2, 9);
+    const newProduct = {
+      id: newId,
+      buId: id,
+      quantity: 1,
+      selectPrice: "Discounted % (e.g. 25% off)",
+      discountPrice: 20,
+      selectedVariants: ""
+    };
+    setProducts(prev => [...prev, newProduct]); // local child state if needed
+    onAddProduct?.(barId, newProduct); // send barId + new upsell to parent
+  }, [onAddProduct]);
+
+  const deleteProduct = useCallback((barId, productId) => {
+    setProducts(prev => prev.filter(item => item.id !== productId));
+    onDeleteProducts?.(barId, productId);
+  }, [onDeleteProducts]);
+
+  const onProductDataChange = useCallback((childId, childBarId, data) => {
+    setProducts(prev =>
+      prev.map(item =>
+        item.id === childId
+          ? { ...item, ...data }
+          : item
+      )
+    );
+    console.log("",);
+  }, []);
+
+  const handleUpsellSelectChange = useCallback(
+    (value: string) => {
+      setSelectPrice(value);
+    },
+    [],
+  );
+  const handleBadgeSelectChange = useCallback(
+    (value: string) => {
+      setBadgeStyle(value);
+      if (upBadgeStyleChange) {
+        upBadgeStyleChange(id, value);
+      }
+    },
+    [id, upBadgeStyleChange],
+  );
 
   const upsellsOptions = [
     { label: "Default", value: 'default' },
@@ -207,22 +259,13 @@ export function GeneralBundleUpsell({
     { label: "Most Popular", value: 'mostpopular' },
   ]
 
-  const QuantityBackground = "#FF0000";
-  const handleColorQuantityBackground = (newColor: string) => {
-    void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
-  };
-  const QuantityText = "#FF0000";
-  const handleColorQuantityText = (newColor: string) => {
-    void newColor; // kept for ColorPickerPopoverItem callback; state not needed here
-  };
   const handleReceiveProduct = (itemId) => (value) => {
     setSelectedProduct(prev => ({
       ...prev,
       [itemId]: value,   // store product for that item
     }));
-    upSeletedProduct(bundleId, { [itemId]: value });
+    upSeletedProduct(barId, { [itemId]: value });
   };
-
 
   return (
     < Card >
@@ -240,7 +283,7 @@ export function GeneralBundleUpsell({
           <InlineStack gap="100">
             {/* <Button icon={SortAscendingIcon} variant="tertiary" accessibilityLabel="Sort up" />
             <Button icon={SortDescendingIcon} variant="tertiary" accessibilityLabel="Sort down" /> */}
-            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(bundleId)} />
+            <Button icon={DeleteIcon} variant="tertiary" accessibilityLabel="Delete theme" onClick={() => deleteSection(barId)} />
           </InlineStack>
         </InlineStack>
         <Collapsible
@@ -271,7 +314,7 @@ export function GeneralBundleUpsell({
             {/* {Badge text} */}
             <Grid>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
-                <PopUpover title='Badge text' defaultPopText={bagdeText} upPopTextChange={setBagdeText} badgeSelected={badgeSelected} />
+                <PopUpover title='Badge text' defaultPopText={badgeText} upPopTextChange={setBadgeText} badgeSelected={badgeStyle} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 6, lg: 6 }}>
                 <BlockStack gap='200'>
@@ -282,7 +325,7 @@ export function GeneralBundleUpsell({
                     label=""
                     options={badgeStyleOption}
                     onChange={handleBadgeSelectChange}
-                    value={badgeSelected}
+                    value={badgeStyle}
                   />
                 </BlockStack>
               </Grid.Cell>
@@ -396,10 +439,11 @@ export function GeneralBundleUpsell({
                     <BoxProductItem
                       id={item.id}
                       key={item.id}
-                      bundleId={bundleId}
+                      barId={barId}
+                      productItemData={item}
                       selectproductInfo={selectedProduct[item.id]}
                       deleteSection={deleteProduct}
-                      onDataAddProductItemChange={onDataAddProductItemChange}
+                      onDataAddProductItemChange={onProductDataChange}
                     />
                   </Box>
                 )}
@@ -410,16 +454,17 @@ export function GeneralBundleUpsell({
             <Divider />
             {/* {three button} */}
             <BlockStack gap="300">
-              <Button onClick={addBoxUpSell} icon={ProductAddIcon}>Add upsell</Button>
+              <Button onClick={addBoxUpsell} icon={ProductAddIcon}>Add upsell</Button>
               <BlockStack gap="300">
                 {/* {Add upsell} */}
-                {boxUpSells.map((item) => (
+                {boxUpsells?.map((upsellItem) => (
                   <BoxUpSellItem
-                    key={item.id}
-                    id={item.id}
-                    bundleId={bundleId} // important
+                    key={upsellItem.id}
+                    id={upsellItem.id}
+                    upsellItemData={upsellItem}
+                    barId={barId}
                     deleteSection={deleteBoxUpsell}
-                    onDataAddUpsellChange={onDataAddUpsellChange}
+                    onDataAddUpsellChange={onBoxUpsellDataChange}
                   />
                 ))}
               </BlockStack>
@@ -455,10 +500,10 @@ export function GeneralBundleUpsell({
                     </Grid.Cell>
 
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
-                      <ColorPickerPopoverItem subtitle='Background' defaultColorSetting={QuantityBackground} colorWidth="100%" onColorChange={handleColorQuantityBackground} />
+                      <ColorPickerPopoverItem subtitle='Background' defaultColorSetting={bgColor} colorWidth="100%" onColorChange={setBgColor} />
                     </Grid.Cell>
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
-                      <ColorPickerPopoverItem subtitle='Text' defaultColorSetting={QuantityText} colorWidth="100%" onColorChange={handleColorQuantityText} />
+                      <ColorPickerPopoverItem subtitle='Text' defaultColorSetting={textColor} colorWidth="100%" onColorChange={setTextColor} />
                     </Grid.Cell>
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <BlockStack>

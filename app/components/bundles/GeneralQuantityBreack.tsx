@@ -151,7 +151,7 @@ export function GeneralQuantityBreack({
       qbId: id,
       isSelectedProduct: "upsellSelectedproduct",
       selectedVariants: "",
-      selectPrice: "Specific (e.g. $29)",
+      selectPrice: "Discounted % (e.g. 25% off)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
       imageSize: 20,
@@ -182,13 +182,8 @@ export function GeneralQuantityBreack({
           : item
       )
     );
-
-    // setBoxUpsells(prev => {
-    //   const updated = [...prev];
-    //   updated[childId] = { ...updated[childId], ...data };
-    //   return updated;
-    // });
   }, []);
+
   const handleUpsellSelectChange = useCallback((value: string) => {
     setSelectPrice(value);
   }, []);
