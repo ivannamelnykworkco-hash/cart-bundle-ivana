@@ -101,7 +101,7 @@
         xyListArray = product.xyList || [];
         buListArray = product.buList || [];
         gsListArray = product.gsList || [];
-        console.log("gsListArray==>", gsListArray);
+        console.log("qbListArray==>", qbListArray);
       }
     } catch (err) {
       console.error('Settings parse error:', err);
@@ -126,6 +126,9 @@
         })
         .filter(Boolean);
       /////////////////////////////////////////////////
+      /// selected product calculation
+
+
 
 
       /////////////////////////view cart drawer
@@ -156,12 +159,12 @@
           </div>
         </div>
         <div>
+          <div class="xcart-line-total" style="text-align:right;">
+          ${money(Number.isFinite(it.final_line_price) ? it.final_line_price : it.line_price)}
+          </div>
           <div class="xcart-price">
             ${compare ? `<span class="xcart-price--compare">${money(compare)}</span>` : ''}
             <span class="xcart-price--current">${money(current)}</span>
-          </div>
-          <div class="xcart-line-total" style="text-align:right;">
-            ${money(Number.isFinite(it.final_line_price) ? it.final_line_price : it.line_price)}
           </div>
         </div>
       </div>
@@ -178,6 +181,23 @@
           const upsellArray = Array.isArray(bundleItem.upsellItems)
             ? bundleItem.upsellItems
             : [];
+
+          const basePrice = it.price;
+          const discountPrice = bundleItem.discountPrice;
+          const quantity = bundleItem.quantity;
+          const selectPrice = bundleItem.selectPrice;
+
+          let base = quantity * basePrice;
+          let calc = base;
+          if (selectPrice === 'discounted%') {
+            calc = quantity * basePrice * (1 - discountPrice / 100);
+          } else if (selectPrice === 'discounted$') {
+            calc = quantity * (basePrice - discountPrice);
+          } else if (selectPrice === 'specific') {
+            calc = discountPrice;
+          } else {
+            calc = quantity * basePrice;
+          }
           html += `
                 <div class="xcart-main-quantity-break" data-bundle-id="${bundleItem.id}">
                   <div class="xcart-main-quantity-break--container">
@@ -212,9 +232,9 @@
                           </div>            
                         </div>
                         <div class="xcart--bundle-price">
-                          <div class="xcart-bundle-discounted-price">${money(current)}</div>
+                          <div class="xcart-bundle-discounted-price">${money(calc)}</div>
                           <div class="xcart-bundle-full-price">
-                            <span>${money(Number.isFinite(it.final_line_price) ? it.final_line_price : it.line_price)}</span>
+                            <span>${money(base)}</span>
                           </div>
                         </div>
                       </div>
@@ -222,16 +242,20 @@
             `;
 
           upsellArray.forEach((upsellItem) => {
+            console.log("upsellArray==>", upsellArray);
+            const imageUrl = upsellItem?.selectedProduct?.[0]?.imageUrl;
             html += `
                 <div class="xcart-upsell-container">
                   <div class="xcart-upsell-checkbox-with-product--info">
                     <input type="checkbox">
-                    <div class="xcart-upsell-img"><img src="${upsellItem.imageUrl || ''}" alt="${upsellItem.title || ''}" /></div>
+                    <div class="xcart-upsell-img" style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px">
+                     <img style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px" src="${imageUrl || ''}" alt="${upsellItem.title || ''}" />
+                    </div>
                     <div class="xcart-upsell-product-title">${upsellItem.priceText || ''}</div>
-                  </div>
+                  </div> 
                   <div class="xcart-upsell-prices">
-                    <div class="xcart-upsell-original-price">$${upsellItem.discountPrice || ''}</div>
-                    <div class="xcart-upsell-current-price">$${upsellItem.selectPrice || ''}</div>
+                    <div class="xcart-upsell-original-price">$${(upsellItem.calc.toFixed(2) || '')}</div>
+                    <div class="xcart-upsell-current-price">$${upsellItem.base.toFixed(2) || ''}</div>
                   </div>
                 </div>
               `;

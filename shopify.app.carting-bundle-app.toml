@@ -1,9 +1,12 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "b85595cc3f47f524f9bcfb5d0a60bc1d"
-name = "cartbundle-app"
+client_id = "c812c9caf9208233e1ad77170a906762"
+name = "carting bundle-app"
 application_url = "https://example.com"
 embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2026-01"
@@ -14,6 +17,3 @@ scopes = "write_discounts,write_products"
 
 [auth]
 redirect_urls = [ "https://example.com/api/auth" ]
-
-[build]
-automatically_update_urls_on_dev = true

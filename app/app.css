@@ -417,7 +417,7 @@
 }
 .bundles-products__product--price {
   display: flex;
-  flex-direction: column;
+  gap: 10px;
 }
 .products__divider-inline {
   background: #000;

@@ -319,6 +319,8 @@ model QbUpsellItem {
   selectedVariants    String
   selectedProduct     Json?
   quantity            Int 
+  base                Decimal  @default(10.00)
+  calc                Decimal  @default(20.00)
   selectPrice         String
   discountPrice       Float?
   priceText           String

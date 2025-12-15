@@ -28,7 +28,7 @@
 .xcart-remove:hover svg {transform: scale(1.2);}
 .xcart-price{display:flex;gap:8px;align-items:baseline;justify-content:flex-end;}
 .xcart-price--compare{text-decoration:line-through;opacity:.6}
-.xcart-price--current{font-weight:400; color: black; font-size: 12px;}
+.xcart-price--current{font-weight:400; color: black; font-size: 12px; text-decoration: line-through;}
 .xcart-line-items-with-bundle{display: flex; flex-direction: column;justify-content: space-between;height: 70%;}
 .xcart-line_title-with-qty {display: flex; flex-direction: column; justify-content: space-between; gap: 5px; width: 50%;}
 /* Actions */

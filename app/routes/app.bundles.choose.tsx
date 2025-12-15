@@ -1249,6 +1249,7 @@ export default function BundleSettingsAdvanced() {
                           {/* {add quantity Breaks} */}
                           {quantityBreakData.map((item) => {
                             const qbData = item;
+                            console.log('qbData==>', quantityBreakData);
                             const currentIsSelected = selectedId === item.id;
 
                             const qbCalc = qbData?.calc != null ? Number(qbData.calc) : 0;

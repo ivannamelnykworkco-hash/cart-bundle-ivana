@@ -70,6 +70,7 @@
 .xcart-bundle-full-price {
   color: var(--barFullPrice-color);
   font-size: var(--sutTitle-size);
+  text-decoration: line-through;
 }
 .xcart-bundle_bar_most_popular_fancy ellipse {
   fill: var(--barBadgeback-color);
@@ -128,8 +129,9 @@
 .xcart-upsell-current-price {
   font-size: var(--upsell-size);
   color: var(--barFullPrice-color);
+  text-decoration: line-through;
 }
-.xcart-upsell-img{
+/* .xcart-upsell-img{
   width: 40px;
   height: 40px;
   border-radius: 12px;
@@ -137,7 +139,7 @@
 .xcart-upsell-img img {
   width: 40px;
   height: 40px;
-}
+} */
 .xcart-upsell-checkbox-with-product--info {
   display: flex;
   align-items: center;
