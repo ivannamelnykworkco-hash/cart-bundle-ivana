@@ -47,7 +47,7 @@ export function BoxUpSellItem({
   const [isVisibleOnly, setIsVisibleOnly] = useState(upsellItemData.isVisibleOnly);
   const [selectedProduct, setSelectedProduct] = useState(upsellItemData.selectedProduct);
   const [priceText, setPriceText] = useState(upsellItemData.priceText);
-  const [quantity, setQuantity] = useState(upsellItemData.quantity); console.log("upsellItemData==>", upsellItemData);
+  const [quantity, setQuantity] = useState(upsellItemData.quantity);
   const [discountPrice, setDiscountPrice] = useState(upsellItemData.discountPrice);
   const productArray =
     loaderData?.products?.map((product: any) => ({

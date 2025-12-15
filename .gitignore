@@ -11,7 +11,7 @@ node_modules
 /prisma/dev.sqlite-journal
 /prisma/schema.prisma
 database.sqlite
-
+/prisma
 .env
 .env.*
 

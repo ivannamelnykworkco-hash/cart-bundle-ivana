@@ -1,3 +1,22 @@
+export const GET_DISCOUNT_WITH_TITLE_QUERY = `
+    query DiscountByTitle($titleQuery: String!) {
+      discountNodes(first: 10, query: $titleQuery) {
+        edges {
+          node {
+            id
+            discount {
+              __typename
+              ... on DiscountAutomaticApp {
+                title
+                status
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
 export const GET_DISCOUNT_QUERY = `
     query getAutomaticAppDiscount($id: ID!) {
     automaticDiscountNode(id: $id) {

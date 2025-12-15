@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Text,
   Box,
@@ -14,13 +14,29 @@ import {
 import { SearchIcon, ImageIcon } from "@shopify/polaris-icons";
 
 //Filtered indextable of products
-export function IndexDataTable({ inputArray, onSelect, selectionMode }) {
+export function IndexDataTable({ inputArray, onSelect, selectionMode, selected }) {
+  ////
+  const normalizedSelected = useMemo(() => {
+    if (!selected) return [];
+    return Array.isArray(selected) ? selected : [selected]; // ✅ ensures it's always an array
+  }, [selected]);
+
   const [queryValue, setQueryValue] = useState("");
   const [searchMode, setSearchMode] = useState("all");
   const [typeFilter, setTypeFilter] = useState(null);
   const [vendorFilter, setVendorFilter] = useState(null);
+  //  const [selectedRows, setSelectedRows] = useState([]);
+  // ----------------- UPDATED: internal state initialized from selected prop -----------------
+  const [selectedRows, setSelectedRows] = useState(selected || []); // UPDATED
 
-  const [selectedRows, setSelectedRows] = useState([]);
+  // ----------------- UPDATED: sync internal state if prop changes -----------------
+  useEffect(() => { // UPDATED
+    if (selected) {
+      setSelectedRows(selected);
+    }
+  }, [selected]); // UPDATED
+
+
 
   const typeOptions = [
     { label: "Type A", value: "typeA" },

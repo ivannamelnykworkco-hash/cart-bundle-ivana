@@ -10,21 +10,32 @@ import {
   Text,
   RadioButton
 } from "@shopify/polaris";
-import { ImageIcon, VariantIcon } from '@shopify/polaris-icons';
+import { ImageIcon, NoteIcon, VariantIcon } from '@shopify/polaris-icons';
 import { SelectProductModal } from "./SelectProductModal";
 import { useLoaderData } from "@remix-run/react";
 
-export function SetDefaultVariantsModal({ productArray, onSelect }) {
+function safeJsonParse(value) {
+  if (typeof value !== "string") return value;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
+export function SetDefaultVariantsModal({
+  productArray,
+  defaultVariant,
+  onSelect }) {
 
   const loaderData = useLoaderData<typeof loader>();
-  const defaultVariant = JSON.parse(loaderData.generalSettingConf.setDefaultVariant);
-  console.log("defaul==>", defaultVariant);
   const [activeModalSetDefaultVariants, setActiveModalSetDefaultVariants] = useState(false);
   const [bundleType, setBundleType] = useState('singleType');
-  const [selectedProduct, setSelectedProduct] = useState<any>([defaultVariant] ?? []);
+  const [selectedProduct, setSelectedProduct] = useState<any>([defaultVariant]);
 
   //FUNCTIONS
-
+  const parsedDefaultVariant = safeJsonParse(defaultVariant);
   const handleBundleType = useCallback(
     (_: boolean, newValue: string) => setBundleType(newValue),
     [],
@@ -45,11 +56,11 @@ export function SetDefaultVariantsModal({ productArray, onSelect }) {
       <Thumbnail
         size="small"
         alt=""
-        source={productArray[0]?.imageUrl}
+        source={parsedDefaultVariant.imageUrl ?? NoteIcon}
       />
     </Box>,
     <Text as="span" alignment="start">
-      {productArray[0]?.title}
+      {parsedDefaultVariant.title}
     </Text>
   ];
 
@@ -58,11 +69,11 @@ export function SetDefaultVariantsModal({ productArray, onSelect }) {
       <Thumbnail
         size="small"
         alt=""
-        source={product?.imageUrl || ImageIcon}
+        source={product?.imageUrl || parsedDefaultVariant.imageUrl}
       />
     </Box>,
     <Text as="span" alignment="start">
-      {product?.title}
+      {product?.title || parsedDefaultVariant.title}
     </Text>
   ]);
 

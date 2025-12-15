@@ -25,6 +25,77 @@ function parseMetafield(metafield) {
   }
 }
 
+function buildDiscountValue(
+  discountType,
+  discountPricePerItem,
+  lineTotal
+) {
+  switch (discountType) {
+    case "percent":
+      return { percentage: { value: discountPricePerItem.toString() } };
+
+    case "fixed_amount":
+      return {
+        fixedAmount: {
+          amount: discountPricePerItem.toString(),
+          appliesToEachItem: true,
+        },
+      };
+
+    case "total_price": {
+      const discountAmount = lineTotal - discountPricePerItem;
+      if (discountAmount > 0) {
+        return {
+          fixedAmount: {
+            amount: discountAmount.toString(),
+            appliesToEachItem: false,
+          },
+        };
+      }
+      return null;
+    }
+
+    default:
+      return null;
+  }
+}
+
+function applyUpsellItems({
+  cart,
+  upsellItems,
+  candidates,
+  prefixMessage,
+}) {
+  if (!upsellItems?.length) return;
+
+  for (const upsell of upsellItems) {
+    const upsellLine = cart.lines.find(
+      l => l.merchandise.product.id === upsell.id
+    );
+    if (!upsellLine) continue;
+    if (upsellLine.quantity < upsell.quantity) continue;
+
+    const upsellLineTotal = parseFloat(
+      upsellLine.cost.subtotalAmount.amount
+    );
+
+    const value = buildDiscountValue(
+      upsell.discountType,
+      upsell.discountPricePerItem,
+      upsellLineTotal
+    );
+
+    if (!value) continue;
+
+    candidates.push({
+      message: `${prefixMessage}: ${upsell.discountPricePerItem}${upsell.discountType === "percent" ? "%" : ""
+        } off ${upsellLine.merchandise.title}`,
+      targets: [{ cartLine: { id: upsellLine.id } }],
+      value,
+    });
+  }
+}
+
 export function cartLinesDiscountsGenerateRun(input) {
   const { cart, discount } = input;
   if (!cart.lines.length) return { operations: [] };
@@ -50,29 +121,25 @@ export function cartLinesDiscountsGenerateRun(input) {
     for (const conf of discountConf) {
       // ---------------- Quantity Break ----------------
       if (conf.type === "quantity_break" && quantity >= conf.quantity) {
-        let value = {};
-        switch (conf.discountType) {
-          case "percent":
-            value = { percentage: { value: conf.discountPricePerItem.toString() } };
-            break;
-          case "fixed_amount":
-            value = { fixedAmount: { amount: conf.discountPricePerItem.toString(), appliesToEachItem: true } };
-            break;
-          case "total_price":
-            const discountAmount = lineTotal - conf.discountPricePerItem;
-            if (discountAmount > 0) {
-              value = { fixedAmount: { amount: discountAmount.toString(), appliesToEachItem: false } };
-            } else continue;
-            break;
-          case "default":
-          default:
-            continue;
-        }
+        const value = buildDiscountValue(
+          conf.discountType,
+          conf.discountPricePerItem,
+          lineTotal
+        );
+        if (!value)
+          continue;
 
         candidates.push({
           message: `Quantity break: ${conf.discountPricePerItem}${conf.discountType === "percent" ? "%" : ""} off ${quantity} × ${variantTitle}`,
           targets: [{ cartLine: { id: line.id } }],
           value
+        });
+
+        applyUpsellItems({
+          cart,
+          upsellItems: conf.upsellItems,
+          candidates,
+          prefixMessage: "Quantity break upsell",
         });
       }
 
@@ -87,6 +154,12 @@ export function cartLinesDiscountsGenerateRun(input) {
             message: `Buy ${conf.buyQuantity} get ${conf.getQuantity}: free ${freeItems} × ${variantTitle}`,
             targets: [{ cartLine: { id: line.id } }],
             value: { fixedAmount: { amount: discountAmount.toString(), appliesToEachItem: false } }
+          });
+          applyUpsellItems({
+            cart,
+            upsellItems: conf.upsellItems,
+            candidates,
+            prefixMessage: "Buy X Get Y upsell",
           });
         }
       }
@@ -150,7 +223,15 @@ export function cartLinesDiscountsGenerateRun(input) {
               value: addedValue
             });
           }
+          applyUpsellItems({
+            cart,
+            upsellItems: conf.upsellItems,
+            candidates,
+            prefixMessage: "Bundle upsell extra",
+          });
         }
+
+
       }
     }
   }
