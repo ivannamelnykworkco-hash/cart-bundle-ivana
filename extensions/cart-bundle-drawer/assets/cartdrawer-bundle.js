@@ -254,8 +254,8 @@
                     <div class="xcart-upsell-product-title">${upsellItem.priceText || ''}</div>
                   </div> 
                   <div class="xcart-upsell-prices">
-                    <div class="xcart-upsell-original-price">$${(upsellItem.calc.toFixed(2) || '')}</div>
-                    <div class="xcart-upsell-current-price">$${upsellItem.base.toFixed(2) || ''}</div>
+                    <div class="xcart-upsell-original-price">$${(upsellItem.calc || '')}</div>
+                    <div class="xcart-upsell-current-price">$${upsellItem.base || ''}</div>
                   </div>
                 </div>
               `;
