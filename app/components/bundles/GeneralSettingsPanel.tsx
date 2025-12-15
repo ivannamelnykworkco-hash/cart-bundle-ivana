@@ -1,5 +1,4 @@
 import { useState, useCallback, useContext, useEffect } from "react";
-
 import {
   Card,
   BlockStack,
@@ -20,9 +19,7 @@ import {
   Tooltip,
   Popover,
   ActionList,
-
 } from "@shopify/polaris";
-
 import { AddSwatchesModal } from "../common/AddSwatchesModal";
 import { SettingsIcon, AlertCircleIcon } from '@shopify/polaris-icons';
 import { SetDefaultVariantsModal } from "../common/SetDefaultVariantsModal";
@@ -66,45 +63,45 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
     { label: "Price per tiem", value: 'pi' },
     { label: "Bundle price", value: 'bp' },
   ]
-
+  const currentDateTime = new Date().toISOString();
   //USESTATE FUNCTIONS
-  const [bundleName, setBundleName] = useState(conf.bundleName);///
-  const [discountName, setDiscountName] = useState(conf.discountName);///
-  const [unitLabel, setUnitLabel] = useState(conf.unitLabel);///
-  const [roundingValue, setRoundingValue] = useState(conf.priceRounding);///
-  const [updatePriceSelect, setUpdatePriceSelect] = useState(conf.priceSelect);///
-  const [blockTitle, setBlockTitle] = useState(conf.blockTitle);///
+  const [bundleName, setBundleName] = useState(conf.bundleName); ``
+  const [discountName, setDiscountName] = useState(conf.discountName ?? "");
+  const [unitLabel, setUnitLabel] = useState(conf.unitLabel);
+  const [roundingValue, setRoundingValue] = useState(conf.priceRounding);
+  const [updatePriceSelect, setUpdatePriceSelect] = useState(conf.priceSelect);
+  const [blockTitle, setBlockTitle] = useState(conf.blockTitle);
   const [visibility, setVisibility] = useState(conf.visibility);
-  const [markets, setMarkets] = useState(conf.markets); ///
-  const [excludeB2B, setExcludeB2B] = useState(conf.excludeB2B);///
-  const [startDate, setStartDate] = useState(conf.startDateTime.split('T')[0]);///
-  const [startTime, setStartTime] = useState(conf.startDateTime.split('T')[1].split('Z')[0]);///
-  const [endDate, setEndDate] = useState(conf.endDateTime.split('T')[0]);///
-  const [endTime, setEndTime] = useState(conf.endDateTime.split('T')[1].split('Z')[0]);///
-  const [endStateDate, setEndStateDate] = useState(conf.setEndDate);///
-  const [variant, setVariant] = useState(conf.letCustomer);///
-  const [hidnPicker, setHidnPicker] = useState(conf.hideTheme);///
-  const [variantSingle, setVariantSingle] = useState(conf.showVariant);///
-  const [showPricesItem, setShowPricesItem] = useState(conf.showPrices);///
-  const [compareAtPrice, setCompareAtPrice] = useState(conf.useProductCompare);///
-  const [showPriceDecimal, setShowPriceDecimal] = useState(conf.showPricesWithout);///
-  const [priceRounding, setPriceRounding] = useState(conf.showPriceRoundig);///
-  const [updatePrice, setUpdatePrice] = useState(conf.updateTheme);///
-  const [showBothPrices, setShowBothPrices] = useState(conf.showBothPrices);///
-  const [isGoCheckout, setIsGoCheckout] = useState(conf.skipCart);///
-  const [showStock, setShowStock] = useState<any>(conf.showWhenStock);///
-  const [isShowLowAlert, setIsShowLowAlert] = useState(conf.showAlert);///
-  const [textValue, setTextValue] = useState(conf.msgText);///
+  const [markets, setMarkets] = useState(conf.markets);
+  const [excludeB2B, setExcludeB2B] = useState(conf.excludeB2B);
+  const [startDate, setStartDate] = useState(conf?.startDateTime?.split('T')[0] ?? currentDateTime.split('T')[0]);
+  const [startTime, setStartTime] = useState(conf?.startDateTime?.split('T')[1].split('Z')[0] ?? currentDateTime.split('T')[1].split('Z')[0]);
+  const [endDate, setEndDate] = useState(conf?.endDateTime?.split('T')[0] ?? currentDateTime.split('T')[0]);
+  const [endTime, setEndTime] = useState(conf?.endDateTime?.split('T')[1].split('Z')[0] ?? currentDateTime.split('T')[1].split('Z')[0]);
+  const [endStateDate, setEndStateDate] = useState(conf.setEndDate);
+  const [variant, setVariant] = useState(conf.letCustomer);
+  const [hidnPicker, setHidnPicker] = useState(conf.hideTheme);
+  const [variantSingle, setVariantSingle] = useState(conf.showVariant);
+  const [showPricesItem, setShowPricesItem] = useState(conf.showPrices);
+  const [compareAtPrice, setCompareAtPrice] = useState(conf.useProductCompare);
+  const [showPriceDecimal, setShowPriceDecimal] = useState(conf.showPricesWithout);
+  const [priceRounding, setPriceRounding] = useState(conf.showPriceRoundig);
+  const [updatePrice, setUpdatePrice] = useState(conf.updateTheme);
+  const [showBothPrices, setShowBothPrices] = useState(conf.showBothPrices);
+  const [isGoCheckout, setIsGoCheckout] = useState(conf.skipCart);
+  const [showStock, setShowStock] = useState<any>(conf.showWhenStock);
+  const [isShowLowAlert, setIsShowLowAlert] = useState(conf.showAlert);
+  const [textValue, setTextValue] = useState(conf.msgText);
   const [textColor, setTextColor] = useState(conf.msgColor);
-  const [defaultVariant, setDefaultVariant] = useState(conf.setDefaultVariant);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [selectedCollection, setSelectedCollection] = useState<any>(null);
-  const [excludedProduct, setExcludedProduct] = useState<any>(null);
-  const [excludedCollection, setExcludedCollection] = useState<any>(null);
+  const [defaultVariant, setDefaultVariant] = useState(conf.setDefaultVariant ?? {});
+  const [selectedProduct, setSelectedProduct] = useState<any>(conf?.selectedProducts || []);
+  const [selectedCollection, setSelectedCollection] = useState<any>(conf?.selectedCollections ?? []);
+  const [excludedProduct, setExcludedProduct] = useState<any>(conf?.excludedProducts ?? []);
+  const [excludedCollection, setExcludedCollection] = useState<any>(conf?.excludedCollections ?? []);
   const [swatchData, setSwatchData] = useState<any>(null);
-  const id = conf.id;
-  const discountId = conf.discountId;
-  const bundleId = conf.bundleId;
+  const id = conf.id ?? "";
+  const discountId = conf.discountId ?? "";
+  const bundleId = conf.bundleId ?? "";
   //FUNCTIONS
   const addCluryDobule = () => {
     setTextValue(prev => prev + "{{stack}}"); // append "abc"
@@ -117,32 +114,32 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   const toggleActive = (id: string) => () => {
     setActive((activeId: string) => (activeId !== id ? id : null));
   };
-  const handleReceiveProduct = (value) => {
+
+  const handleReceiveProduct = useCallback((value) => {
     setSelectedProduct(value); // get products array from product modal
     setSelectedCollection(null);
     setExcludedProduct(null);
     setExcludedCollection(null);
-  };
-  const handleReceiveCollection = (value) => {
+  }, []);
+  const handleReceiveCollection = useCallback((value) => {
     setSelectedCollection(value); // get collections array from collection modal
     setSelectedProduct(null);
     setExcludedProduct(null);
     setExcludedCollection(null);
 
-  };
-  const handleReceiveExcludedProduct = (value) => {
+  }, []);
+  const handleReceiveExcludedProduct = useCallback((value) => {
     setExcludedProduct(value); // get excluded products array from product modal
     setSelectedProduct(null);
     setSelectedCollection(null);
     setExcludedCollection(null);
-
-  };
-  const handleReceiveExcludedCollection = (value) => {
+  }, []);
+  const handleReceiveExcludedCollection = useCallback((value) => {
     setExcludedCollection(value); // get excluded collection array from collection modal
     setSelectedProduct(null); // get products array from product modal
     setSelectedCollection(null);
     setExcludedProduct(null);
-  };
+  }, []);
   const handleOnSaveSwatch = (swatchData) => {
     setSwatchData(swatchData);
   }
@@ -151,13 +148,12 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   }
   const handleReceiveDefaultVariant = (value) => {
     setDefaultVariant(value);
-    console.log("defaultvalue>>>", defaultVariant);
   }
 
-  const selectedProductData = visibility === "all" ? [] : selectedProduct?.map(item => item.id);
-  const selectedCollectionData = visibility === "all" ? [] : selectedCollection?.map(item => item.id);
-  const excludedProductData = visibility === "all" ? [] : excludedProduct?.map(item => item.id);
-  const excludedCollectionData = visibility === "all" ? [] : excludedCollection?.map(item => item.id);
+  const selectedProductData = visibility === "all" ? [] : Array.isArray(selectedProduct) ? selectedProduct.map(item => item.id) : [];
+  const selectedCollectionData = visibility === "all" ? [] : Array.isArray(selectedCollection) ? selectedCollection.map(item => item.id) : [];
+  const excludedProductData = visibility === "all" ? [] : Array.isArray(excludedProduct) ? excludedProduct.map(item => item.id) : [];
+  const excludedCollectionData = visibility === "all" ? [] : Array.isArray(excludedCollection) ? excludedCollection.map(item => item.id) : [];
   const settingData = () => ({
     id,
     discountId,
@@ -442,7 +438,10 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
                 />
                 <ButtonGroup fullWidth>
                   <AddSwatchesModal onSaveSwatch={handleOnSaveSwatch} />
-                  <SetDefaultVariantsModal productArray={productArray} onSelect={handleReceiveDefaultVariant} />
+                  <SetDefaultVariantsModal
+                    productArray={productArray}
+                    defaultVariant={defaultVariant}
+                    onSelect={handleReceiveDefaultVariant} />
                 </ButtonGroup>
               </BlockStack>
             </BlockStack>

@@ -123,9 +123,9 @@ model GeneralSetting {
   skipCart    Boolean
   showAlert Boolean
   showWhenStock     Int
-  msgText     String
-  msgColor    String
-  createdAt String
+  msgText       String
+  msgColor      String
+  createdAt     String
   updatedAt     String
 }
 
@@ -294,6 +294,7 @@ model BundleUpsell {
   subtitle    String
   badgeText   String
   badgeStyle  String
+  defaultVariant          Json?
   labelText       String @default("")
   isSelectedByDefault     Boolean
   isShowQuantitySelector  Boolean

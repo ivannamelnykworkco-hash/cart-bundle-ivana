@@ -14,6 +14,16 @@ import { SelectVariantModal } from "../common/SelectVariantModal";
 import { BoxProductItem } from "../common/BoxProductItem";
 import type { BundleUpsell } from "../../models/types";
 
+function safeJsonParse(value) {
+  if (typeof value !== "string") return value;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
+}
+
 export function createNewBundleUpsell(): BundleUpsell {
   return {
     id: Math.random().toString(36).substr(2, 9),
@@ -45,6 +55,7 @@ export function GeneralBundleUpsell({
   open,//
   itemData,
   onToggle,//
+  defaultVariant,
   onAddUpsell,//
   onAddProduct,
   onDeleteUpsell,//
@@ -64,8 +75,7 @@ export function GeneralBundleUpsell({
     id: product.id,
     variants: product.variants
   }));
-  console.log("generalconf>>>", loaderData?.generalSettingConf?.setDefaultVariant);
-  const defaultVariant = JSON.parse(loaderData?.generalSettingConf?.setDefaultVariant);
+
   const [isShowQuantitySelector, setIsShowQuantitySelector] = useState(itemData.isShowQuantitySelector ?? false);
   const [productCounts, setProductCounts] = useState(itemData.productCounts ?? 1);
   const [isSelectedByDefault, setIsSelectedByDefault] = useState(itemData.isSelectedByDefault ?? false);
@@ -80,10 +90,12 @@ export function GeneralBundleUpsell({
   const [badgeText, setBadgeText] = useState(itemData.badgeText || "");//
   const [labelText, setLabelText] = useState(itemData.labelText || "");
   const [labelTitle, setLabelTitle] = useState(itemData.labelTitle || "");
-  const [boxUpsells, setBoxUpsells] = useState(itemData.upsellItems ?? []); console.log('itemData==>', itemData)
+  const [boxUpsells, setBoxUpsells] = useState(itemData.upsellItems ?? []);
   const [products, setProducts] = useState(itemData.productItems ?? []);
   const [bgColor, setBgColor] = useState(itemData.bgColor);
   const [textColor, setTextColor] = useState(itemData.textColor);
+  // const [defaultVariant, setDefaultVariant] = useState(safeJsonParse(loaderData?.generalSettingConf?.setDefaultVariant));
+  const parsedDefaultVariant = safeJsonParse(defaultVariant);
   const [selectedProduct, setSelectedProduct] = useState(() => {
     const initialState = {};
     itemData.productItems?.forEach(item => {
@@ -149,6 +161,7 @@ export function GeneralBundleUpsell({
     badgeStyle,
     labelText,
     isSelectedByDefault,
+    defaultVariant,
     isShowQuantitySelector,
     productCounts,
     selectPrice,
@@ -240,7 +253,6 @@ export function GeneralBundleUpsell({
           : item
       )
     );
-    console.log("",);
   }, []);
 
   const handleUpsellSelectChange = useCallback(
@@ -370,11 +382,11 @@ export function GeneralBundleUpsell({
               <InlineStack align="space-between" blockAlign="center">
                 <InlineStack align="center" blockAlign="center" gap='200'>
                   <Thumbnail
-                    source={defaultVariant?.imageUrl ?? NoteIcon}
+                    source={parsedDefaultVariant?.imageUrl ?? NoteIcon}
                     size="small"
-                    alt={defaultVariant?.title ?? "Default product"}
+                    alt={parsedDefaultVariant?.title ?? "Default product"}
                   />
-                  <Text as="span" fontWeight="bold">{defaultVariant?.title ?? "Default "}</Text>
+                  <Text as="span" fontWeight="bold">{parsedDefaultVariant?.title ?? "Default "}</Text>
                 </InlineStack>
                 <Box width='20%'>
                   <TextField
@@ -497,7 +509,7 @@ export function GeneralBundleUpsell({
               </InlineStack>
               {isShowAsSoldOut && (
                 <BlockStack gap="300">
-                  <PopUpover title='Label title' defaultPopText='Sold out' upPopTextChange={undefined} badgeSelected={""} />
+                  <PopUpover title='Label title' defaultPopText={labelTitle} upPopTextChange={setLabelTitle} badgeSelected={""} />
                   <Grid>
                     <Grid.Cell columnSpan={{ xs: 3, sm: 3, lg: 3 }}>
                       <BlockStack>

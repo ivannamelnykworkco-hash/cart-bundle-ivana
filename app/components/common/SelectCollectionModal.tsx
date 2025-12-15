@@ -69,7 +69,7 @@ export function SelectCollectionModal({ collectionArray, onSelect, title, select
     >
       <Modal.Section>
         <Box minHeight="500px">
-          <IndexDataTable inputArray={collectionArray} onSelect={handleSelectCollection} selectionMode={selectionMode} />
+          <IndexDataTable inputArray={collectionArray} selected={selectedCollection} onSelect={handleSelectCollection} selectionMode={selectionMode} />
         </Box>
       </Modal.Section>
     </Modal>

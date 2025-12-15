@@ -75,7 +75,7 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
     >
       <Modal.Section>
         <Box minHeight="500px">
-          <IndexDataTable inputArray={productArray} onSelect={handleSelectProduct} selectionMode={selectionMode} />
+          <IndexDataTable inputArray={productArray} onSelect={handleSelectProduct} selectionMode={selectionMode} selected={selectedProduct} />
         </Box>
       </Modal.Section>
     </Modal >

@@ -5,8 +5,11 @@ import db from "../db.server";
 export async function getGeneralSetting(): Promise<GeneralSetting> {
 
   // TODO: Implement database query
-  const result = await db.generalSetting.findFirst();
-
+  const result = await db.generalSetting.findFirst({
+    orderBy: {
+      updatedAt: 'desc',
+    },
+  });
   if (result) {
     return result;
   }
