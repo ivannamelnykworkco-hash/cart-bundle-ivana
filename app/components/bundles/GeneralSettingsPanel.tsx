@@ -93,7 +93,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   const [isShowLowAlert, setIsShowLowAlert] = useState(conf.showAlert);
   const [textValue, setTextValue] = useState(conf.msgText);
   const [textColor, setTextColor] = useState(conf.msgColor);
-  const [defaultVariant, setDefaultVariant] = useState(conf.setDefaultVariant ?? {});
+  const [defaultVariant, setDefaultVariant] = useState(conf?.setDefaultVariant ?? {});
   const [selectedProduct, setSelectedProduct] = useState<any>(conf?.selectedProducts || []);
   const [selectedCollection, setSelectedCollection] = useState<any>(conf?.selectedCollections ?? []);
   const [excludedProduct, setExcludedProduct] = useState<any>(conf?.excludedProducts ?? []);

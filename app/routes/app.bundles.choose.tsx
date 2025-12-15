@@ -588,7 +588,7 @@ export default function BundleSettingsAdvanced() {
   // const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf);
   // const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf);
   // const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf);
-  const [defaultVariant, setDefaultVariant] = useState(loaderData.generalSettingConf.setDefaultVariant ?? {});
+  const [defaultVariant, setDefaultVariant] = useState(loaderData.generalSettingConf?.setDefaultVariant ?? {});
   const handleCountdownTimerChange = useCallback((updated: any) => {
     setCountdownTimerData(prev => ({ ...prev, ...updated }));
   }, []);
