@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "140ab3829c6f68961c41ee1085e2e0a2"
-name = "Kaching Bundle"
-application_url = "https://example.com"
+client_id = "c812c9caf9208233e1ad77170a906762"
+name = "carting bundle-app"
+application_url = "https://cartbundle-ed4680083865.herokuapp.com"
 embedded = true
 
 [build]
@@ -11,17 +11,14 @@ automatically_update_urls_on_dev = true
 [webhooks]
 api_version = "2026-01"
 
-  [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
-  uri = "/webhooks/app/scopes_update"
-
-  [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "/webhooks/app/uninstalled"
-
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products, write_discounts, read_products, read_discounts"
+scopes = "write_discounts,write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://cartbundle-ed4680083865.herokuapp.com/api/auth" ]
+
+[app_proxy]
+url = "https://cartbundle-ed4680083865.herokuapp.com/cart-drawer-settings"
+subpath = "cart-drawer-settings"
+prefix = "apps"

@@ -19,6 +19,6 @@ scopes = "write_discounts,write_products"
 redirect_urls = [ "https://cartbundle-ed4680083865.herokuapp.com/api/auth" ]
 
 [app_proxy]
-url = "/cart-drawer-settings"
+url = "https://cartbundle-ed4680083865.herokuapp.com/cart-drawer-settings"
 subpath = "cart-drawer-settings"
 prefix = "apps"
