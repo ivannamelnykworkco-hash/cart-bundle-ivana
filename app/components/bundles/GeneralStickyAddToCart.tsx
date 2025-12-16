@@ -37,8 +37,8 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange }) {
   const [styleButtonFontSize, setStyleButtonFontSize] = useState(conf.styleButtonFontSize);
   const [styleButtonFontStyle, setStyleButtonFontStyle] = useState(conf.styleButtonFontStyle);
   const [stylePhotoSize, setStylePhotoSize] = useState(conf.stylePhotoSize);
-  const [stylePhotoCornerRadius, setStyleButtonPadding] = useState(conf.stylePhotoCornerRadius);
-  const [styleButtonPadding, setStylePhotoCornerRadius] = useState(conf.styleButtonPadding);
+  const [stylePhotoCornerRadius, setStylePhotoCornerRadius] = useState(conf.stylePhotoCornerRadius);
+  const [styleButtonPadding, setStyleButtonPadding] = useState(conf.styleButtonPadding);
   const [styleButtonCornerRadius, setStyleButtonCornerRadius] = useState(conf.styleButtonCornerRadius);
   const tabs = [
     { id: 'content', content: 'Content', panelID: 'content-1' },

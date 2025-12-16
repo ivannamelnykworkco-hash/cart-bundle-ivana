@@ -584,7 +584,7 @@ export default function BundleSettingsAdvanced() {
   const [generalVolumeData, setGeneralVolumeData] = useState(loaderData.generalVolumeConf);
   const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
   const [generalStickyAddData, setGeneralStickyAddData] = useState(loaderData.generalStickyAddConf);
-  const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf);
+  const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf); console.log("generalStickyAddData==>", generalStickyAddData)
   // const [quantityBreakData, setQuantityBreakData] = useState(loaderData.quantityBreakConf);
   // const [buyXGetYData, setBuyXGetYData] = useState(loaderData.buyXGetYConf);
   // const [bundleUpsellData, setBundleUpsellData] = useState(loaderData.bundleUpsellConf);
@@ -2340,6 +2340,39 @@ export default function BundleSettingsAdvanced() {
                             );
                           })}
 
+                        </div>
+
+                        <div className="sticky-main">
+                          <div
+                            className="sticky-main-content"
+                            style={{ backgroundColor: generalStickyAddData?.styleBgColor }}
+                          >
+                            <div className="sticky-image-with-content">
+                              <Thumbnail
+                                source={generalStickyAddData?.imageUrl || NoteIcon}
+                                alt={generalStickyAddData?.contentTitleText || 'Sticky Add to Cart Image'}
+                              />
+                              <span className="sticky-content"
+                                style={{
+                                  fontSize: `${generalStickyAddData?.styleTitleFontSize}px`,
+                                  color: generalStickyAddData?.styleTitleColor
+                                }}>
+                                {generalStickyAddData?.contentTitleText}
+                              </span>
+                            </div>
+                            <div className="sticky-button">
+                              <span className="sticky-biutton-text"
+                                style={{
+                                  fontSize: `${generalSettingData?.styleButtonFontSize}px`,
+                                  color: generalStickyAddData?.styleButtonTextColor,
+                                  backgroundColor: generalStickyAddData?.styleButtonColor,
+                                  padding: `${generalStickyAddData?.styleButtonPadding}px`,
+                                  borderRadius: `${generalStickyAddData?.styleButtonCornerRadius}px`
+                                }}>
+                                {generalStickyAddData.contentButtonText}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </BlockStack>
                     </Box>
