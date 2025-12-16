@@ -2342,7 +2342,7 @@ export default function BundleSettingsAdvanced() {
 
                         </div>
 
-                        <div className="sticky-main">
+                        {/* <div className="sticky-main">
                           <div
                             className="sticky-main-content"
                             style={{ backgroundColor: generalStickyAddData?.styleBgColor }}
@@ -2373,7 +2373,7 @@ export default function BundleSettingsAdvanced() {
                               </span>
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </BlockStack>
                     </Box>
                     <Divider />
