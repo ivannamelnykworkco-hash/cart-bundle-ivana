@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "c812c9caf9208233e1ad77170a906762"
-name = "carting bundle-app"
+name = "CartBundle"
 application_url = "https://cartbundle-ed4680083865.herokuapp.com"
 embedded = true
 
