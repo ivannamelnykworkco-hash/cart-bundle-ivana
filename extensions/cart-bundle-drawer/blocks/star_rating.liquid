@@ -1,0 +1,79 @@
+<link rel="stylesheet" href="https://{{ shop.domain }}/apps/cart-drawer-settings">
+
+{{ 'cartdrawer-bundle.css' | asset_url | stylesheet_tag }}
+{{ 'cartdrawer-bundle-app.css' | asset_url | stylesheet_tag }}
+
+<script  src="{{ 'cartdrawer-bundle.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
+<script  src="{{ 'cartdrawer-bundle-countdown.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
+
+<div id="xcart-overlay" class="xcart-overlay" aria-hidden="true" hidden></div>
+
+<aside
+  id="xcart-drawer"
+  class="xcart-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Shopping cart"
+  tabindex="-1"
+  aria-hidden="true"
+  data-xcart-currency="{{ shop.currency }}"
+>
+<header class="xcart-drawer__header">
+    <h2 class="xcart-drawer__title">Your cart</h2>
+    <button
+      id="xcart-close"
+      class="xcart-icon-btn"
+      type="button"
+      aria-label="Your cart"
+      title="Close"
+      data-xcart-close
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <path d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.9 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.9a1 1 0 0 0 1.41-1.41L13.41 12l4.9-4.89a1 1 0 0 0-.01-1.4Z"></path>
+      </svg>
+    </button>
+  </header>
+
+  {% comment %} countdownTimer {% endcomment %}
+    <div class="countdown-timer-container">
+      <span class="countdown-text">
+        Hurry! Offer ends in {{timer}}
+      </span>
+    </div>   
+
+  <section class="xcart-drawer__body">
+    <div class="xcart-line-items-with-bundle">
+      <div id="xcart-line-items" class="xcart-line-items" role="list"></div>
+    </div>
+    <div class="xcart-drawer__actions">
+      <div class="xcart-discount">
+        <label for="xcart-discount-input" class="xcart-label">Discount code</label>
+        <div class="xcart-discount__row">
+          <input id="xcart-discount-input" class="xcart-input" type="text" autocomplete="off" placeholder="Enter code" />
+          <button id="xcart-apply-discount" class="xcart-btn xcart-btn--ghost" type="button">Apply</button>
+        </div>
+      </div>
+
+      <div class="xcart-summary">
+        <div class="xcart-summary__row">
+          <span>Subtotal</span>
+          <span id="xcart-subtotal">$0.00</span>
+        </div>
+        <span class="xcart-note">Taxes and shipping calculated at checkout.</span>
+      </div>
+
+      <div class="xcart-cta">
+        <a href="/cart" class="xcart-btn xcart-btn--secondary" data-xcart-view-cart>View cart</a>
+        <a href="/checkout" id="xcart-checkout" class="xcart-btn xcart-btn--primary">Checkout</a>
+      </div>
+    </div>
+  </section>
+</aside>
+
+{% schema %}
+{
+  "name": "Cart Bundle",
+  "target": "cart-drawer",
+  "settings": []
+}
+{% endschema %}
