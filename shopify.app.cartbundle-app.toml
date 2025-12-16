@@ -2,7 +2,7 @@
 
 client_id = "b85595cc3f47f524f9bcfb5d0a60bc1d"
 name = "cartbundle-app"
-application_url = "https://example.com"
+application_url = "https://cartbundle.app"
 embedded = true
 
 [webhooks]
@@ -13,7 +13,7 @@ api_version = "2026-01"
 scopes = "write_discounts,write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://cartbundle.app/api/auth" ]
 
 [build]
 automatically_update_urls_on_dev = true
