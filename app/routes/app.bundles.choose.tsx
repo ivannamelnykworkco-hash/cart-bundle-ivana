@@ -1106,7 +1106,7 @@ export default function BundleSettingsAdvanced() {
   // console.log("discountconf>>>", discountConf);
   return (
     <Page
-      title="Carting Bundles"
+      title="CartBundle"
       backAction={{ content: "Back", url: "/app" }}
       primaryAction={{
         content: "Save",
