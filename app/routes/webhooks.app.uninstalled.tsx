@@ -4,17 +4,8 @@ import db from "../db.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
-    const rawBody = await request.text(); // raw string
-    const shopifyHmac = request.headers.get("x-shopify-hmac-sha256")!;
-
-    const verified = await authenticate.verifyWebhook({
-      rawBody,
-      hmacHeader: shopifyHmac,
-    });
-
-    if (!verified) throw new Error("Webhook HMAC validation failed");
-
-    const { shop, session, topic } = await authenticate.webhook({ rawBody });
+    const { shop, session, topic } =
+      await authenticate.webhook(request);
 
     console.log(`Received ${topic} webhook for ${shop}`);
 
@@ -29,4 +20,3 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-};
