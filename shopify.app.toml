@@ -13,28 +13,16 @@ api_version = "2026-01"
 
 # App lifecycle webhooks
 [[webhooks.subscriptions]]
-topics = ["app/uninstalled"]
-uri = "/webhooks/app/uninstalled"
+topics = [ "app/uninstalled" ]
+compliance_topics = [ "customers/redact", "customers/data_request", "shop/redact" ]
+uri = "/webhooks"
 
 [[webhooks.subscriptions]]
 topics = ["app/scopes_update"]
 uri = "/webhooks/app/scopes_update"
 
-# GDPR mandatory compliance webhooks
-[[webhooks.subscriptions]]
-compliance_topics = ["customers/data_request"]
-uri = "/webhooks/customers/data_request"
-
-[[webhooks.subscriptions]]
-compliance_topics = ["customers/redact"]
-uri = "/webhooks/customers/redact"
-
-[[webhooks.subscriptions]]
-compliance_topics = ["shop/redact"]
-uri = "/webhooks/shop/redact"
-
 [access_scopes]
-scopes = "read_products,write_products,read_discounts,write_discounts"
+scopes = "read_products, write_products, read_discounts, write_discounts"
 
 [auth]
 redirect_urls = [
