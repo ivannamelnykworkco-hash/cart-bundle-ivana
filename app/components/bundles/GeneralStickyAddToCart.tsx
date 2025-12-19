@@ -20,10 +20,10 @@ import { SwitchIcon } from '../common/SwitchIcon';
 import { useLoaderData } from '@remix-run/react';
 import type { loader } from '../product/ProductList';
 
-export function GeneralStickyAddToCart({ open, onToggle, onDataChange }) {
+export function GeneralStickyAddToCart({ open, onToggle, onDataChange, generalStickyAddData, bundleId }) {
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData.products;
-  const conf = loaderData.generalStickyAddConf;
+  const conf = generalStickyAddData;
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const [selected, setSelected] = useState<number>(0);
   const [contentButtonText, setContentButtonText] = useState(conf.contentButtonText);
@@ -85,12 +85,12 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange }) {
 
 
   const id = conf.id;
-  const bundleId = conf.bundleId;
   useEffect(() => {
     if (onDataChange) {
       onDataChange({
         id,
         bundleId,
+        isShowLowAlert,
         contentTitleText,
         contentButtonText,
         styleBgColor,
@@ -108,6 +108,7 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange }) {
       });
     }
   }, [
+    isShowLowAlert,
     contentTitleText,
     contentButtonText,
     styleBgColor,
@@ -146,7 +147,7 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange }) {
               {tabs[selected].content === 'Content' && (
                 <InlineGrid columns={2} gap="200">
                   <BlockStack>
-                    <PopUpover title='Title' defaultPopText={contentTitleText} dataArray={productArray} />
+                    <PopUpover title='Title' defaultPopText={contentTitleText} upPopTextChange={setContentTitleText} dataArray={productArray} />
                   </BlockStack>
                   <BlockStack gap="200">
                     <Text as="span">Button</Text>

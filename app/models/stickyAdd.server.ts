@@ -1,9 +1,12 @@
 import type { StickyAdd } from "./types";
 import db from "../db.server";
 
-export async function getStickyAdd(): Promise<StickyAdd> {
+export async function getStickyAdd(bundleId): Promise<StickyAdd> {
   // TODO: Implement database query
   const result = await db.stickyAdd.findFirst({
+    where: {
+      bundleId: bundleId
+    },
     orderBy: {
       updatedAt: 'desc',
     },
@@ -14,21 +17,21 @@ export async function getStickyAdd(): Promise<StickyAdd> {
   const init = await db.stickyAdd.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
-      bundleId: Math.random().toString(36).substr(2, 9),
-      contentTitleText: "",
-      contentButtonText: "",
-      styleBgColor: "#FF0000",
-      styleTitleColor: "#00FF00",
-      styleButtonColor: "#0000FF",
-      styleButtonTextColor: "#FF00FF",
-      styleTitleFontSize: 15,
-      styleTitleFontStyle: "",
-      styleButtonFontSize: 15,
-      styleButtonFontStyle: "",
-      stylePhotoSize: 15,
+      bundleId: bundleId,
+      contentTitleText: "product title",
+      contentButtonText: "Choose bundle",
+      styleBgColor: "#FFFFFF",
+      styleTitleColor: "#000000",
+      styleButtonColor: "#000000",
+      styleButtonTextColor: "#FFFFFF",
+      styleTitleFontSize: 16,
+      styleTitleFontStyle: "stylebold",
+      styleButtonFontSize: 16,
+      styleButtonFontStyle: "stylebold",
+      stylePhotoSize: 40,
       stylePhotoCornerRadius: 15,
-      styleButtonPadding: 15,
-      styleButtonCornerRadius: 15,
+      styleButtonPadding: 10,
+      styleButtonCornerRadius: 8,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
@@ -65,4 +68,20 @@ export async function updateStickyAdd(id: string, data: Partial<StickyAdd>) {
     data: updateData,
   });
   return result;
+}
+
+
+export async function deleteStickyAdd(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.stickyAdd.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
 }

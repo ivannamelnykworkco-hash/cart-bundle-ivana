@@ -1,5 +1,5 @@
 // app/routes/app.bundles.new.tsx
-import { useNavigate } from "@remix-run/react";
+import { useSubmit } from "@remix-run/react";
 import { useState } from "react";
 import {
   Page,
@@ -14,11 +14,26 @@ import {
   Select,
   Checkbox,
 } from "@shopify/polaris";
+import { createBundle } from "app/models/bundle.server";
+import { authenticate } from "../shopify.server";
+import { redirect } from "@remix-run/node";
+
+
+export async function action({ request, params }) {
+  const { admin, session } = await authenticate.admin(request);
+  const bundleConf = await createBundle();
+  const bundleId = bundleConf.id;
+  return redirect(`/app/bundles/choose?bundleId=${bundleId}`);
+}
 
 export default function NewBundle() {
-  const navigate = useNavigate();
-  const [selectedColor, setSelectedColor] = useState("#000000");
 
+  const submit = useSubmit();
+
+  async function onClickChoose() {
+    submit({}, { method: "post" });
+  }
+  const [selectedColor, setSelectedColor] = useState("#000000");
   const colorThemes = [
     "#000000",
     "#FF0000",
@@ -29,7 +44,6 @@ export default function NewBundle() {
     "#800080",
     "#FF1493",
   ];
-
   const getBackgroundColor = (isSelected: boolean) => {
     if (isSelected) return "#FFFFFF";
     const r = parseInt(selectedColor.slice(1, 3), 16);
@@ -225,7 +239,7 @@ export default function NewBundle() {
                 Quantity breaks for the same product
               </Text>
             </div>
-            <Button variant="primary" fullWidth onClick={() => navigate("/app/bundles/choose")}>
+            <Button variant="primary" fullWidth onClick={onClickChoose}>
               Choose
             </Button>
           </div>
@@ -1087,23 +1101,33 @@ export default function NewBundle() {
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <BOGOBundleCard />
+              <div className="coming-soon">
+                <BOGOBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <QuantityBreaksBundleCard />
+              <div className="coming-soon">
+                <QuantityBreaksBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <CompleteBundleCard />
+              <div className="coming-soon">
+                <CompleteBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <SubscriptionBundleCard />
+              <div className="coming-soon">
+                <SubscriptionBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <ProgressiveGiftsBundleCard />
+              <div className="coming-soon">
+                <ProgressiveGiftsBundleCard />
+              </div>
             </Grid.Cell>
           </Grid>
         </Layout.Section>

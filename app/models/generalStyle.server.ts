@@ -2,10 +2,30 @@
 import type { GeneralStyle } from "./types";
 import db from "../db.server";
 
-const defaultColor = "#000000";
+const defaultColor = {
+  cardsBgColor: "#EDF6FF",
+  selectedBgColor: "#FFFFFF",
+  borderColor: "#0085FF",
+  blockTitleColor: "#000000",
+  barTitleColor: "#000000",
+  barSubTitleColor: "#555555",
+  barPriceColor: "#000000",
+  barFullPriceColor: "#555555",
+  barLabelBackColor: "#D9EDFF",
+  barLabelTextColor: "#000000",
+  barBadgebackColor: "#0085FF",
+  barBadgeTextColor: "#FFFFFF",
+  barUpsellBackColor: "#CCE7FF",
+  barUpsellTextColor: "#000000",
+  barUpsellSelectedBackColor: "#000000",
+  barUpsellSelectedTextColor: "#CCE7FF"
+};
 
-export async function getGeneralStyle(): Promise<GeneralStyle> {
+export async function getGeneralStyle(bundleId): Promise<GeneralStyle> {
   const result = await db.generalStyle.findFirst({
+    where: {
+      bundleId: bundleId
+    },
     orderBy: {
       updatedAt: 'desc',
     },
@@ -16,36 +36,36 @@ export async function getGeneralStyle(): Promise<GeneralStyle> {
   const init = await db.generalStyle.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
-      bundleId: Math.random().toString(36).substr(2, 9),
-      cornerRadius: 0,
-      spacing: 0,
-      cardsBgColor: defaultColor,
-      selectedBgColor: defaultColor, //
-      borderColor: defaultColor,//
-      blockTitleColor: defaultColor,
-      barTitleColor: defaultColor,
-      barSubTitleColor: defaultColor,
-      barPriceColor: defaultColor,
-      barFullPriceColor: defaultColor,
-      barLabelBackColor: defaultColor,
-      barLabelTextColor: defaultColor,
-      barBadgebackColor: defaultColor,
-      barBadgeTextColor: defaultColor,
-      barUpsellBackColor: defaultColor,
-      barUpsellTextColor: defaultColor,
-      barUpsellSelectedBackColor: defaultColor,////
-      barUpsellSelectedTextColor: defaultColor,////
-      barBlocktitle: 10,
-      barBlocktitleFontStyle: "styleRegular",
-      bartitleSize: 10,
-      bartitleFontStyle: "styleRegular",
-      subTitleSize: 10,
+      bundleId: bundleId,
+      cornerRadius: 8,
+      spacing: 20,
+      cardsBgColor: defaultColor.cardsBgColor,
+      selectedBgColor: defaultColor.selectedBgColor,
+      borderColor: defaultColor.borderColor,
+      blockTitleColor: defaultColor.blockTitleColor,
+      barTitleColor: defaultColor.barTitleColor,
+      barSubTitleColor: defaultColor.barSubTitleColor,
+      barPriceColor: defaultColor.barPriceColor,
+      barFullPriceColor: defaultColor.barFullPriceColor,
+      barLabelBackColor: defaultColor.barLabelBackColor,
+      barLabelTextColor: defaultColor.barLabelTextColor,
+      barBadgebackColor: defaultColor.barBadgebackColor,
+      barBadgeTextColor: defaultColor.barBadgeTextColor,
+      barUpsellBackColor: defaultColor.barUpsellBackColor,
+      barUpsellTextColor: defaultColor.barUpsellTextColor,
+      barUpsellSelectedBackColor: defaultColor.barUpsellSelectedBackColor,////
+      barUpsellSelectedTextColor: defaultColor.barUpsellSelectedTextColor,////
+      barBlocktitle: 14,
+      barBlocktitleFontStyle: "styleBold",
+      bartitleSize: 20,
+      bartitleFontStyle: "styleBold",
+      subTitleSize: 14,
       subTitleStyle: "styleRegular",
-      labelSize: 10,
+      labelSize: 12,
       labelStyle: "styleRegular",
-      upsellSize: 10,
-      upsellStyle: "styleRegular",
-      unitLabelSize: 10,
+      upsellSize: 13,
+      upsellStyle: "styleBold",
+      unitLabelSize: 14,
       unitLabelStyle: "styleRegular",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -98,5 +118,21 @@ export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>
     data: updateData,
   });
   return result;
+
+
 }
 
+export async function deleteGeneralStyle(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.generalStyle.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
+}

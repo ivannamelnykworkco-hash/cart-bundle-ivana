@@ -1,6 +1,6 @@
 // app/routes/app._index.tsx
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -11,9 +11,11 @@ import {
   EmptyState,
   Banner,
   Text,
-  Tabs
+  Tabs,
+  Frame,
+  Toast
 } from "@shopify/polaris";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { authenticate } from "../shopify.server";
 import {
   ChartVerticalFilledIcon,
@@ -24,12 +26,61 @@ import {
 } from '@shopify/polaris-icons';
 import type { Bundle, Analytics } from "../models/types";
 import { SwitchIcon } from "app/components/common/SwitchIcon";
+import { getBundles, deleteBundle } from "app/models/bundle.server";
+import { deleteGeneralSetting } from "app/models/generalSetting.server";
+import { deleteGeneralStyle } from "app/models/generalStyle.server";
+import { deleteCountdownTimer } from "app/models/countdownTimer.server";
+import { deleteVolumeDiscount } from "app/models/volumeDiscount.server";
+import { deleteStickyAdd } from "app/models/stickyAdd.server";
+import { deleteCheckboxUpsell } from "app/models/checkboxUpsell.server";
+import { deleteQuantityBreaks } from "app/models/quantityBreak.server";
+import { deleteBuyXGetYs } from "app/models/buyXGetY.server";
+import { deleteBundleUpsells } from "app/models/bundleUpsell.server";
+
+async function deleteBundleData(id: string): Promise<boolean> {
+  try {
+    await Promise.all([
+      deleteBundle({ id }),
+      deleteGeneralSetting({ bundleId: id }),
+      deleteGeneralStyle({ bundleId: id }),
+      deleteCountdownTimer({ bundleId: id }),
+      deleteVolumeDiscount({ bundleId: id }),
+      deleteStickyAdd({ bundleId: id }),
+      deleteCheckboxUpsell({ bundleId: id }),
+      deleteQuantityBreaks({ bundleId: id }),
+      deleteBuyXGetYs({ bundleId: id }),
+      deleteBundleUpsells({ bundleId: id }),
+    ]);
+    return true; // all deletes succeeded
+  } catch (err) {
+    console.error("Failed to delete bundle data:", err);
+    return false; // at least one delete failed
+  }
+}
+
+export const action = async ({ request }: { request: Request }) => {
+  const formData = await request.formData();
+  const id = formData.get("id") as string | null;
+  if (!id) {
+    return json({ success: false, error: "No bundle id provided" }, { status: 400 });
+  }
+  try {
+    const result = await deleteBundleData(id);
+    if (result)
+      return json({ success: true });
+    else
+      return json({ success: false, error: err.message || "Delete failed" }, { status: 500 });
+  } catch (err: any) {
+    return json({ success: false, error: err.message || "Delete failed" }, { status: 500 });
+  }
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
+  const bundles = await getBundles();
 
   // TODO: Fetch from database
-  const bundles: Bundle[] = [
+  const bundleList: Bundle[] = [
     {
       id: "1",
       name: "Bundle",
@@ -66,20 +117,34 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function Index() {
   const { bundles, analytics } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState(0);
   const [showBanner, setShowBanner] = useState(true);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
 
+  const submit = useSubmit();
+  async function deleteBundleData(id: string) {
+    const formData = new FormData();
+    formData.append("id", id);
+    submit(formData, { method: "post" });
+  }
 
-  const tabs = [
-    { id: "deals", content: "Deals" },
-    { id: "archive", content: "A/B test archive" },
-  ];
+  const actionData = useActionData();
+  useEffect(() => {
+    if (actionData) {
+      if (actionData.success) {
+        console.log("Deleted successfully!", JSON.stringify(actionData, null, 2));
+        showToast("Deleted successfully!", "success");
+      } else {
+        showToast(`Error: ${actionData.error} `, "error");
+        console.log("Delete failed!", JSON.stringify(actionData, null, 2));
+      }
+    }
+  }, [actionData]);
 
   const rows = bundles.map((bundle, index) => [
     // Deal Column
-    <div key={index} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-      <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
+    <div key={index}
+      onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
+      style={{ display: "flex", alignItems: "center", gap: "12px" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <Text as="span" fontWeight="semibold">
@@ -88,13 +153,14 @@ export default function Index() {
           <Badge tone="info">{bundle.status}</Badge>
         </div>
         <Text as="span" variant="bodySm" tone="subdued">
-          {bundle.products.join(", ")}
+          {bundle.products.length} products
         </Text>
       </div>
     </div>,
 
     // Stats Column
-    <div key={index} style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px" }}>
+    <div key={index} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
+      style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px", cursor: "pointer" }}>
       <div style={{ minWidth: "60px" }}>
         <Text as="span" variant="bodySm" tone="subdued">
           Visitors
@@ -166,13 +232,23 @@ export default function Index() {
       {/* <Button onClick={() => navigate(`/app/bundles/${bundle.id}/test`)}>
         Run A/B test
       </Button> */}
-      <Button icon={ChartVerticalFilledIcon} onClick={() => { }} />
-      <Button icon={EditIcon} onClick={() => navigate(`/app/bundles/${bundle.id}`)} />
-      <Button icon={DuplicateIcon} onClick={() => { }} />
-      <Button icon={ViewIcon} onClick={() => { }} />
-      <Button icon={DeleteIcon} onClick={() => { }} />
+      <Button icon={EditIcon} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)} />
+      <Button icon={ViewIcon} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)} />
+      <Button icon={DeleteIcon} onClick={() => { deleteBundleData(bundle.id) }} />
     </div>,
   ]);
+  const [toastActive, setToastActive] = useState(false);
+  const [toastContent, setToastContent] = useState('');
+  const [toastError, setToastError] = useState(false); // For styling, optional
+
+  const showToast = (message, type = 'success') => {
+    setToastContent(message);
+    setToastActive(true);
+    setToastError(type === 'error');
+  };
+  const handleToastDismiss = () => {
+    setToastActive(false);
+  };
 
   return (
     <Page
@@ -186,76 +262,81 @@ export default function Index() {
         <Layout.Section>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "20px" }}>
             {/* Usage Overview Card */}
-            <Card>
-              <div style={{ padding: "16px", borderRadius: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                  <Text as="h2" variant="headingMd">
-                    Usage overview
+            <div className="coming-soon">
+              <Card>
+                <div style={{ padding: "16px", borderRadius: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <Text as="h2" variant="headingMd">
+                      Usage overview
+                    </Text>
+                  </div>
+                  <Text as="span" tone="subdued">
+                    ${analytics.thisMonthRevenue}/∞ added revenue this month
+                  </Text>
+                  <Text as="span" variant="bodySm" tone="subdued">
+                    Resets on {analytics.resetDate}
                   </Text>
                 </div>
-                <Text as="span" tone="subdued">
-                  ${analytics.thisMonthRevenue}/∞ added revenue this month
-                </Text>
-                <Text as="span" variant="bodySm" tone="subdued">
-                  Resets on {analytics.resetDate}
-                </Text>
-              </div>
-            </Card>
+              </Card>
+            </div>
 
             {/* Analytics Card */}
-            <Card>
-              <div style={{ padding: "16px", borderRadius: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                  <Text as="h2" variant="headingMd">
-                    Analytics
-                  </Text>
-                  <Button onClick={() => navigate("/app/analytics")}>
-                    View full analytics
-                  </Button>
-                </div>
-                <div style={{ display: "flex", gap: "40px" }}>
-                  <div>
-                    <Text as="span" variant="bodySm" tone="subdued">
-                      This month's added revenue
+            <div className="coming-soon">
+              <Card>
+                <div style={{ padding: "16px", borderRadius: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <Text as="h2" variant="headingMd">
+                      Analytics
                     </Text>
-                    <Text as="span" variant="headingLg">
-                      ${analytics.thisMonthRevenue}
-                    </Text>
+                    <Button onClick={() => navigate("/app/analytics")}>
+                      View full analytics
+                    </Button>
                   </div>
-                  <div>
-                    <Text as="span" variant="bodySm" tone="subdued">
-                      All time added revenue
-                    </Text>
-                    <Text as="span" variant="headingLg">
-                      ${analytics.allTimeRevenue}
-                    </Text>
+                  <div style={{ display: "flex", gap: "40px" }}>
+                    <div>
+                      <Text as="span" variant="bodySm" tone="subdued">
+                        This month's added revenue
+                      </Text>
+                      <Text as="span" variant="headingLg">
+                        ${analytics.thisMonthRevenue}
+                      </Text>
+                    </div>
+                    <div>
+                      <Text as="span" variant="bodySm" tone="subdued">
+                        All time added revenue
+                      </Text>
+                      <Text as="span" variant="headingLg">
+                        ${analytics.allTimeRevenue}
+                      </Text>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
 
             {/* Theme Extension Card */}
-            <Card>
-              <div style={{ padding: "16px", borderRadius: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                  <Text as="h2" variant="headingMd">
-                    Theme extension
+            <div className="coming-soon">
+              <Card>
+                <div style={{ padding: "16px", borderRadius: "8px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <Text as="h2" variant="headingMd">
+                      Theme extension
+                    </Text>
+                    <Badge tone="success">Active</Badge>
+                  </div>
+                  <Text as="span" variant="bodySm">
+                    Bundles widget is visible in product pages.
                   </Text>
-                  <Badge tone="success">Active</Badge>
+                  <Button variant="plain" onClick={() => { }}>
+                    Need help?
+                  </Button>
                 </div>
-                <Text as="span" variant="bodySm">
-                  Bundles widget is visible in product pages.
-                </Text>
-                <Button variant="plain" onClick={() => { }}>
-                  Need help?
-                </Button>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
         </Layout.Section>
 
         <Layout.Section>
-          <Tabs tabs={tabs} selected={activeTab} onSelect={setActiveTab} />
           <Card>
             {bundles.length === 0 ? (
               <EmptyState
@@ -276,21 +357,18 @@ export default function Index() {
               />
             )}
           </Card>
-
-          {bundles.length > 0 && showBanner && (
-            <div style={{ marginTop: "16px", borderRadius: "8px", overflow: "hidden" }}>
-              <Banner
-                title="Your bundles need more visibility"
-                tone="info"
-                action={{ content: "Get started" }}
-                secondaryAction={{ content: "Maybe later" }}
-                onDismiss={() => setShowBanner(false)}
-              >
-                <p>Create landing pages to drive traffic and boost sales</p>
-              </Banner>
-            </div>
-          )}
         </Layout.Section>
+        {
+          toastActive && (
+            <Frame>
+              <Toast
+                content={toastContent}
+                onDismiss={handleToastDismiss}
+                error={toastError}
+              />
+            </Frame>
+          )
+        }
       </Layout>
     </Page>
   );

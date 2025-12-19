@@ -5,15 +5,17 @@ import { DeleteIcon, EditIcon } from "@shopify/polaris-icons";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
-export function UpsellItem({ index, upsellData, deleteId, deleteSection, productArray, onChange }: { index: number, number: any, upsellData: any, deleteId: any, deleteSection: (id: any) => void, productArray: any }) {
+export function UpsellItem({ index, upsellData, deleteId, deleteSection, productArray, onDataAddCheckboxUpsellChange }: { index: number, number: any, onDataAddCheckboxUpsellChange: any, upsellData: any, deleteId: any, deleteSection: (id: any) => void, productArray: any }) {
   const loaderData = useLoaderData<typeof loader>();
-  // const upsellData = JSON.parse(loaderData?.checkboxUpsellConf?.upsellData);
   const upsellItem = upsellData.find(obj => obj.deleteId === deleteId);
   const [selected, setSelected] = useState(upsellItem.selected);
   const [upsellTitle, setUpsellTitle] = useState(upsellItem.upsellTitle);
   const [upsellSubTitle, setUpsellSubTitle] = useState(upsellItem.upsellSubTitle);
   const [value, setValue] = useState(upsellItem.value);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState(upsellItem.selectedProduct);
+
+
+
 
   const upsellsOptions = [
     { label: "Default", value: 'default' },
@@ -40,26 +42,51 @@ export function UpsellItem({ index, upsellData, deleteId, deleteSection, product
     setSelectedProduct(null)
   }
 
-  const upsellItemData = () => ({
+  const barAddUpsellDefaultPrice =
+    selectedProduct?.[1]?.price ??
+    selectedProduct?.variants?.[0]?.price ??
+    undefined;
+
+  useEffect(() => {
+    const basePrice = Number(barAddUpsellDefaultPrice) || 10;
+    const discountValue = Number(value) || 0;
+    let finalPrice = basePrice;
+    switch (selected) {
+      case "discounted%":
+        finalPrice = basePrice * (1 - discountValue / 100);
+        break;
+      case "discounted$":
+        finalPrice = basePrice - discountValue;
+        break;
+      case "specific":
+        finalPrice = discountValue;
+        break;
+      default:
+        finalPrice = basePrice;
+    }
+    finalPrice = Math.max(0, Number(finalPrice) || 0);
+
+    onDataAddCheckboxUpsellChange?.(index, {
+      selected,
+      value,
+      upsellTitle,
+      upsellSubTitle,
+      selectedProduct: selectedProduct ?? null,
+      basePrice,
+      finalPrice,
+    });
+  }, [
     index,
     deleteId,
     selected,
     value,
     upsellTitle,
-    upsellSubTitle
-  });
-
-  useEffect(() => {
-    if (upsellItemData) {
-      onChange(index, upsellItemData());
-    }
-  }, [
-    selected,
-    value,
-    upsellTitle,
     upsellSubTitle,
-    deleteId
+    selectedProduct,
+    barAddUpsellDefaultPrice,
+    onDataAddCheckboxUpsellChange,
   ]);
+
 
 
   return (
@@ -78,7 +105,7 @@ export function UpsellItem({ index, upsellData, deleteId, deleteSection, product
       )}
       {selectedProduct && (
         <InlineGrid columns={2}>
-          <InlineStack gap="200" align="start" blockAlign="center">
+          <InlineStack gap="200" align="start" blockAlign="center" direction='row'>
             <Thumbnail
               source={selectedProduct[0].imageUrl}
               alt="Black choker necklace"
@@ -86,7 +113,6 @@ export function UpsellItem({ index, upsellData, deleteId, deleteSection, product
             <Text as='h5' fontWeight="bold">{selectedProduct[0].title}</Text>
           </InlineStack>
           <InlineStack gap="200" align="end" blockAlign="center">
-            <Button icon={EditIcon}>Edit image</Button>
             <Button icon={DeleteIcon} onClick={handleRemoveProduct} />
           </InlineStack>
         </InlineGrid>

@@ -47,6 +47,7 @@ export function createNewQuantityBreak(): QuantityBreak {
 export function GeneralQuantityBreack({
   barId,
   id,
+  bundleId,
   deleteSection,
   heading,
   open,
@@ -97,6 +98,7 @@ export function GeneralQuantityBreack({
 
     const qbObjectData = () => ({
       id,
+      bundleId,
       quantity,
       title,
       subtitle,
@@ -158,7 +160,7 @@ export function GeneralQuantityBreack({
       selectPrice: "Discounted % (e.g. 25% off)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
-      imageSize: 20,
+      imageSize: 40,
       isSelectedByDefault: false,
       isVisibleOnly: false,
       isShowAsSoldOut: false,
@@ -386,11 +388,7 @@ export function GeneralQuantityBreack({
               </Grid.Cell>
 
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
-                <Checkbox
-                  label="Selected by default"
-                  checked={isSelectedByDefault}
-                  onChange={setIsSelectedByDefault}
-                />
+
               </Grid.Cell>
             </Grid>
 

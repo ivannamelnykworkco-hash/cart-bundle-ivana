@@ -1,7 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 // To add or update a model in prisma
-// npm run prisma migrate dev -- --name add-YourTableName-table
+// npm run prisma migrate dev -- --name add-Bundle-table
 //
 generator client {
   provider = "prisma-client-js"
@@ -11,8 +11,8 @@ generator client {
 // enough when changing adapters.
 // See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
 }
 
 model Session {
@@ -40,6 +40,7 @@ model Bundle {
   type          String
   status        String   @default("draft")
   products      Json
+  discountId    String?
   discountType  String
   discountValue Float
   stats         Json
@@ -131,6 +132,7 @@ model GeneralSetting {
 
 model CountdownTimer {
   id    String @id @default(cuid())
+  bundleId      String @default("")
   isCountdown   Boolean
   visibility String
   fixedDurationTime   Int
@@ -234,6 +236,7 @@ model CheckboxUpsell {
   id                  String @id @default(cuid())
   bundleId            String
   upsellData          Json
+  selectedProduct     Json?
   createdAt             String
   updatedAt             String
 }

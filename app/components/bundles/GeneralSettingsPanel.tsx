@@ -31,7 +31,7 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 
-export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
+export function GeneralSettingsPanel({ open, onToggle, onDataChange, generalSettingData, bundleId }) {
   // const loaderData = useContext(LoaderDataContext);
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData?.products?.map((product: any) => ({
@@ -65,43 +65,42 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
   ]
   const currentDateTime = new Date().toISOString();
   //USESTATE FUNCTIONS
-  const [bundleName, setBundleName] = useState(conf.bundleName); ``
-  const [discountName, setDiscountName] = useState(conf.discountName ?? "");
-  const [unitLabel, setUnitLabel] = useState(conf.unitLabel);
-  const [roundingValue, setRoundingValue] = useState(conf.priceRounding);
-  const [updatePriceSelect, setUpdatePriceSelect] = useState(conf.priceSelect);
-  const [blockTitle, setBlockTitle] = useState(conf.blockTitle);
-  const [visibility, setVisibility] = useState(conf.visibility);
-  const [markets, setMarkets] = useState(conf.markets);
-  const [excludeB2B, setExcludeB2B] = useState(conf.excludeB2B);
-  const [startDate, setStartDate] = useState(conf?.startDateTime?.split('T')[0] ?? currentDateTime.split('T')[0]);
-  const [startTime, setStartTime] = useState(conf?.startDateTime?.split('T')[1].split('Z')[0] ?? currentDateTime.split('T')[1].split('Z')[0]);
-  const [endDate, setEndDate] = useState(conf?.endDateTime?.split('T')[0] ?? currentDateTime.split('T')[0]);
-  const [endTime, setEndTime] = useState(conf?.endDateTime?.split('T')[1].split('Z')[0] ?? currentDateTime.split('T')[1].split('Z')[0]);
-  const [endStateDate, setEndStateDate] = useState(conf.setEndDate);
-  const [variant, setVariant] = useState(conf.letCustomer);
-  const [hidnPicker, setHidnPicker] = useState(conf.hideTheme);
-  const [variantSingle, setVariantSingle] = useState(conf.showVariant);
-  const [showPricesItem, setShowPricesItem] = useState(conf.showPrices);
-  const [compareAtPrice, setCompareAtPrice] = useState(conf.useProductCompare);
-  const [showPriceDecimal, setShowPriceDecimal] = useState(conf.showPricesWithout);
-  const [priceRounding, setPriceRounding] = useState(conf.showPriceRoundig);
-  const [updatePrice, setUpdatePrice] = useState(conf.updateTheme);
-  const [showBothPrices, setShowBothPrices] = useState(conf.showBothPrices);
-  const [isGoCheckout, setIsGoCheckout] = useState(conf.skipCart);
-  const [showStock, setShowStock] = useState<any>(conf.showWhenStock);
-  const [isShowLowAlert, setIsShowLowAlert] = useState(conf.showAlert);
-  const [textValue, setTextValue] = useState(conf.msgText);
-  const [textColor, setTextColor] = useState(conf.msgColor);
-  const [defaultVariant, setDefaultVariant] = useState(conf?.setDefaultVariant ?? {});
-  const [selectedProduct, setSelectedProduct] = useState<any>(conf?.selectedProducts || []);
-  const [selectedCollection, setSelectedCollection] = useState<any>(conf?.selectedCollections ?? []);
-  const [excludedProduct, setExcludedProduct] = useState<any>(conf?.excludedProducts ?? []);
-  const [excludedCollection, setExcludedCollection] = useState<any>(conf?.excludedCollections ?? []);
+  const [bundleName, setBundleName] = useState(generalSettingData.bundleName); ``
+  const [discountName, setDiscountName] = useState(generalSettingData.discountName ?? "");
+  const [unitLabel, setUnitLabel] = useState(generalSettingData.unitLabel);
+  const [roundingValue, setRoundingValue] = useState(generalSettingData.priceRounding);
+  const [updatePriceSelect, setUpdatePriceSelect] = useState(generalSettingData.priceSelect);
+  const [blockTitle, setBlockTitle] = useState(generalSettingData.blockTitle);
+  const [visibility, setVisibility] = useState(generalSettingData.visibility);
+  const [markets, setMarkets] = useState(generalSettingData.markets);
+  const [excludeB2B, setExcludeB2B] = useState(generalSettingData.excludeB2B);
+  const [startDate, setStartDate] = useState(generalSettingData?.startDateTime?.split('T')[0] ?? currentDateTime.split('T')[0]);
+  const [startTime, setStartTime] = useState(generalSettingData?.startDateTime?.split('T')[1].split('Z')[0] ?? currentDateTime.split('T')[1].split('Z')[0]);
+  const [endDate, setEndDate] = useState(generalSettingData?.endDateTime?.split('T')[0] ?? currentDateTime.split('T')[0]);
+  const [endTime, setEndTime] = useState(generalSettingData?.endDateTime?.split('T')[1].split('Z')[0] ?? currentDateTime.split('T')[1].split('Z')[0]);
+  const [endStateDate, setEndStateDate] = useState(generalSettingData.setEndDate);
+  const [variant, setVariant] = useState(generalSettingData.letCustomer);
+  const [hidnPicker, setHidnPicker] = useState(generalSettingData.hideTheme);
+  const [variantSingle, setVariantSingle] = useState(generalSettingData.showVariant);
+  const [showPricesItem, setShowPricesItem] = useState(generalSettingData.showPrices);
+  const [compareAtPrice, setCompareAtPrice] = useState(generalSettingData.useProductCompare);
+  const [showPriceDecimal, setShowPriceDecimal] = useState(generalSettingData.showPricesWithout);
+  const [priceRounding, setPriceRounding] = useState(generalSettingData.showPriceRoundig);
+  const [updatePrice, setUpdatePrice] = useState(generalSettingData.updateTheme);
+  const [showBothPrices, setShowBothPrices] = useState(generalSettingData.showBothPrices);
+  const [isGoCheckout, setIsGoCheckout] = useState(generalSettingData.skipCart);
+  const [showStock, setShowStock] = useState<any>(generalSettingData.showWhenStock);
+  const [isShowLowAlert, setIsShowLowAlert] = useState(generalSettingData.showAlert);
+  const [textValue, setTextValue] = useState(generalSettingData.msgText);
+  const [textColor, setTextColor] = useState(generalSettingData.msgColor);
+  const [defaultVariant, setDefaultVariant] = useState(generalSettingData.setDefaultVariant ?? {});
+  const [selectedProduct, setSelectedProduct] = useState<any>(generalSettingData?.selectedProducts || []);
+  const [selectedCollection, setSelectedCollection] = useState<any>(generalSettingData?.selectedCollections ?? []);
+  const [excludedProduct, setExcludedProduct] = useState<any>(generalSettingData?.excludedProducts ?? []);
+  const [excludedCollection, setExcludedCollection] = useState<any>(generalSettingData?.excludedCollections ?? []);
   const [swatchData, setSwatchData] = useState<any>(null);
-  const id = conf.id ?? "";
-  const discountId = conf.discountId ?? "";
-  const bundleId = conf.bundleId ?? "";
+  const id = generalSettingData.id ?? "";
+  const discountId = generalSettingData.discountId ?? "";
   //FUNCTIONS
   const addCluryDobule = () => {
     setTextValue(prev => prev + "{{stack}}"); // append "abc"
@@ -344,17 +343,6 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
                   )
                 }
               </BlockStack>
-              <Select
-                label="Markets"
-                options={marketOptions}
-                onChange={setMarkets}
-                value={markets}
-              />
-              <Checkbox
-                label="Exclude B2B customers"
-                checked={excludeB2B}
-                onChange={setExcludeB2B}
-              />
             </BlockStack>
             <Divider />
 
@@ -419,208 +407,13 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange }) {
               </Text>
 
               <BlockStack gap="100">
-                <Checkbox
-                  label="Let customers choose different variants for each item"
-                  checked={variant}
-                  onChange={setVariant}
-                />
-                {variant && (
-                  <Checkbox
-                    label="Show variant selectioin for single quantity deal bar"
-                    checked={variantSingle}
-                    onChange={setVariantSingle}
-                  />
-                )}
-                <Checkbox
-                  label="Hide theme variant picker"
-                  checked={hidnPicker}
-                  onChange={setHidnPicker}
-                />
                 <ButtonGroup fullWidth>
-                  <AddSwatchesModal onSaveSwatch={handleOnSaveSwatch} />
                   <SetDefaultVariantsModal
                     productArray={productArray}
                     defaultVariant={defaultVariant}
                     onSelect={handleReceiveDefaultVariant} />
                 </ButtonGroup>
               </BlockStack>
-            </BlockStack>
-
-            <Divider />
-            <BlockStack gap="200">
-              <Text as="span" variant="bodyMd" fontWeight="semibold">
-                Pricing
-              </Text>
-              <BlockStack gap="100">
-                <Grid>
-                  <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                    <Checkbox
-                      label="Show prices per item"
-                      checked={showPricesItem}
-                      onChange={setShowPricesItem}
-                    />
-                    {showPricesItem && (
-                      <Checkbox
-                        label="Show both prices"
-                        checked={showBothPrices}
-                        onChange={setShowBothPrices}
-                      />
-                    )}
-                  </Grid.Cell>
-                  <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                    {showPricesItem && (
-                      <TextField
-                        label="Unit label"
-                        value={unitLabel}
-                        onChange={setUnitLabel}
-                        placeholder="e.g per piece"
-                        autoComplete="off"
-                      />
-                    )}
-                  </Grid.Cell>
-                </Grid>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <Checkbox
-                    label="Use product compare-at-price"
-                    checked={compareAtPrice}
-                    onChange={setCompareAtPrice}
-                  />
-                  <Tooltip content="Learn more">
-                    <Icon
-                      source={AlertCircleIcon}
-                      tone="base"
-                    />
-                  </Tooltip>
-                </div>
-                <Checkbox
-                  label="Show prices without decimals"
-                  checked={showPriceDecimal}
-                  onChange={setShowPriceDecimal}
-                />
-                <InlineStack gap="300">
-                  <Checkbox
-                    label="Price rounding"
-                    checked={priceRounding}
-                    onChange={setPriceRounding}
-                  />
-                  {priceRounding && (
-                    <Select
-                      label=""
-                      options={roundingValueOption}
-                      onChange={setRoundingValue}
-                      value={roundingValue}
-                    />
-                  )}
-                </InlineStack>
-                <InlineStack gap="300">
-                  <Checkbox
-                    label="Update theme product price"
-                    checked={updatePrice}
-                    onChange={setUpdatePrice}
-                  />
-                  <Select
-                    label=""
-                    options={updatePriceSelectOption}
-                    value={updatePriceSelect}
-                    onChange={setUpdatePriceSelect}
-                  />
-                </InlineStack>
-              </BlockStack>
-            </BlockStack>
-            <Divider />
-            <BlockStack gap="200">
-              <Text as="span" variant="bodyMd" fontWeight="semibold">
-                Cart
-              </Text>
-              <Checkbox
-                label="Skip cart and go to checkout directly"
-                checked={isGoCheckout}
-                onChange={setIsGoCheckout}
-              />
-            </BlockStack>
-            <Divider />
-            <BlockStack gap="200">
-              <InlineStack align="space-between">
-                <Text as="span" variant="bodyMd" fontWeight="semibold">
-                  Low stock alert
-                </Text>
-                <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
-              </InlineStack>
-              {isShowLowAlert && (
-                <BlockStack gap="200">
-                  <InlineStack gap="300" blockAlign="center">
-                    <Text as='span' variant="bodyMd">
-                      Show when stock is less than
-                    </Text>
-                    <Box maxWidth="20%">
-                      <TextField
-                        label=""
-                        type="number"
-                        value={showStock}
-                        onChange={handleChangeShowStock}
-                        autoComplete="off">
-                      </TextField>
-                    </Box>
-                  </InlineStack>
-                  <InlineStack gap="300">
-                    <Box width="80%">
-                      <InlineStack align="space-between">
-                        <Text as='span'>Message text</Text>
-                        <Popover
-                          active={active === 'popover'}
-                          preferredAlignment="right"
-                          activator={
-                            <Button
-                              variant="tertiary"
-                              onClick={toggleActive('popover')}
-                              icon={SettingsIcon}
-                              accessibilityLabel="Other save actions"
-                            />
-                          }
-                          autofocusTarget="first-node"
-                          onClose={toggleActive('popover')}
-                        >
-                          <ActionList
-                            actionRole="menuitem"
-                            sections={[
-                              {
-                                items: [
-                                  {
-                                    content: 'Add variable',
-                                    suffix: <Icon source={AlertCircleIcon} />
-                                  },
-                                ],
-                              },
-                              {
-                                title: 'Low stock alert',
-                                items: [
-                                  {
-                                    content: 'Stock',
-                                    onAction: addCluryDobule,
-                                  }
-                                ]
-                              }
-                            ]}
-                          />
-                        </Popover>
-                      </InlineStack>
-                      <TextField
-                        label=" "
-                        value={textValue}
-                        onChange={setTextValue}
-                        autoComplete="off"
-                      />
-                    </Box>
-                    <Box width="15%">
-                      <BlockStack gap="200">
-                        <Text as='span'>Color</Text>
-                        <ColorPickerPopoverItem defaultColorSetting={textColor} subtitle="" colorWidth="100%" onColorChange={handleColorChange} />
-                      </BlockStack>
-                    </Box>
-                  </InlineStack>
-
-                </BlockStack>
-              )}
             </BlockStack>
           </BlockStack>
         </Collapsible>

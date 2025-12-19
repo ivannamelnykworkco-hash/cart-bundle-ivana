@@ -25,9 +25,8 @@ import { loader } from "../product/ProductList";
 import { useLoaderData } from "@remix-run/react";
 
 
-export function CountDownPanel({ onDataChange, open, onToggle }) {
-  const loaderData = useLoaderData<typeof loader>();
-  const conf = loaderData.countdownTimerConf;
+export function CountDownPanel({ onDataChange, open, onToggle, countdownTimerData, bundleId }) {
+  const conf = countdownTimerData;
   const [showCountdownTimer, setShowCountdownTimer] = useState(conf.isCountdown);
   const [visibility, setVisibility] = useState(conf.visibility);
   const [timeDuration, setTimeDuration] = useState<any>(conf.fixedDurationTime);;
@@ -127,6 +126,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
 
 
   const gatherStateData = () => ({
+    bundleId,
     showCountdownTimer,
     visibility,
     timeDuration,
@@ -221,219 +221,221 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
           id="collapsible-settings"
           expandOnPrint
         >
-          <BlockStack gap="200">
-            {/* <Box width="100%"> */}
-            <InlineStack blockAlign="center" align="space-between">
-              <InlineStack>
+          <div className="coming-soon">
+            <BlockStack gap="200">
+              {/* <Box width="100%"> */}
+              <InlineStack blockAlign="center" align="space-between">
+                <InlineStack>
+                  <RadioButton
+                    label="Fixed duration"
+                    checked={visibility === "showFixedDuration"}
+                    id="fixedDuration"
+                    onChange={() => setVisibility("showFixedDuration")}
+                  />
+                  <Tooltip content="The countdown resets after it ends">
+                    <Icon
+                      source={AlertCircleIcon}
+                      tone="base"
+                    />
+                  </Tooltip>
+
+                </InlineStack>
+
+                {visibility === "showFixedDuration" && (
+                  <Box width="30%">
+                    <TextField
+                      label=""
+                      type="number"
+                      value={timeDuration}
+                      onChange={handleSetTimeDuration}
+                      autoComplete="off"
+                      min={0}
+                      max={240}
+                      prefix={<Icon source={ClockIcon} />}
+                      suffix="min"
+                    />
+                  </Box>
+                )}
+              </InlineStack>
+              <InlineStack blockAlign="center" align="start">
                 <RadioButton
-                  label="Fixed duration"
-                  checked={visibility === "showFixedDuration"}
-                  id="fixedDuration"
-                  onChange={() => setVisibility("showFixedDuration")}
+                  label="Ends at midnight (user's local time)"
+                  checked={visibility === "showEndsAtMidnight"}
+                  id="endsAtMidnight"
+                  onChange={() => setVisibility("showEndsAtMidnight")}
                 />
-                <Tooltip content="The countdown resets after it ends">
+                <Tooltip content="The countdown resets everyday at night">
                   <Icon
                     source={AlertCircleIcon}
                     tone="base"
                   />
                 </Tooltip>
-
+              </InlineStack>
+              <InlineStack blockAlign="center" align="start">
+                <RadioButton
+                  label="Custom end date"
+                  checked={visibility === "showCustomEndDate"}
+                  id="customEndDate"
+                  onChange={() => setVisibility("showCustomEndDate")}
+                />
+                <Tooltip content="The countdown ends at a specific date and time. The countdown section will hide when it ends">
+                  <Icon
+                    source={AlertCircleIcon}
+                    tone="base"
+                  />
+                </Tooltip>
               </InlineStack>
 
-              {visibility === "showFixedDuration" && (
-                <Box width="30%">
+              {visibility === "showCustomEndDate" && (
+                <InlineStack gap="0" blockAlign="center" align="space-between">
+                  <Box width="50%">
+                    <TextField
+                      type="date"
+                      label="End date"
+                      value={endDate}
+                      onChange={setEndDate}
+                      autoComplete="off"
+                    />
+                  </Box>
+                  <Box width="45%">
+                    <TextField
+                      type="time"
+                      label="End time (GMT-8)"
+                      value={endTime}
+                      onChange={setEndTime}
+                      autoComplete="off"
+                    />
+                  </Box>
+                </InlineStack>
+              )}
+
+              {/* </Box> */}
+              <Divider />
+              <BlockStack gap="200">
+                <InlineStack align="space-between">
+                  <Box width="65%">
+                    <InlineStack align="space-between">
+                      <Text as='span'>Message text</Text>
+                      <Popover
+                        active={active === 'popover'}
+                        preferredAlignment="right"
+                        activator={
+                          <Button
+                            variant="tertiary"
+                            onClick={toggleActive('popover')}
+                            icon={SettingsIcon}
+                            accessibilityLabel="Other save actions"
+                          />
+                        }
+                        autofocusTarget="first-node"
+                        onClose={toggleActive('popover')}
+                      >
+                        <ActionList
+                          actionRole="menuitem"
+                          sections={[
+                            {
+                              items: [
+                                {
+                                  content: 'Add variable',
+                                  suffix: <Icon source={AlertCircleIcon} />
+                                },
+                              ],
+                            },
+                            {
+                              title: 'Timer',
+                              items: [
+                                {
+                                  content: 'Remaining time',
+                                  onAction: addRemainingTime,
+                                }
+                              ]
+                            }
+                          ]}
+                        />
+                      </Popover>
+                    </InlineStack>
+                    <TextField
+                      label=""
+                      value={textValue}
+                      onChange={setTextValue}
+                      autoComplete="off"
+                    />
+                  </Box>
+                  <InlineStack blockAlign="end">
+                    <Button icon={MagicIcon} size="large">
+                      AI suggestion
+                    </Button>
+                  </InlineStack>
+                </InlineStack>
+              </BlockStack>
+
+              <InlineStack align="space-around" blockAlign="end">
+                <Box width="20%">
+                  <Text as="span" variant="bodySm">Background</Text>
+                  <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgBgColor} colorWidth="100%" onColorChange={handleBgColorChange} />
+                </Box>
+                <Box>
+                  <Text as="span" variant="bodySm">Text</Text>
+                  <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgTextColor} colorWidth="100%" onColorChange={handleTextColorChange} />
+                </Box>
+                <Box>
+                  <Text as="span" variant="bodySm">Alignment</Text>
+                  <ButtonGroup gap="extraTight">
+                    <Button
+                      pressed={activeAlignmentButtonIndex === 0}
+                      onClick={() => handleAlignmentButtonClick(0)}
+                      icon={TextAlignLeftIcon}
+                    >
+                    </Button>
+                    <Button
+                      pressed={activeAlignmentButtonIndex === 1}
+                      onClick={() => handleAlignmentButtonClick(1)}
+                      icon={TextAlignCenterIcon}
+                    >
+                    </Button>
+                    <Button
+                      pressed={activeAlignmentButtonIndex === 2}
+                      onClick={() => handleAlignmentButtonClick(2)}
+                      icon={TextAlignRightIcon}
+                    >
+                    </Button>
+                  </ButtonGroup>
+
+                </Box>
+                <Box>
+                  <Text as="span" variant="bodySm">Style</Text>
+                  <ButtonGroup gap="extraTight">
+                    <Button
+                      pressed={activeTextBoldButton}
+                      onClick={() => handleTextBoldButtonClick()}
+                      icon={TextBoldIcon}
+                    >
+                    </Button>
+                    <Button
+                      pressed={activeTextItalicButton}
+                      onClick={() => handleTextItalicButtonClick()}
+                      icon={TextItalicIcon}
+                    >
+                    </Button>
+                  </ButtonGroup>
+                </Box>
+                <Box width="25%">
+                  <Text as="span" variant="bodySm">Size</Text>
                   <TextField
                     label=""
                     type="number"
-                    value={timeDuration}
-                    onChange={handleSetTimeDuration}
+                    value={textFontSize}
+                    onChange={handleSetTextFontSize}
                     autoComplete="off"
-                    min={0}
-                    max={240}
-                    prefix={<Icon source={ClockIcon} />}
-                    suffix="min"
-                  />
-                </Box>
-              )}
-            </InlineStack>
-            <InlineStack blockAlign="center" align="start">
-              <RadioButton
-                label="Ends at midnight (user's local time)"
-                checked={visibility === "showEndsAtMidnight"}
-                id="endsAtMidnight"
-                onChange={() => setVisibility("showEndsAtMidnight")}
-              />
-              <Tooltip content="The countdown resets everyday at night">
-                <Icon
-                  source={AlertCircleIcon}
-                  tone="base"
-                />
-              </Tooltip>
-            </InlineStack>
-            <InlineStack blockAlign="center" align="start">
-              <RadioButton
-                label="Custom end date"
-                checked={visibility === "showCustomEndDate"}
-                id="customEndDate"
-                onChange={() => setVisibility("showCustomEndDate")}
-              />
-              <Tooltip content="The countdown ends at a specific date and time. The countdown section will hide when it ends">
-                <Icon
-                  source={AlertCircleIcon}
-                  tone="base"
-                />
-              </Tooltip>
-            </InlineStack>
-
-            {visibility === "showCustomEndDate" && (
-              <InlineStack gap="0" blockAlign="center" align="space-between">
-                <Box width="50%">
-                  <TextField
-                    type="date"
-                    label="End date"
-                    value={endDate}
-                    onChange={setEndDate}
-                    autoComplete="off"
-                  />
-                </Box>
-                <Box width="45%">
-                  <TextField
-                    type="time"
-                    label="End time (GMT-8)"
-                    value={endTime}
-                    onChange={setEndTime}
-                    autoComplete="off"
+                    min={1}
+                    max={100}
+                    suffix="px"
                   />
                 </Box>
               </InlineStack>
-            )}
 
-            {/* </Box> */}
-            <Divider />
-            <BlockStack gap="200">
-              <InlineStack align="space-between">
-                <Box width="65%">
-                  <InlineStack align="space-between">
-                    <Text as='span'>Message text</Text>
-                    <Popover
-                      active={active === 'popover'}
-                      preferredAlignment="right"
-                      activator={
-                        <Button
-                          variant="tertiary"
-                          onClick={toggleActive('popover')}
-                          icon={SettingsIcon}
-                          accessibilityLabel="Other save actions"
-                        />
-                      }
-                      autofocusTarget="first-node"
-                      onClose={toggleActive('popover')}
-                    >
-                      <ActionList
-                        actionRole="menuitem"
-                        sections={[
-                          {
-                            items: [
-                              {
-                                content: 'Add variable',
-                                suffix: <Icon source={AlertCircleIcon} />
-                              },
-                            ],
-                          },
-                          {
-                            title: 'Timer',
-                            items: [
-                              {
-                                content: 'Remaining time',
-                                onAction: addRemainingTime,
-                              }
-                            ]
-                          }
-                        ]}
-                      />
-                    </Popover>
-                  </InlineStack>
-                  <TextField
-                    label=""
-                    value={textValue}
-                    onChange={setTextValue}
-                    autoComplete="off"
-                  />
-                </Box>
-                <InlineStack blockAlign="end">
-                  <Button icon={MagicIcon} size="large">
-                    AI suggestion
-                  </Button>
-                </InlineStack>
-              </InlineStack>
             </BlockStack>
-
-            <InlineStack align="space-around" blockAlign="end">
-              <Box width="20%">
-                <Text as="span" variant="bodySm">Background</Text>
-                <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgBgColor} colorWidth="100%" onColorChange={handleBgColorChange} />
-              </Box>
-              <Box>
-                <Text as="span" variant="bodySm">Text</Text>
-                <ColorPickerPopoverItem subtitle="" defaultColorSetting={msgTextColor} colorWidth="100%" onColorChange={handleTextColorChange} />
-              </Box>
-              <Box>
-                <Text as="span" variant="bodySm">Alignment</Text>
-                <ButtonGroup gap="extraTight">
-                  <Button
-                    pressed={activeAlignmentButtonIndex === 0}
-                    onClick={() => handleAlignmentButtonClick(0)}
-                    icon={TextAlignLeftIcon}
-                  >
-                  </Button>
-                  <Button
-                    pressed={activeAlignmentButtonIndex === 1}
-                    onClick={() => handleAlignmentButtonClick(1)}
-                    icon={TextAlignCenterIcon}
-                  >
-                  </Button>
-                  <Button
-                    pressed={activeAlignmentButtonIndex === 2}
-                    onClick={() => handleAlignmentButtonClick(2)}
-                    icon={TextAlignRightIcon}
-                  >
-                  </Button>
-                </ButtonGroup>
-
-              </Box>
-              <Box>
-                <Text as="span" variant="bodySm">Style</Text>
-                <ButtonGroup gap="extraTight">
-                  <Button
-                    pressed={activeTextBoldButton}
-                    onClick={() => handleTextBoldButtonClick()}
-                    icon={TextBoldIcon}
-                  >
-                  </Button>
-                  <Button
-                    pressed={activeTextItalicButton}
-                    onClick={() => handleTextItalicButtonClick()}
-                    icon={TextItalicIcon}
-                  >
-                  </Button>
-                </ButtonGroup>
-              </Box>
-              <Box width="25%">
-                <Text as="span" variant="bodySm">Size</Text>
-                <TextField
-                  label=""
-                  type="number"
-                  value={textFontSize}
-                  onChange={handleSetTextFontSize}
-                  autoComplete="off"
-                  min={1}
-                  max={100}
-                  suffix="px"
-                />
-              </Box>
-            </InlineStack>
-
-          </BlockStack>
+          </div>
         </Collapsible >
 
       </BlockStack >

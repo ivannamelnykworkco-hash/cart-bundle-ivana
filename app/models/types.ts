@@ -11,11 +11,13 @@ export type BundleStatus = 'draft' | 'active' | 'inactive';
 
 export interface Bundle {
   id: string;
+  shop?: string;
   name: string;
   type: BundleType;
   status: BundleStatus;
   products: string[]; // Product IDs
-  discountType: 'percentage' | 'fixed';
+  discountId?: string;
+  discountType: string;
   discountValue: number;
   stats: BundleStats;
   createdAt: string;
@@ -111,6 +113,7 @@ export interface GeneralSetting {
 
 export interface CountdownTimer {
   id: string
+  bundleId: string
   isCountdown: boolean
   visibility: string
   fixedDurationTime: number

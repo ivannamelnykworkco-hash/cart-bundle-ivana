@@ -115,7 +115,6 @@ export function PopUpover({
             <Button
               variant="tertiary"
               onClick={() => toggleActive('popover')}
-              icon={SettingsIcon}
               accessibilityLabel="Other save actions"
             />
           }

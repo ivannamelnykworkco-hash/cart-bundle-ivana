@@ -73,12 +73,13 @@ export function GeneralStylePanel({
   styleHandlers,
   open,
   onToggle,
+  generalSettingStyleData,
+  bundleId,
   onChangeLayoutStyle,
   layoutStyleOptions,
   layoutSelectedStyle
 }) {
-  const loaderData = useLoaderData<typeof loader>();
-  const conf = loaderData.generalStyleConf;
+  const conf = generalSettingStyleData;
   const {
     upCornerRadiusChange,
     upSpacingChange,

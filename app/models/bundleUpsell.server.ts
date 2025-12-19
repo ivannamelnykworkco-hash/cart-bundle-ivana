@@ -1,6 +1,9 @@
 import db from "../db.server";
-export async function getBundleUpsells() {
+export async function getBundleUpsells(bundleId) {
   return db.bundleUpsell.findMany({
+    where: {
+      bundleId: bundleId
+    },
     include: {
       upsellItems: true,
       productItems: true
@@ -289,4 +292,19 @@ export async function updateBundleUpsells(bundleUpsellList) {
     }
   });
   return Promise.all(bundleUpsellList.map(bundleUpsell => updateBundleUpsell(bundleUpsell)));
+}
+
+export async function deleteBundleUpsells(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.bundleUpsell.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
 }

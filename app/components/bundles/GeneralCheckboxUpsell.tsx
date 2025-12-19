@@ -6,7 +6,7 @@ import { SwitchIcon } from "../common/SwitchIcon";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
-export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle }) {
+export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle, checkboxUpsellData, bundleId }) {
 
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData?.products?.map((product: any) => ({
@@ -18,7 +18,7 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle }) {
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const initialUpsellData = (() => {
     try {
-      return JSON.parse(loaderData?.checkboxUpsellConf?.upsellData);
+      return JSON.parse(checkboxUpsellData?.upsellData);
     } catch (e) {
       return [];
     }
@@ -33,9 +33,11 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle }) {
     setUpsellData(prevData => ([...prevData, {
       deleteId: id,
       title: "",
+      isShowLowAlert: 'false',
       selected: "discounted %",
+      selectedProduct: '',
       upsellTitle: "{{product}}",
-      upsellSubTitle: "Save {{saved_amount}}!",
+      upsellSubTitle: "Save",
       value: "20",
     }]));
     return;
@@ -66,9 +68,10 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle }) {
   }, []);
 
   useEffect(() => {
-    onUpsellChange(upsellData);
+    onUpsellChange(upsellData, isShowLowAlert);
   }, [
     upsellData,
+    isShowLowAlert,
     onUpsellChange
   ]);
 
