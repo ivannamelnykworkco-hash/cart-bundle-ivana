@@ -18,7 +18,7 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle, checkbox
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
   const initialUpsellData = (() => {
     try {
-      return JSON.parse(checkboxUpsellData.upsellData);
+      return JSON.parse(checkboxUpsellData?.upsellData);
     } catch (e) {
       return [];
     }
@@ -33,9 +33,11 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle, checkbox
     setUpsellData(prevData => ([...prevData, {
       deleteId: id,
       title: "",
+      isShowLowAlert: 'false',
       selected: "discounted %",
+      selectedProduct: '',
       upsellTitle: "{{product}}",
-      upsellSubTitle: "Save {{saved_amount}}!",
+      upsellSubTitle: "Save",
       value: "20",
     }]));
     return;
@@ -66,9 +68,10 @@ export function GeneralCheckboxUpsell({ open, onUpsellChange, onToggle, checkbox
   }, []);
 
   useEffect(() => {
-    onUpsellChange(upsellData);
+    onUpsellChange(upsellData, isShowLowAlert);
   }, [
     upsellData,
+    isShowLowAlert,
     onUpsellChange
   ]);
 

@@ -104,8 +104,9 @@ export function cartLinesDiscountsGenerateRun(input) {
     parseMetafield(discount.metafield);
 
   const candidates = [];
-
+  // console.log("Discount Configurations:", cart.attributes?.qb_selected_bundle);
   for (const line of cart.lines) {
+    console.log("Processing cart line:", line);
     const productId = line.merchandise.product.id;
     const variantTitle = line.merchandise.title;
     const quantity = line.quantity;
@@ -237,6 +238,8 @@ export function cartLinesDiscountsGenerateRun(input) {
   }
 
   if (candidates.length === 0) return { operations: [] };
+
+  console.log("Generated discount candidates:", candidates);
 
   return {
     operations: [

@@ -17,15 +17,23 @@ export async function getGeneralSetting(bundleId: string): Promise<GeneralSettin
     return result;
   }
 
+  // const bundleCount = await db.generalSetting.count({
+  //   where: {
+  //     bundleId: { not: null } // adjust filter if needed
+  //   }
+  // });
+  // const nextBundleNumber = bundleCount + 1;
+
+
   //if no result then send init result
   const init = await db.generalSetting.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
       bundleId: bundleId,
       discountId: "",
-      bundleName: "",
-      discountName: "",
-      blockTitle: "",
+      bundleName: 'Bundle #1',
+      discountName: "Discount #1",
+      blockTitle: "Block",
       visibility: "all",
       markets: "all",
       excludedProducts: "",
@@ -52,10 +60,10 @@ export async function getGeneralSetting(bundleId: string): Promise<GeneralSettin
       unitLabel: "",
       useProductCompare: false,
       showPricesWithout: false,
-      showPriceRounding: false,//
+      showPriceRounding: false,
       priceRounding: ".99",
       updateTheme: false,
-      priceSelect: "pi",//
+      priceSelect: "pi",
       skipCart: false,
       showAlert: false,
       showWhenStock: 5,

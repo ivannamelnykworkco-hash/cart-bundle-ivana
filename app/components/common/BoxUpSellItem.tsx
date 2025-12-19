@@ -209,7 +209,7 @@ export function BoxUpSellItem({
                 </InlineStack>
 
                 <InlineStack gap="200" align="end" blockAlign="center">
-                  <Box width="60px">
+                  <Box>
                     <TextField
                       label=""
                       type="number"
@@ -314,20 +314,6 @@ export function BoxUpSellItem({
         max={70}
         suffix="px"
       />
-
-      {/* Checkboxes */}
-      <InlineStack gap="200">
-        <Checkbox
-          label="Selected by default"
-          checked={isSelectedByDefault}
-          onChange={setIsSelectedByDefault}
-        />
-        <Checkbox
-          label="Visible only when bar is selected"
-          checked={isVisibleOnly}
-          onChange={setIsVisibleOnly}
-        />
-      </InlineStack>
     </div>
   );
 }

@@ -85,7 +85,7 @@ export function BoxProductItem({
           )}
         </InlineStack>
         <InlineStack gap="200" align="end" blockAlign="center">
-          <Box width='30%'>
+          <Box width='50%'>
             <TextField
               label
               type="number"
@@ -102,14 +102,6 @@ export function BoxProductItem({
           ></Button>
         </InlineStack>
       </InlineStack>
-      {/* {change pre-selectd variant} */}
-      <SelectProductModal
-        productArray={selectedProduct}
-        onSelect={setSelectedVariants}
-        title="Add variant"
-        selectionMode="singleVariant"
-        buttonText="Select pre-selected variant"
-      />
       {/* { price and title and subtitle} */}
       <InlineGrid columns={2} gap="200">
         <Select

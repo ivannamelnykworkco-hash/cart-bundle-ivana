@@ -1,7 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 // To add or update a model in prisma
-// npm run prisma migrate dev -- --name add-YourTableName-table
+// npm run prisma migrate dev -- --name add-Bundle-table
 //
 generator client {
   provider = "prisma-client-js"
@@ -236,6 +236,7 @@ model CheckboxUpsell {
   id                  String @id @default(cuid())
   bundleId            String
   upsellData          Json
+  selectedProduct     Json?
   createdAt             String
   updatedAt             String
 }
@@ -322,6 +323,8 @@ model QbUpsellItem {
   selectedVariants    String
   selectedProduct     Json?
   quantity            Int 
+  base                Decimal  @default(10.00)
+  calc                Decimal  @default(20.00)
   selectPrice         String
   discountPrice       Float?
   priceText           String

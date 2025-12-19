@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="https://{{ shop.domain }}/apps/cart-drawer-settings">
+{% if product %}
+  {{ 'cartdrawer-bundle.css' | asset_url | stylesheet_tag }}
+  {{ 'cartdrawer-bundle-app.css' | asset_url | stylesheet_tag }}
+
+  <script
+    src="{{ 'xcart-product-bundle.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+<script id="xcart-product-json" type="application/json">
+  {{ product | json }}
+</script>
+
+  <div
+    id="xcart-product-bundle"
+    class="xcart-product-bundle"
+    data-product-id="{{ product.id }}"
+    data-product-handle="{{ product.handle }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    data-currency="{{ shop.currency }}"
+  >
+    productbundle
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "ProductBundle",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

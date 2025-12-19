@@ -143,126 +143,127 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange, generalVolume
           <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
         </InlineStack>
         <Collapsible open={open} id="collapsible-settings" expandOnPrint>
-          <BlockStack gap="200">
-            {/* {eligible layout} */}
+          <div className="coming-soon">
             <BlockStack gap="200">
-              <Text as="span" variant="bodyMd" fontWeight="semibold">
-                Eligible for bundling
-              </Text>
-              <BlockStack gap="100">
-                <RadioButton
-                  label="All products except selected"
-                  checked={eligible === "productsExcept"}
-                  id="productsExcept"
-                  onChange={() => setEligible("productsExcept")}
-                />
-                <RadioButton
-                  label="Selected products"
-                  checked={eligible === "productsSelected"}
-                  id="productsSelected"
-                  onChange={() => setEligible("productsSelected")}
-                />
-                <RadioButton
-                  label="Products in selected collections"
-                  checked={eligible === "collectionSelected"}
-                  id="collectionSelected"
-                  onChange={() => setEligible("collectionSelected")}
-                />
-                {eligible === "productsExcept" && (
-                  <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
-                )
-                }
-                {
-                  eligible === "collectionSelected" && (
-                    <SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select Collections" selectionMode="multipleCollection" />
-
-                  )
-                }
-                {
-                  eligible === "productsSelected" && (
-                    <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
-                  )
-                }
-              </BlockStack>
-            </BlockStack>
-
-            <Divider />
-
-            <BlockStack gap="300">
-              <Text as="span" variant="bodyMd" fontWeight="semibold">
-                Layout
-              </Text>
-              {/* {edit image and utton text} */}
-              <InlineStack gap="100">
-                <ImageLoad onChange={handleImageChange} />
-                <TextField
-                  label="Button text"
-                  value={volumeButtonText}
-                  onChange={setVolumeButtonText}
-                  autoComplete="off"
-                />
-              </InlineStack>
-
-              {/* {color and product photo size} */}
+              {/* {eligible layout} */}
               <BlockStack gap="200">
-                <ColorPickerPopoverItem subtitle="Color" defaultColorSetting={layoutColor} colorWidth="50px" onColorChange={handleColorChange} />
-                <BlockStack inlineAlign="stretch">
-                  <Text as="span" variant="bodySm">Product photo size</Text>
-                  <InlineStack gap="0" align="space-between" blockAlign="center">
-                    <div style={{ width: "70%" }}>
-                      <RangeSlider
-                        value={Number(photoSize)}
-                        onChange={(v: number) => setPhotoSize(v)} // The 'onChange' should expect a number
-                        min={0}
-                        max={40}
-                        label
-                        output
-                      />
-                    </div>
-                    <Box width="20%" minHeight="32px">
-                      <TextField
-                        autoComplete="off"
-                        value={`${photoSize}`} // Convert the number to a string
-                        onChange={setPhotoSize} // Convert the string back to a number
-                        min={0}
-                        max={40}
-                        suffix="px"
-                        label
-                      />
-                    </Box>
-                  </InlineStack>
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
+                  Eligible for bundling
+                </Text>
+                <BlockStack gap="100">
+                  <RadioButton
+                    label="All products except selected"
+                    checked={eligible === "productsExcept"}
+                    id="productsExcept"
+                    onChange={() => setEligible("productsExcept")}
+                  />
+                  <RadioButton
+                    label="Selected products"
+                    checked={eligible === "productsSelected"}
+                    id="productsSelected"
+                    onChange={() => setEligible("productsSelected")}
+                  />
+                  <RadioButton
+                    label="Products in selected collections"
+                    checked={eligible === "collectionSelected"}
+                    id="collectionSelected"
+                    onChange={() => setEligible("collectionSelected")}
+                  />
+                  {eligible === "productsExcept" && (
+                    <SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
+                  )
+                  }
+                  {
+                    eligible === "collectionSelected" && (
+                      <SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select Collections" selectionMode="multipleCollection" />
+
+                    )
+                  }
+                  {
+                    eligible === "productsSelected" && (
+                      <SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select Products' />
+                    )
+                  }
                 </BlockStack>
               </BlockStack>
-            </BlockStack>
 
-            <Divider />
-            {/* {other settings} */}
-            <BlockStack gap="200">
-              <Text as="span" variant="bodyMd" fontWeight="semibold">
-                Other settings
-              </Text>
-              <Checkbox
-                label="Show product name"
-                checked={isProductName}
-                onChange={setIsProductName}
-              />
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <Checkbox
-                  label="Show price of chosen products only"
-                  checked={isShowPrice}
-                  onChange={setIsShowPrice}
-                />
-                <Tooltip content="Learn more">
-                  <Icon
-                    source={AlertCircleIcon}
-                    tone="base"
+              <Divider />
+
+              <BlockStack gap="300">
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
+                  Layout
+                </Text>
+                {/* {edit image and utton text} */}
+                <InlineStack gap="100">
+                  <ImageLoad onChange={handleImageChange} />
+                  <TextField
+                    label="Button text"
+                    value={volumeButtonText}
+                    onChange={setVolumeButtonText}
+                    autoComplete="off"
                   />
-                </Tooltip>
-              </div>
-            </BlockStack>
-            <CustomModal onSave={handleOnSave} />
-          </BlockStack>
+                </InlineStack>
 
+                {/* {color and product photo size} */}
+                <BlockStack gap="200">
+                  <ColorPickerPopoverItem subtitle="Color" defaultColorSetting={layoutColor} colorWidth="50px" onColorChange={handleColorChange} />
+                  <BlockStack inlineAlign="stretch">
+                    <Text as="span" variant="bodySm">Product photo size</Text>
+                    <InlineStack gap="0" align="space-between" blockAlign="center">
+                      <div style={{ width: "70%" }}>
+                        <RangeSlider
+                          value={Number(photoSize)}
+                          onChange={(v: number) => setPhotoSize(v)} // The 'onChange' should expect a number
+                          min={0}
+                          max={40}
+                          label
+                          output
+                        />
+                      </div>
+                      <Box width="20%" minHeight="32px">
+                        <TextField
+                          autoComplete="off"
+                          value={`${photoSize}`} // Convert the number to a string
+                          onChange={setPhotoSize} // Convert the string back to a number
+                          min={0}
+                          max={40}
+                          suffix="px"
+                          label
+                        />
+                      </Box>
+                    </InlineStack>
+                  </BlockStack>
+                </BlockStack>
+              </BlockStack>
+
+              <Divider />
+              {/* {other settings} */}
+              <BlockStack gap="200">
+                <Text as="span" variant="bodyMd" fontWeight="semibold">
+                  Other settings
+                </Text>
+                <Checkbox
+                  label="Show product name"
+                  checked={isProductName}
+                  onChange={setIsProductName}
+                />
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <Checkbox
+                    label="Show price of chosen products only"
+                    checked={isShowPrice}
+                    onChange={setIsShowPrice}
+                  />
+                  <Tooltip content="Learn more">
+                    <Icon
+                      source={AlertCircleIcon}
+                      tone="base"
+                    />
+                  </Tooltip>
+                </div>
+              </BlockStack>
+              <CustomModal onSave={handleOnSave} />
+            </BlockStack>
+          </div>
         </Collapsible>
       </BlockStack >
     </Card >

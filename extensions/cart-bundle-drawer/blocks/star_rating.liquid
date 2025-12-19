@@ -5,12 +5,8 @@
 
 <script  src="{{ 'cartdrawer-bundle.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
 <script  src="{{ 'cartdrawer-bundle-countdown.js' | asset_url }}"  type="module"  fetchpriority="low"></script>
-<script>
 
-</script>
-
-<div id="xcart-overlay" class="xcart-overlay" aria-hidden="true" hidden>
-</div>
+<div id="xcart-overlay" class="xcart-overlay" aria-hidden="true" hidden></div>
 
 <aside
   id="xcart-drawer"
@@ -43,9 +39,7 @@
       <span class="countdown-text">
         Hurry! Offer ends in {{timer}}
       </span>
-    </div>
-
-    
+    </div>   
 
   <section class="xcart-drawer__body">
     <div class="xcart-line-items-with-bundle">
@@ -73,22 +67,12 @@
         <a href="/checkout" id="xcart-checkout" class="xcart-btn xcart-btn--primary">Checkout</a>
       </div>
     </div>
-
-    {%- comment -%}
-      If you really need a second bundle block, give it a different ID.
-    {%- endcomment -%}
-    {% comment %} <div id="xcart-bundle-app-secondary" class="xcart-bundle">
-      <h3 class="xcart-bundle__title">Special bundle offers</h3>
-      <div class="xcart-bundle__content"><!-- Mount your app here --></div>
-    </div> {% endcomment %}
   </section>
 </aside>
 
-
-
 {% schema %}
 {
-  "name": "Cart Bundle",
+  "name": "CartBundle0000",
   "target": "body",
   "settings": []
 }

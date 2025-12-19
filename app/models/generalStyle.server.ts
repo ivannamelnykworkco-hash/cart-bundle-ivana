@@ -2,9 +2,26 @@
 import type { GeneralStyle } from "./types";
 import db from "../db.server";
 
-const defaultColor = "#000000";
+const defaultColor = {
+  cardsBgColor: "#EDF6FF",
+  selectedBgColor: "#FFFFFF",
+  borderColor: "#0085FF",
+  blockTitleColor: "#000000",
+  barTitleColor: "#000000",
+  barSubTitleColor: "#555555",
+  barPriceColor: "#000000",
+  barFullPriceColor: "#555555",
+  barLabelBackColor: "#D9EDFF",
+  barLabelTextColor: "#000000",
+  barBadgebackColor: "#0085FF",
+  barBadgeTextColor: "#FFFFFF",
+  barUpsellBackColor: "#CCE7FF",
+  barUpsellTextColor: "#000000",
+  barUpsellSelectedBackColor: "#000000",
+  barUpsellSelectedTextColor: "#CCE7FF"
+};
 
-export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
+export async function getGeneralStyle(): Promise<GeneralStyle> {
   const result = await db.generalStyle.findFirst({
     where: {
       bundleId: bundleId
@@ -19,7 +36,7 @@ export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
   const init = await db.generalStyle.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
-      bundleId: bundleId,
+      bundleId: Math.random().toString(36).substr(2, 9),
       cornerRadius: 0,
       spacing: 0,
       cardsBgColor: defaultColor,
@@ -44,11 +61,11 @@ export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
       bartitleFontStyle: "styleRegular",
       subTitleSize: 10,
       subTitleStyle: "styleRegular",
-      labelSize: 10,
+      labelSize: 12,
       labelStyle: "styleRegular",
-      upsellSize: 10,
-      upsellStyle: "styleRegular",
-      unitLabelSize: 10,
+      upsellSize: 13,
+      upsellStyle: "styleBold",
+      unitLabelSize: 14,
       unitLabelStyle: "styleRegular",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -103,17 +120,3 @@ export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>
   return result;
 }
 
-export async function deleteGeneralStyle(params: { id?: string, bundleId?: string }) {
-  const { id, bundleId } = params;
-  if (!id && !bundleId) {
-    throw new Error("Must provide id or bundleId");
-  }
-  await db.generalStyle.deleteMany({
-    where: {
-      OR: [
-        id ? { id } : undefined,
-        bundleId ? { bundleId } : undefined,
-      ].filter(Boolean) as any[],
-    },
-  });
-}

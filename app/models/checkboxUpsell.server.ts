@@ -1,7 +1,7 @@
 import type { CheckboxUpsell } from "./types";
 import db from "../db.server";
 
-export async function getCheckboxUpsell(bundleId: string): Promise<CheckboxUpsell> {
+export async function getCheckboxUpsell(): Promise<CheckboxUpsell> {
   // TODO: Implement database query
   const result = await db.checkboxUpsell.findFirst({
     where: {
@@ -20,7 +20,6 @@ export async function getCheckboxUpsell(bundleId: string): Promise<CheckboxUpsel
 export async function updateCheckboxUpsell(id: string, data: Partial<CheckboxUpsell>) {
   const updateData: any = {
     upsellData: data.upsellData,
-    bundleId: data.bundleId,
     updatedAt: new Date().toISOString()
   };
 
@@ -32,6 +31,7 @@ export async function updateCheckboxUpsell(id: string, data: Partial<CheckboxUps
     id: Math.random().toString(36).substr(2, 9),
     bundleId: data.bundleId,
     upsellData: data.upsellData ?? "",
+    selectedProduct: data.selectedProduct ?? null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };

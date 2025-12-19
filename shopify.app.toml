@@ -1,27 +1,37 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "140ab3829c6f68961c41ee1085e2e0a2"
-name = "Kaching Bundle"
-application_url = "https://example.com"
+client_id = "c812c9caf9208233e1ad77170a906762"
+name = "CartBundle"
+application_url = "https://cartbundle-ed4680083865.herokuapp.com"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
 
 [webhooks]
-api_version = "2026-01"
+# Use a real, current API version
+api_version = "2025-10"
 
-  [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
-  uri = "/webhooks/app/scopes_update"
-
+  # Handled by: /app/routes/webhooks.tsx
   [[webhooks.subscriptions]]
   topics = [ "app/uninstalled" ]
-  uri = "/webhooks/app/uninstalled"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+  uri = "/webhooks"
+
+  # Handled by: /app/routes/webhooks.app.scopes_update.tsx
+  [[webhooks.subscriptions]]
+  topics = ["app/scopes_update"]
+  uri = "/webhooks/app/scopes_update"
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products, write_discounts, read_products, read_discounts"
+scopes = "read_products, write_products, read_discounts, write_discounts"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://cartbundle-ed4680083865.herokuapp.com/api/auth/callback"
+]
+
+[app_proxy]
+url = "https://cartbundle-ed4680083865.herokuapp.com/cart-drawer-settings"
+subpath = "cart-drawer-settings"
+prefix = "apps"

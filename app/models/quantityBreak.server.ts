@@ -1,7 +1,7 @@
 import db from "../db.server";
 import type { QuantityBreak } from "./types";
 
-export async function getQuantityBreaks(bundleId: string) {
+export async function getQuantityBreaks(bundleId) {
   return db.quantityBreak.findMany({
     where: {
       bundleId: bundleId
@@ -53,6 +53,8 @@ export async function updateQuantityBreak(data) {
         selectedProduct: u.selectedProduct || "",
         selectPrice: u.selectPrice || "",
         quantity: parseInt(u.quantity, 10) || 1,
+        base: u.base || 10,
+        calc: u.calc || 20,
         discountPrice: u.discountPrice ? parseFloat(u.discountPrice) : 0,
         priceText: u.priceText || "",
         imageSize: parseInt(u.imageSize, 10) || 12,
@@ -160,6 +162,8 @@ export async function updateQuantityBreak(data) {
         selectedProduct: u.selectedProduct,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
+        base: u.base,
+        calc: u.calc,
         discountPrice: u.discountPrice,
         priceText: u.priceText,
         isSelectedByDefault: u.isSelectedByDefault,
@@ -180,6 +184,8 @@ export async function updateQuantityBreak(data) {
         isSelectedProduct: u.isSelectedProduct,
         selectedVariants: u.selectedVariants,
         selectedProduct: u.selectedProduct,
+        base: u.base,
+        calc: u.calc,
         selectPrice: u.selectPrice,
         quantity: u.quantity,
         discountPrice: u.discountPrice,

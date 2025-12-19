@@ -1101,23 +1101,33 @@ export default function NewBundle() {
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <BOGOBundleCard />
+              <div className="coming-soon">
+                <BOGOBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <QuantityBreaksBundleCard />
+              <div className="coming-soon">
+                <QuantityBreaksBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <CompleteBundleCard />
+              <div className="coming-soon">
+                <CompleteBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <SubscriptionBundleCard />
+              <div className="coming-soon">
+                <SubscriptionBundleCard />
+              </div>
             </Grid.Cell>
 
             <Grid.Cell columnSpan={{ xs: 6, sm: 6, md: 4, lg: 4, xl: 4 }}>
-              <ProgressiveGiftsBundleCard />
+              <div className="coming-soon">
+                <ProgressiveGiftsBundleCard />
+              </div>
             </Grid.Cell>
           </Grid>
         </Layout.Section>

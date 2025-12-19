@@ -22,13 +22,13 @@ export async function getCountdownTimer(bundleId: string): Promise<CountdownTime
       visibility: "showFixedDuration",
       fixedDurationTime: 0,
       endDateTime: new Date().toISOString(),
-      msgText: "Text",
-      msgAlignment: 0,
-      msgBold: false,
+      msgText: "Hurry! Offer expires in {{timer}} ⏰",
+      msgAlignment: 1,
+      msgBold: true,
       msgItalic: false,
-      msgSize: 12,
-      msgBgColor: "#FF0000",////////////
-      msgTextColor: "#00FF00",////////////
+      msgSize: 13,
+      msgBgColor: "#d9edff",////////////
+      msgTextColor: "#000000",////////////
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }
@@ -47,7 +47,7 @@ export async function updateCountdownTimer(id: string, data: Partial<CountdownTi
     msgAlignment: parseInt(data.activeAlignmentButtonIndex, 10),
     msgBold: data.activeTextBoldButton === "true",
     msgItalic: data.activeTextItalicButton === "true",
-    msgSize: parseInt(data.textFontSize, 12),
+    msgSize: parseInt(data.textFontSize, 13),
     msgBgColor: data.msgBgColor,  ////
     msgTextColor: data.msgTextColor,  ////
     updatedAt: new Date().toISOString()

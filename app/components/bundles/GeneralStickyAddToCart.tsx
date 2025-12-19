@@ -37,8 +37,8 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange, generalSt
   const [styleButtonFontSize, setStyleButtonFontSize] = useState(conf.styleButtonFontSize);
   const [styleButtonFontStyle, setStyleButtonFontStyle] = useState(conf.styleButtonFontStyle);
   const [stylePhotoSize, setStylePhotoSize] = useState(conf.stylePhotoSize);
-  const [stylePhotoCornerRadius, setStyleButtonPadding] = useState(conf.stylePhotoCornerRadius);
-  const [styleButtonPadding, setStylePhotoCornerRadius] = useState(conf.styleButtonPadding);
+  const [stylePhotoCornerRadius, setStylePhotoCornerRadius] = useState(conf.stylePhotoCornerRadius);
+  const [styleButtonPadding, setStyleButtonPadding] = useState(conf.styleButtonPadding);
   const [styleButtonCornerRadius, setStyleButtonCornerRadius] = useState(conf.styleButtonCornerRadius);
   const tabs = [
     { id: 'content', content: 'Content', panelID: 'content-1' },
@@ -90,6 +90,7 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange, generalSt
       onDataChange({
         id,
         bundleId,
+        isShowLowAlert,
         contentTitleText,
         contentButtonText,
         styleBgColor,
@@ -107,6 +108,7 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange, generalSt
       });
     }
   }, [
+    isShowLowAlert,
     contentTitleText,
     contentButtonText,
     styleBgColor,
@@ -145,7 +147,7 @@ export function GeneralStickyAddToCart({ open, onToggle, onDataChange, generalSt
               {tabs[selected].content === 'Content' && (
                 <InlineGrid columns={2} gap="200">
                   <BlockStack>
-                    <PopUpover title='Title' defaultPopText={contentTitleText} dataArray={productArray} />
+                    <PopUpover title='Title' defaultPopText={contentTitleText} upPopTextChange={setContentTitleText} dataArray={productArray} />
                   </BlockStack>
                   <BlockStack gap="200">
                     <Text as="span">Button</Text>

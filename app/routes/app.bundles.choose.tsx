@@ -533,6 +533,14 @@ export async function action({ request, params }) {
         { status: 500 }
       );
     }
+    //---------------------discountName is duplicated----------------------
+    // const duplicatedDiscountName = await checkDuplicateDiscountName(admin, discountData.discountName)
+    // if (duplicatedDiscountName) {
+    //   return json(
+    //     { success: false, error: "Discount name duplicated!" },
+    //     { status: 500 }
+    //   );
+    // }
     const automaticAppDiscount = await createDiscountAutomaticApp(admin, createVariables);
     if (automaticAppDiscount == null) {
       return json(
@@ -576,7 +584,6 @@ export async function action({ request, params }) {
       );
     }
   }
-
 }
 
 /**************************************************************/
@@ -648,7 +655,7 @@ export default function BundleSettingsAdvanced() {
   const bundleId = bundleData.id;
   const [countdownTimerData, setCountdownTimerData] = useState(loaderData.countdownTimerConf);
   const [generalVolumeData, setGeneralVolumeData] = useState(loaderData.generalVolumeConf);
-  const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
+  const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf); console.log("checkboxUpsellData==>", checkboxUpsellData);
   const [generalStickyAddData, setGeneralStickyAddData] = useState(loaderData.generalStickyAddConf);
   const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf);
   const [defaultVariant, setDefaultVariant] = useState(loaderData.generalSettingConf.setDefaultVariant ?? {});
@@ -671,6 +678,8 @@ export default function BundleSettingsAdvanced() {
 
   // Send data to action
   const submit = useSubmit();
+  console.log('generalStickyAddData==>', generalStickyAddData);
+
 
   function formDataToObject(fd) {
     return Object.fromEntries(fd.entries());
@@ -1106,12 +1115,6 @@ export default function BundleSettingsAdvanced() {
         content: "Save",
         onAction: saveData, /////////////
       }}
-      secondaryActions={[
-        {
-          content: "Preview",
-          onAction: () => console.log("Preview clicked"),
-        },
-      ]}
     >
       <Layout>
         <Box width="70%">
@@ -1291,27 +1294,6 @@ export default function BundleSettingsAdvanced() {
                       <Text as="h2" variant="headingMd">
                         Preview 🔗
                       </Text>
-                      <Button>Run A/B test</Button>
-                    </InlineStack>
-                    <Divider />
-                    {/* Preview Selectors */}
-                    <InlineStack gap="400">
-                      <Box minWidth="48%">
-                        <Select
-                          label="Product previewing"
-                          options={productOptions}
-                          onChange={setSelectedProduct}
-                          value={selectedProduct}
-                        />
-                      </Box>
-                      <Box minWidth="48%">
-                        <Select
-                          label="Country previewing"
-                          options={countryOptions}
-                          onChange={setSelectedCountry}
-                          value={selectedCountry}
-                        />
-                      </Box>
                     </InlineStack>
                     <Divider />
                     {/* Bundle Preview Card */}
@@ -1367,6 +1349,7 @@ export default function BundleSettingsAdvanced() {
                           {/* {add quantity Breaks} */}
                           {quantityBreakData.map((item) => {
                             const qbData = item;
+                            console.log('qbData==>', quantityBreakData);
                             const currentIsSelected = selectedId === item.id;
 
                             const qbCalc = qbData?.calc != null ? Number(qbData.calc) : 0;
@@ -2347,123 +2330,124 @@ export default function BundleSettingsAdvanced() {
                             );
                           })}
 
+                          {/* {-----checkboxupsell-preview} */}
+                          {Object.values(checkboxUpsellData || {})?.map((item, index) => (
+                            <div className="checkboxupsell-main" key={index}>
+                              <div className="checkboxupsell-main-container"
+                                style={{
+                                  background: barUpsellBackColor,
+                                  borderRadius: cornerRadius,
+                                }}>
+                                <div className="checkboxupsell-left">
+                                  <Checkbox
+                                    label=""
+                                    checked={false}
+                                    onChange={(value) =>
+                                      handleUpsellValueChange()
+                                    }
+                                  />
+
+                                  <Thumbnail
+                                    source={item?.selectedProduct?.[0]?.imageUrl || ""}
+                                    alt=""
+                                  />
+
+                                  <div className="checkbox-title-with-subtitle">
+                                    <span style={{
+                                      fontSize: `${bartitleSize}px`, fontWeight:
+                                        fontWeightMap[
+                                        bartitleFontStyle as keyof typeof fontWeightMap
+                                        ],
+                                      fontStyle:
+                                        fontStyleMap[
+                                        bartitleFontStyle as keyof typeof fontWeightMap
+                                        ],
+                                    }}>{item?.upsellTitle === '{{product}}' ? item?.selectedProduct?.[0]?.title : item?.upsellTitle ?? ""}</span>
+                                    <span tyle={{
+                                      fontSize: `${subTitleSize}px`, fontWeight:
+                                        fontWeightMap[
+                                        subTitleStyle as keyof typeof fontWeightMap
+                                        ],
+                                      fontStyle:
+                                        fontStyleMap[
+                                        subTitleStyle as keyof typeof fontWeightMap
+                                        ],
+                                      color: "grey"
+                                    }}>{item?.upsellSubTitle ?? ""}</span>
+                                  </div>
+
+                                  <div className="checkboxupsell-right">
+                                    <span style={{
+                                      fontSize: `${bartitleSize}px`, fontWeight:
+                                        fontWeightMap[
+                                        bartitleFontStyle as keyof typeof fontWeightMap
+                                        ],
+                                      fontStyle:
+                                        fontStyleMap[
+                                        bartitleFontStyle as keyof typeof fontWeightMap
+                                        ],
+                                    }}>${item?.finalPrice ?? "$8"}</span>
+                                    <s style={{
+                                      fontSize: `${subTitleSize}px`, fontWeight:
+                                        fontWeightMap[
+                                        subTitleStyle as keyof typeof fontWeightMap
+                                        ],
+                                      fontStyle:
+                                        fontStyleMap[
+                                        subTitleStyle as keyof typeof fontWeightMap
+                                        ],
+                                      color: "grey"
+                                    }}>${item?.basePrice ?? "$10"}</s>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+
+
                         </div>
+
                       </BlockStack>
                     </Box>
-                    <Divider />
-                    {/* Cart Drawer Preview */}
-                    <BlockStack gap="300">
-                      <Text as="h3" variant="headingSm">
-                        Cart Drawer Preview
-                      </Text>
-                      <Card background="bg-surface-secondary">
-                        <BlockStack gap="300">
-                          {/* Timer and Progress Bar */}
-                          <Box
-                            padding="300"
-                            background="bg-surface"
-                            borderRadius="100"
+                    {/* { sticky-preview} */}
+                    {generalStickyAddData?.isShowLowAlert && (
+                      <BlockStack>
+                        <div className="sticky-main">
+                          <div
+                            className="sticky-main-content"
+                            style={{ backgroundColor: generalStickyAddData?.styleBgColor }}
                           >
-                            <BlockStack gap="200">
-                              <Text as="span" variant="bodySm" alignment="center">
-                                Your cart will expire in{" "}
-                                <Text as="span" fontWeight="bold" tone="critical">
-                                  09:59 ⏰
-                                </Text>
-                              </Text>
-
-                              <Text
-                                as="p"
-                                variant="bodySm"
-                                alignment="center"
-                                tone="subdued"
-                              >
-                                Free shipping unlocked! Add $12.00 to unlock 10%
-                                discount!
-                              </Text>
-
-                              {/* Progress indicators */}
-                              <InlineStack gap="200" align="center">
-                                <div
-                                  style={{
-                                    width: "32px",
-                                    height: "32px",
-                                    background: "#10b981",
-                                    borderRadius: "50%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "white",
-                                    fontSize: "14px",
-                                    fontWeight: "bold",
-                                  }}
-                                >
-                                  ✓
-                                </div>
-                                <div
-                                  style={{
-                                    flex: 1,
-                                    height: "4px",
-                                    background: "#10b981",
-                                    borderRadius: "2px",
-                                  }}
+                            <div className="sticky-image-with-content">
+                              <div className="sticky-image" style={{ width: `${generalStickyAddData?.stylePhotoSize}px`, height: `${generalStickyAddData?.stylePhotoSize}px` }}>
+                                <Thumbnail
+                                  source={generalStickyAddData?.imageUrl || NoteIcon}
+                                  alt={generalStickyAddData?.contentTitleText || 'Sticky Add to Cart Image'}
                                 />
-                                <div
-                                  style={{
-                                    width: "32px",
-                                    height: "32px",
-                                    background: "#e5e5e5",
-                                    borderRadius: "50%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: "14px",
-                                  }}
-                                >
-                                  📦
-                                </div>
-                                <div
-                                  style={{
-                                    flex: 1,
-                                    height: "4px",
-                                    background: "#e5e5e5",
-                                    borderRadius: "2px",
-                                  }}
-                                />
-                                <div
-                                  style={{
-                                    width: "32px",
-                                    height: "32px",
-                                    background: "#e5e5e5",
-                                    borderRadius: "50%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: "14px",
-                                  }}
-                                >
-                                  🎁
-                                </div>
-                              </InlineStack>
-
-                              <InlineStack gap="300" align="center" wrap={false}>
-                                <Badge tone="success">Free shipping</Badge>
-                                <Badge>10% discount</Badge>
-                                <Badge>Free gift</Badge>
-                              </InlineStack>
-                            </BlockStack>
-                          </Box>
-
-                          {/* Upsell Products */}
-                          <Box
-                            padding="300"
-                            background="bg-surface"
-                            borderRadius="100"
-                          >
-                          </Box>
-                        </BlockStack>
-                      </Card>
-                    </BlockStack>
+                              </div>
+                              <span className="sticky-content"
+                                style={{
+                                  fontSize: `${generalStickyAddData?.styleTitleFontSize}px`,
+                                  color: generalStickyAddData?.styleTitleColor
+                                }}>
+                                {generalStickyAddData?.contentTitleText}
+                              </span>
+                            </div>
+                            <div className="sticky-button">
+                              <span className="sticky-biutton-text"
+                                style={{
+                                  fontSize: `${generalSettingData?.styleButtonFontSize}px`,
+                                  color: generalStickyAddData?.styleButtonTextColor,
+                                  backgroundColor: generalStickyAddData?.styleButtonColor,
+                                  padding: `${generalStickyAddData?.styleButtonPadding}px`,
+                                  borderRadius: `${generalStickyAddData?.styleButtonCornerRadius}px`
+                                }}>
+                                {generalStickyAddData.contentButtonText}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </BlockStack>
+                    )}
                   </BlockStack>
                 </Card>
               </div>

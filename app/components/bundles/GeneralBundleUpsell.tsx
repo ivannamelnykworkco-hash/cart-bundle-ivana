@@ -196,7 +196,7 @@ export function GeneralBundleUpsell({
       selectPrice: "Specific (e.g. $29)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
-      imageSize: 20,
+      imageSize: 40,
       isSelectedByDefault: false,
       isVisibleOnly: false,
       isShowAsSoldOut: false,
@@ -365,11 +365,7 @@ export function GeneralBundleUpsell({
                 <PopUpover title='Label' defaultPopText='' upPopTextChange={setLabelText} badgeSelected={labelText} />
               </Grid.Cell>
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
-                <Checkbox
-                  label="Selected by default"
-                  checked={isSelectedByDefault}
-                  onChange={setIsSelectedByDefault}
-                />
+                
               </Grid.Cell>
             </Grid>
             <Checkbox
