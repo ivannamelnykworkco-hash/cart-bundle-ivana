@@ -1,8 +1,11 @@
 import db from "../db.server";
 import type { QuantityBreak } from "./types";
 
-export async function getQuantityBreaks() {
+export async function getQuantityBreaks(bundleId: string) {
   return db.quantityBreak.findMany({
+    where: {
+      bundleId: bundleId
+    },
     include: {
       upsellItems: true
     },
@@ -211,3 +214,17 @@ export async function updateQuantityBreaks(qbList) {
   return Promise.all(qbList.map(qb => updateQuantityBreak(qb)));
 }
 
+export async function deleteQuantityBreaks(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.quantityBreak.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
+}

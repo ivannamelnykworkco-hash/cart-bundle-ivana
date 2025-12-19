@@ -50,6 +50,7 @@ export function createNewBundleUpsell(): BundleUpsell {
 export function GeneralBundleUpsell({
   id,//
   barId,//
+  bundleId,
   deleteSection,
   heading,//
   open,//
@@ -130,6 +131,7 @@ export function GeneralBundleUpsell({
 
     const buObjectData = () => ({
       id,
+      bundleId,
       layoutOption: "",
       title,
       subtitle,
@@ -222,6 +224,7 @@ export function GeneralBundleUpsell({
           : item
       )
     );
+    console.log("bundleupsell", data);
   }, []);
 
   // add product select button and delete product

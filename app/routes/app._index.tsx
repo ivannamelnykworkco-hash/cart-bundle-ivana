@@ -1,6 +1,6 @@
 // app/routes/app._index.tsx
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -11,9 +11,11 @@ import {
   EmptyState,
   Banner,
   Text,
-  Tabs
+  Tabs,
+  Frame,
+  Toast
 } from "@shopify/polaris";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { authenticate } from "../shopify.server";
 import {
   ChartVerticalFilledIcon,
@@ -24,12 +26,106 @@ import {
 } from '@shopify/polaris-icons';
 import type { Bundle, Analytics } from "../models/types";
 import { SwitchIcon } from "app/components/common/SwitchIcon";
+import { getBundles, deleteBundle } from "app/models/bundle.server";
+import { deleteGeneralSetting } from "app/models/generalSetting.server";
+import { deleteGeneralStyle } from "app/models/generalStyle.server";
+import { deleteCountdownTimer } from "app/models/countdownTimer.server";
+import { deleteVolumeDiscount } from "app/models/volumeDiscount.server";
+import { deleteStickyAdd } from "app/models/stickyAdd.server";
+import { deleteCheckboxUpsell } from "app/models/checkboxUpsell.server";
+import { deleteQuantityBreaks } from "app/models/quantityBreak.server";
+import { deleteBuyXGetYs } from "app/models/buyXGetY.server";
+import { deleteBundleUpsells } from "app/models/bundleUpsell.server";
+import { DELETE_DISCOUNT_QUERY } from "app/graphql/discount";
+
+async function deleteBundleData(id: string): Promise<boolean> {
+  try {
+    await Promise.all([
+      deleteBundle({ id }),
+      deleteGeneralSetting({ bundleId: id }),
+      deleteGeneralStyle({ bundleId: id }),
+      deleteCountdownTimer({ bundleId: id }),
+      deleteVolumeDiscount({ bundleId: id }),
+      deleteStickyAdd({ bundleId: id }),
+      deleteCheckboxUpsell({ bundleId: id }),
+      deleteQuantityBreaks({ bundleId: id }),
+      deleteBuyXGetYs({ bundleId: id }),
+      deleteBundleUpsells({ bundleId: id }),
+    ]);
+    return true; // all deletes succeeded
+  } catch (err) {
+    console.error("Failed to delete bundle data:", err);
+    return false; // at least one delete failed
+  }
+}
+
+async function deleteAutomaticAppDiscount(admin: any, discountId: string) {
+  const deleteDiscountVariables = {
+    id: discountId
+  };
+
+  try {
+    const graphqlResult = await admin.graphql(DELETE_DISCOUNT_QUERY, {
+      variables: deleteDiscountVariables,
+    });
+
+    const body = await graphqlResult.json();
+    // Check top-level GraphQL errors
+    if (body.errors?.length) {
+      return { success: false, errors: body.errors };
+    }
+    const result = body.data.discountAutomaticDelete;
+    // Check user errors from mutation
+    if (result.userErrors?.length) {
+      return { success: false, errors: result.userErrors };
+    }
+    // If deletion succeeded
+    if (result.deletedAutomaticDiscountId) {
+      return { success: true, deletedId: result.deletedAutomaticDiscountId };
+    }
+    // Mutation ran but nothing deleted (ID might not exist)
+    return { success: false, errors: "No discount deleted (ID may not exist)" };
+  } catch (err: any) {
+    // Network or other exception
+    return { success: false, errors: err };
+  }
+}
+
+export const action = async ({ request }: { request: Request }) => {
+  try {
+    const { admin } = await authenticate.admin(request);
+    const formData = await request.formData();
+    const id = formData.get("id") as string | null;
+    if (!id) {
+      return json({ success: false, error: "id not defined" }, { status: 400 });
+    }
+    const bundles = await getBundles();
+    const bundle = bundles.find(b => b.id === id);
+    if (!bundle) {
+      return json({ success: false, error: "Delete failed (No discount found)" }, { status: 500 });
+    }
+    const discountId = bundle.discountId;
+    const graphqlResult = await deleteAutomaticAppDiscount(admin, discountId || "gid://shopify/DiscountAutomaticNode/1510751207703");
+    if (!graphqlResult.success) {
+      return json({ success: false, error: graphqlResult.errors }, { status: 500 });
+    }
+    const dbResult = await deleteBundleData(id);
+    if (!dbResult) {
+      return json({ success: false, error: "Delete DB failed" }, { status: 500 });
+    }
+    // Everything succeeded
+    return json({ success: true });
+  } catch (err: any) {
+    return json({ success: false, error: err.message || "Delete failed" }, { status: 500 });
+  }
+};
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { admin, session } = await authenticate.admin(request);
+  const bundles = await getBundles();
 
   // TODO: Fetch from database
-  const bundles: Bundle[] = [
+  const bundleList: Bundle[] = [
     {
       id: "1",
       name: "Bundle",
@@ -70,6 +166,25 @@ export default function Index() {
   const [showBanner, setShowBanner] = useState(true);
   const [isShowLowAlert, setIsShowLowAlert] = useState(false);
 
+  const submit = useSubmit();
+  async function deleteBundleData(id: string) {
+    const formData = new FormData();
+    formData.append("id", id);
+    submit(formData, { method: "post" });
+  }
+
+  const actionData = useActionData();
+  console.log("actionData==>", actionData);
+
+  useEffect(() => {
+    if (actionData) {
+      if (actionData.success) {
+        showToast("Deleted successfully!", "success");
+      } else {
+        showToast(`Error: ${actionData.error} `, "error");
+      }
+    }
+  }, [actionData]);
 
   const tabs = [
     { id: "deals", content: "Deals" },
@@ -78,7 +193,9 @@ export default function Index() {
 
   const rows = bundles.map((bundle, index) => [
     // Deal Column
-    <div key={index} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+    <div key={index}
+      onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
+      style={{ display: "flex", alignItems: "center", gap: "12px" }}>
       <SwitchIcon checked={isShowLowAlert} onChange={setIsShowLowAlert} />
       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -88,13 +205,14 @@ export default function Index() {
           <Badge tone="info">{bundle.status}</Badge>
         </div>
         <Text as="span" variant="bodySm" tone="subdued">
-          {bundle.products.join(", ")}
+          {bundle.products.length} products
         </Text>
       </div>
     </div>,
 
     // Stats Column
-    <div key={index} style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px" }}>
+    <div key={index} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
+      style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px" }}>
       <div style={{ minWidth: "60px" }}>
         <Text as="span" variant="bodySm" tone="subdued">
           Visitors
@@ -167,12 +285,24 @@ export default function Index() {
         Run A/B test
       </Button> */}
       <Button icon={ChartVerticalFilledIcon} onClick={() => { }} />
-      <Button icon={EditIcon} onClick={() => navigate(`/app/bundles/${bundle.id}`)} />
+      <Button icon={EditIcon} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)} />
       <Button icon={DuplicateIcon} onClick={() => { }} />
       <Button icon={ViewIcon} onClick={() => { }} />
-      <Button icon={DeleteIcon} onClick={() => { }} />
+      <Button icon={DeleteIcon} onClick={() => { deleteBundleData(bundle.id) }} />
     </div>,
   ]);
+  const [toastActive, setToastActive] = useState(false);
+  const [toastContent, setToastContent] = useState('');
+  const [toastError, setToastError] = useState(false); // For styling, optional
+
+  const showToast = (message, type = 'success') => {
+    setToastContent(message);
+    setToastActive(true);
+    setToastError(type === 'error');
+  };
+  const handleToastDismiss = () => {
+    setToastActive(false);
+  };
 
   return (
     <Page
@@ -291,6 +421,17 @@ export default function Index() {
             </div>
           )}
         </Layout.Section>
+        {
+          toastActive && (
+            <Frame>
+              <Toast
+                content={toastContent}
+                onDismiss={handleToastDismiss}
+                error={toastError}
+              />
+            </Frame>
+          )
+        }
       </Layout>
     </Page>
   );

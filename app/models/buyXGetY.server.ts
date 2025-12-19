@@ -1,7 +1,10 @@
 import db from "../db.server";
 
-export async function getBuyXGetYs() {
+export async function getBuyXGetYs(bundleId: string) {
   return db.buyXGetY.findMany({
+    where: {
+      bundleId: bundleId
+    },
     include: {
       upsellItems: true
     },
@@ -202,4 +205,19 @@ export async function updateBuyXGetYs(buyXGetYList) {
     }
   });
   return Promise.all(buyXGetYList.map(buyXGetY => updateBuyXGetY(buyXGetY)));
+}
+
+export async function deleteBuyXGetYs(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.buyXGetY.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
 }

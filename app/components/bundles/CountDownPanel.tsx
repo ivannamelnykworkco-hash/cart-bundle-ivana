@@ -25,9 +25,8 @@ import { loader } from "../product/ProductList";
 import { useLoaderData } from "@remix-run/react";
 
 
-export function CountDownPanel({ onDataChange, open, onToggle }) {
-  const loaderData = useLoaderData<typeof loader>();
-  const conf = loaderData.countdownTimerConf;
+export function CountDownPanel({ onDataChange, open, onToggle, countdownTimerData, bundleId }) {
+  const conf = countdownTimerData;
   const [showCountdownTimer, setShowCountdownTimer] = useState(conf.isCountdown);
   const [visibility, setVisibility] = useState(conf.visibility);
   const [timeDuration, setTimeDuration] = useState<any>(conf.fixedDurationTime);;
@@ -127,6 +126,7 @@ export function CountDownPanel({ onDataChange, open, onToggle }) {
 
 
   const gatherStateData = () => ({
+    bundleId,
     showCountdownTimer,
     visibility,
     timeDuration,

@@ -73,3 +73,15 @@ export const UPDATE_DISCOUNT_QUERY = `
       }
     }
   }`;
+
+export const DELETE_DISCOUNT_QUERY = `
+    mutation discountAutomaticDelete($id: ID!) {
+      discountAutomaticDelete(id: $id) {
+        deletedAutomaticDiscountId
+        userErrors {
+          field
+          code
+          message
+        }
+      }
+    }`;

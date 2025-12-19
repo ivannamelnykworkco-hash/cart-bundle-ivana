@@ -1,9 +1,12 @@
 import type { StickyAdd } from "./types";
 import db from "../db.server";
 
-export async function getStickyAdd(): Promise<StickyAdd> {
+export async function getStickyAdd(bundleId: string): Promise<StickyAdd> {
   // TODO: Implement database query
   const result = await db.stickyAdd.findFirst({
+    where: {
+      bundleId: bundleId
+    },
     orderBy: {
       updatedAt: 'desc',
     },
@@ -14,7 +17,7 @@ export async function getStickyAdd(): Promise<StickyAdd> {
   const init = await db.stickyAdd.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
-      bundleId: Math.random().toString(36).substr(2, 9),
+      bundleId: bundleId,
       contentTitleText: "",
       contentButtonText: "",
       styleBgColor: "#FF0000",
@@ -65,4 +68,19 @@ export async function updateStickyAdd(id: string, data: Partial<StickyAdd>) {
     data: updateData,
   });
   return result;
+}
+
+export async function deleteStickyAdd(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.stickyAdd.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
 }

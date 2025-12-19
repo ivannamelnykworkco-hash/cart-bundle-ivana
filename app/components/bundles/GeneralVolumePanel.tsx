@@ -27,7 +27,7 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 
 
-export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
+export function GeneralVolumePanel({ open, onToggle, onDataChange, generalVolumeData, bundleId }) {
   const loaderData = useLoaderData<typeof loader>();
 
   const productArray = loaderData?.products?.map((product: any) => ({
@@ -43,7 +43,7 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
     id: collection.id
   }));
 
-  const conf = loaderData.generalVolumeConf;
+  const conf = generalVolumeData;
 
   const [openStyle, setOpenStyle] = useState(false);
   const bundlingColor = "#FF0000";
@@ -59,7 +59,6 @@ export function GeneralVolumePanel({ open, onToggle, onDataChange }) {
   const [excludedProduct, setExcludedProduct] = useState<any>(null);
   const [imageData, setImageData] = useState(conf.layoutImageUrl);
   const id = conf.id;
-  const bundleId = conf.bundleId;
   const initDataLoad = {
     heading: conf.customHeadingText,
     buttonText: conf.customButtonText,

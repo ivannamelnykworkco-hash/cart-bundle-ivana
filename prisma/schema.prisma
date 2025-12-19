@@ -40,6 +40,7 @@ model Bundle {
   type          String
   status        String   @default("draft")
   products      Json
+  discountId    String?
   discountType  String
   discountValue Float
   stats         Json
@@ -131,6 +132,7 @@ model GeneralSetting {
 
 model CountdownTimer {
   id    String @id @default(cuid())
+  bundleId      String @default("")
   isCountdown   Boolean
   visibility String
   fixedDurationTime   Int

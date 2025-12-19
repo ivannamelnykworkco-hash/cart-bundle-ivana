@@ -4,8 +4,11 @@ import db from "../db.server";
 
 const defaultColor = "#00DDDD"
 
-export async function getVolumeDiscount(): Promise<VolumeDiscount> {
+export async function getVolumeDiscount(bundleId: string): Promise<VolumeDiscount> {
   const result = await db.volumeDiscount.findFirst({
+    where: {
+      bundleId: bundleId
+    },
     orderBy: {
       updatedAt: 'desc',
     },
@@ -16,7 +19,7 @@ export async function getVolumeDiscount(): Promise<VolumeDiscount> {
   const init = await db.volumeDiscount.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
-      bundleId: Math.random().toString(36).substr(2, 9),
+      bundleId: bundleId,
       visibility: "productsExcept", //
       layoutImageUrl: "",
       layoutButtonText: "Layout Button", //
@@ -80,3 +83,19 @@ export async function updateVolumeDiscount(id: string, data: Partial<VolumeDisco
   });
   return result;
 }
+
+export async function deleteVolumeDiscount(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.volumeDiscount.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
+}
+

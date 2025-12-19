@@ -52,6 +52,7 @@ export function GeneralBuyXgetYfree({
   id,
   barId,
   open,
+  bundleId,
   itemData,
   onToggle,
   heading,
@@ -108,6 +109,7 @@ export function GeneralBuyXgetYfree({
 
     const xyObjectData = () => ({
       id,
+      bundleId,
       buyQuantity,
       getQuantity,
       title,

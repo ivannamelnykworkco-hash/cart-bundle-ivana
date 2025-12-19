@@ -2,10 +2,13 @@
 import type { GeneralSetting } from "./types";
 import db from "../db.server";
 
-export async function getGeneralSetting(): Promise<GeneralSetting> {
+export async function getGeneralSetting(bundleId: string): Promise<GeneralSetting> {
 
   // TODO: Implement database query
   const result = await db.generalSetting.findFirst({
+    where: {
+      bundleId: bundleId
+    },
     orderBy: {
       updatedAt: 'desc',
     },
@@ -18,7 +21,7 @@ export async function getGeneralSetting(): Promise<GeneralSetting> {
   const init = await db.generalSetting.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
-      bundleId: Math.random().toString(36).substr(2, 9),
+      bundleId: bundleId,
       discountId: "",
       bundleName: "",
       discountName: "",
@@ -67,6 +70,7 @@ export async function getGeneralSetting(): Promise<GeneralSetting> {
 
 export async function updateGeneralSetting(id: string, data: Partial<GeneralSetting>) {
   const updateData: any = {
+    bundleId: data.bundleId ?? "",
     discountId: data?.discountId ?? "",
     bundleName: data.bundleName,
     discountName: data.discountName,
@@ -111,4 +115,19 @@ export async function updateGeneralSetting(id: string, data: Partial<GeneralSett
     data: updateData,
   });
   return result;
+}
+
+export async function deleteGeneralSetting(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.generalSetting.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
 }

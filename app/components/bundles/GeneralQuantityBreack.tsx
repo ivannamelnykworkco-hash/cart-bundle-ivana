@@ -47,6 +47,7 @@ export function createNewQuantityBreak(): QuantityBreak {
 export function GeneralQuantityBreack({
   barId,
   id,
+  bundleId,
   deleteSection,
   heading,
   open,
@@ -97,6 +98,7 @@ export function GeneralQuantityBreack({
 
     const qbObjectData = () => ({
       id,
+      bundleId,
       quantity,
       title,
       subtitle,
@@ -179,12 +181,11 @@ export function GeneralQuantityBreack({
   const onBoxUpsellDataChange = useCallback(
     (childId: string | number, barId: string | number, data: any) => {
       if (!data) return;
-
       setBoxUpsells(prev => {
         const updated = Array.isArray(prev)
           ? prev.map(item => (item.id === childId ? { ...item, ...data } : item))
           : [];
-        console.log("Updated boxUpsells:"); // log here
+        console.log("Updated boxUpsells:", updated); // log here
         return updated;
       });
     },

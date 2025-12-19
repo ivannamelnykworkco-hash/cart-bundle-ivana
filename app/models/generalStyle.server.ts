@@ -4,8 +4,11 @@ import db from "../db.server";
 
 const defaultColor = "#000000";
 
-export async function getGeneralStyle(): Promise<GeneralStyle> {
+export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
   const result = await db.generalStyle.findFirst({
+    where: {
+      bundleId: bundleId
+    },
     orderBy: {
       updatedAt: 'desc',
     },
@@ -16,7 +19,7 @@ export async function getGeneralStyle(): Promise<GeneralStyle> {
   const init = await db.generalStyle.create({
     data: {
       id: Math.random().toString(36).substr(2, 9),
-      bundleId: Math.random().toString(36).substr(2, 9),
+      bundleId: bundleId,
       cornerRadius: 0,
       spacing: 0,
       cardsBgColor: defaultColor,
@@ -100,3 +103,17 @@ export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>
   return result;
 }
 
+export async function deleteGeneralStyle(params: { id?: string, bundleId?: string }) {
+  const { id, bundleId } = params;
+  if (!id && !bundleId) {
+    throw new Error("Must provide id or bundleId");
+  }
+  await db.generalStyle.deleteMany({
+    where: {
+      OR: [
+        id ? { id } : undefined,
+        bundleId ? { bundleId } : undefined,
+      ].filter(Boolean) as any[],
+    },
+  });
+}
