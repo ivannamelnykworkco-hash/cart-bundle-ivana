@@ -185,19 +185,6 @@ export default function Index() {
     }
   }, [actionData]);
 
-  const actionData = useActionData();
-  useEffect(() => {
-    if (actionData) {
-      if (actionData.success) {
-        console.log("Deleted successfully!", JSON.stringify(actionData, null, 2));
-        showToast("Deleted successfully!", "success");
-      } else {
-        showToast(`Error: ${actionData.error} `, "error");
-        console.log("Delete failed!", JSON.stringify(actionData, null, 2));
-      }
-    }
-  }, [actionData]);
-
   const rows = bundles.map((bundle, index) => [
     // Deal Column
     <div key={index}

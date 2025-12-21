@@ -9,7 +9,7 @@ export function SelectFontStyle({ defaultLabel, upFontStyleChange }: SelectFontS
   const [selected, setSelected] = useState(defaultLabel);
 
   const handleSelectChange = useCallback(
-    (value: string) => {setSelected(value); upFontStyleChange(value);},
+    (value: string) => { setSelected(value); upFontStyleChange(value); },
     [upFontStyleChange],
   );
 

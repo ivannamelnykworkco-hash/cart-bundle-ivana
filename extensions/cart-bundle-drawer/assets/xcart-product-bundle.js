@@ -6,8 +6,9 @@
 (() => {
   const BUNDLE_ROOT_ID = 'xcart-product-bundle';
 
-
-
+  let qbListArrayStore = [];
+  let xyListArrayStore = [];
+  let buListArrayStore = [];
   function init() {
     const bundleRoot = document.getElementById(BUNDLE_ROOT_ID);
     if (!bundleRoot) return;
@@ -67,10 +68,14 @@
       const xyListArray = product.xyList || [];
       const buListArray = product.buList || [];
       const gsListArray = product.gsList || [];
+      const stListArray = product.stList || [];
 
-      console.log('gsLintArray==>', gsListArray);
+      qbListArrayStore = qbListArray;
+      xyListArrayStore = xyListArray;
+      buListArrayStore = buListArray;
 
-      renderBundles(bundleRoot, qbListArray, xyListArray, buListArray, gsListArray);
+
+      renderBundles(bundleRoot, qbListArray, xyListArray, buListArray, gsListArray, stListArray);
     } catch (err) {
       console.error('[XCART] Bundle load error:', err);
     }
@@ -79,7 +84,7 @@
   /* -----------------------------
      Render bundle options
   ------------------------------ */
-  function renderBundles(bundleRoot, qbListArray, xyListArray, buListArray, gsListArray) {
+  function renderBundles(bundleRoot, qbListArray, xyListArray, buListArray, gsListArray, stListArray) {
     const list = bundleRoot.querySelector('.xcart-bundle-list');
     if (!list) return;
 
@@ -120,13 +125,50 @@
       .filter(Boolean);
 
     let html = '';
+    //-------------font style =----------------------
+    const fontWeightMap = {
+      styleLight: '200',
+      styleLightItalic: '200',
+      styleRegular: '400',
+      styleMedium: '400',
+      styleMediumItalic: '400',
+      styleBold: '700',
+      styleBoldItalic: '700',
+    };
+    const fontStyleMap = {
+      styleLight: 'normal',
+      styleLightItalic: 'italic',
+      styleRegular: 'normal',
+      styleMedium: 'normal',
+      styleMediumItalic: 'italic',
+      styleBold: 'normal',
+      styleBoldItalic: 'italic',
+    };
+    const barBlocktitleFontStyle = stListArray?.[0].barBlocktitleFontStyle;
+    const bartitleFontStyle = stListArray?.[0].bartitleFontStyle;
+    const labelFontStyle = stListArray?.[0].labelStyle;
+    const subTitleFontStyle = stListArray?.[0].subTitleStyle;
+    const upsellFontStyle = stListArray?.[0].upsellStyle;
 
+    //-----------------------------------
     // NOTE: assumes `it` is defined somewhere in your theme/app
-    console.log('selectedProductids==>', selectedProductIds, it.product_id)
     if (selectedProductIds.includes(String(it.product_id))) {
+
+      const headerWeight = fontWeightMap[barBlocktitleFontStyle] ?? '400';
+      const headerStyle = fontStyleMap[barBlocktitleFontStyle] ?? 'normal';
+      const bartitleFontWeight = fontWeightMap[bartitleFontStyle] ?? '700';
+      const bartitleStyle = fontStyleMap[bartitleFontStyle] ?? 'normal';
+      const labelWeight = fontWeightMap[labelFontStyle] ?? '400';
+      const labelStyle = fontStyleMap[labelFontStyle] ?? 'normal';
+      const subTitleWeight = fontWeightMap[subTitleFontStyle] ?? '400';
+      const subTitleStyle = fontStyleMap[subTitleFontStyle] ?? 'nomal';
+      const upsellWeight = fontWeightMap[upsellFontStyle] ?? '700';
+      const upsellStyle = fontStyleMap[upsellFontStyle] ?? 'normal';
+
+
       html += `
         <div id="xcart-bundle-app">
-          <div class="xcart-bundle-app--header"><span>BUNDLE &amp; SAVE</span></div>
+          <div class="xcart-bundle-app--header" style='font-weight: ${headerWeight}; font-style: ${headerStyle}'><span>BUNDLE &amp; SAVE</span></div>
       `;
 
       // ----- QB bundles -----
@@ -135,7 +177,6 @@
         const upsellArray = Array.isArray(bundleItem.upsellItems)
           ? bundleItem.upsellItems
           : [];
-
         const basePrice = it.price;
         const discountPrice = bundleItem.discountPrice;
         const quantity = bundleItem.quantity;
@@ -182,16 +223,16 @@
                       <div class="xcart-bundle-checkbox-body">.</div>
                     <div class="xcart-bundle-left">
                       <div class="xcart-bundle-title-with-label">
-                        <span class="xcart-bundle-title">${bundleItem.title || ''}</span>
-                        <span class="xcart-bundle-label">${bundleItem.label || ''}</span>
+                        <span class="xcart-bundle-title" style='font-weight: ${bartitleFontWeight}; font-style: ${bartitleStyle}'>${bundleItem.title || ''}</span>
+                        <span class="xcart-bundle-label" style='font-weight: ${labelWeight}; font-style: ${labelStyle}'>${bundleItem.label || ''}</span>
                       </div>
-                      <div class="xcart-bundle-subtitle">${bundleItem.subtitle || ''}</div>
+                      <div class="xcart-bundle-subtitle" style='font-weight: ${subTitleWeight}; font-style: ${subTitleStyle}'>${bundleItem.subtitle || ''}</div>
                     </div>
                   </div>
                   <div class="xcart--bundle-price">
-                    <div class="xcart-bundle-discounted-price">${(calc)}</div>
+                    <div class="xcart-bundle-discounted-price" style='font-weight: ${bartitleFontWeight}; font-style: ${bartitleStyle}'>$${(calc / 100).toFixed(2)}</div>
                     <div class="xcart-bundle-full-price">
-                      <span>${(base)}</span>
+                      <span>$${(base / 100).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -200,17 +241,22 @@
 
         upsellArray.forEach((upsellItem) => {
           const imageUrl = upsellItem?.selectedProduct?.[0]?.imageUrl;
+          console.log('upsellItem==>', upsellItem);
           html += `
-              <div class="xcart-upsell-container">
+              <div class="xcart-upsell-container">  
                 <div class="xcart-upsell-checkbox-with-product--info">
-                  <input type="checkbox">
+                  <input 
+                  type="checkbox"
+                  class="xcart-upsell-checkbox"
+                  data-variant-id="${upsellItem?.selectedProduct?.[1]?.id || ''}"
+                  data-quantity="${upsellItem.quantity || 1}">
                   <div class="xcart-upsell-img" style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px">
                     <img style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px" src="${imageUrl || ''}" alt="${upsellItem.title || ''}" />
                   </div>
-                  <div class="xcart-upsell-product-title">${upsellItem.priceText || ''}</div>
+                  <div class="xcart-upsell-product-title" style='font-weight: ${upsellWeight}; font-style: ${upsellStyle}'>${upsellItem.priceText || ''}</div>
                 </div>
                 <div class="xcart-upsell-prices">
-                  <div class="xcart-upsell-original-price">$${upsellItem.calc || ''}</div>
+                  <div class="xcart-upsell-original-price" style='font-weight: ${upsellWeight}; font-style: ${upsellStyle}'>$${upsellItem.calc || ''}</div>
                   <div class="xcart-upsell-current-price">$${upsellItem.base || ''}</div>
                 </div>
               </div>
@@ -228,6 +274,13 @@
         const upsellArray = Array.isArray(bundleItem.upsellItems)
           ? bundleItem.upsellItems
           : [];
+        console.log('upsellArray==>', upsellArray);
+        const bQuantity = bundleItem.buyQuantity;
+        const gQuantity = bundleItem.getQuantity;
+        const tQuantity = bQuantity + gQuantity;
+        const basePrice = it.price;
+        const base = tQuantity * basePrice;
+        const calc = bQuantity * basePrice;
 
         html += `
           <div class="xcart-main-quantity-break" data-bundle-id="${bundleItem.id}">
@@ -257,16 +310,16 @@
                       <div class="xcart-bundle-checkbox-body">.</div>
                     <div class="xcart-bundle-left">
                       <div class="xcart-bundle-title-with-label">
-                        <span class="xcart-bundle-title">${bundleItem.title || ''}</span>
-                        <span class="xcart-bundle-label">${bundleItem.label || ''}</span>
+                        <span class="xcart-bundle-title" style='font-weight: ${bartitleFontWeight}; font-style: ${bartitleStyle}'>${bundleItem.title || ''}</span>
+                        <span class="xcart-bundle-label" style='font-weight: ${labelWeight}; font-style: ${labelStyle}'>${bundleItem.label || ''}</span>
                       </div>
-                      <div class="xcart-bundle-subtitle">${bundleItem.subtitle || ''}</div>
+                      <div class="xcart-bundle-subtitle" style='font-weight: ${subTitleWeight}; font-style: ${subTitleStyle}'>${bundleItem.subtitle || ''}</div>
                     </div>
                   </div>
                   <div class="xcart--bundle-price">
-                    <div class="xcart-bundle-discounted-price"></div>
+                    <div class="xcart-bundle-discounted-price" style='font-weight: ${bartitleFontWeight}; font-style: ${bartitleStyle}'>$${(calc / 100).toFixed(2)}</div>
                     <div class="xcart-bundle-full-price">
-                      <span>${(Number.isFinite(it.final_line_price) ? it.final_line_price : it.line_price)}</span>
+                      <span>$${(base / 100).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -274,16 +327,23 @@
         `;
 
         upsellArray.forEach((upsellItem) => {
+          const imageUrl = upsellItem?.selectedProduct?.[0]?.imageUrl;
           html += `
               <div class="xcart-upsell-container">
                 <div class="xcart-upsell-checkbox-with-product--info">
-                  <input type="checkbox">
-                  <div class="xcart-upsell-img"><img src="${upsellItem.imageUrl || ''}" alt="${upsellItem.title || ''}" /></div>
-                  <div class="xcart-upsell-product-title">${upsellItem.priceText || ''}</div>
+                  <input
+                  type="checkbox"
+                  class="xcart-upsell-checkbox"
+                  data-variant-id="${upsellItem?.selectedProduct?.[1]?.id || ''}"
+                  data-quantity="${upsellItem.quantity || 1}">
+                  <div class="xcart-upsell-img" style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px">
+                    <img style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px" src="${imageUrl || ''}" alt="${upsellItem.title || ''}" />
+                  </div>
+                  <div class="xcart-upsell-product-title" style='font-weight: ${upsellWeight}; font-style: ${upsellStyle}'>${upsellItem.priceText || ''}</div>
                 </div>
                 <div class="xcart-upsell-prices">
-                  <div class="xcart-upsell-original-price">$${upsellItem.discountPrice || ''}</div>
-                  <div class="xcart-upsell-current-price">$${upsellItem.selectPrice || ''}</div>
+                  <div class="xcart-upsell-original-price" style='font-weight: ${upsellWeight}; font-style: ${upsellStyle}'>$${upsellItem.calc || ''}</div>
+                  <div class="xcart-upsell-current-price">$${upsellItem.base || ''}</div>
                 </div>
               </div>
           `;
@@ -303,6 +363,31 @@
         const productArray = Array.isArray(bundleItem.productItems)
           ? bundleItem.productItems
           : [];
+        let totalBase = 0;
+        let totalCalc = 0;
+        productArray.forEach((productItem) => {
+          const quantity = productItem.productQuantity || 1;
+          const basePrice = productItem.selectedProduct?.[0]?.variants?.[0]?.node?.price || 0;
+          const selectPrice = productItem.selectPrice || '';
+          const discountPercent = productItem.discountPrice || 0;
+          const discountPrice = productItem.discountPrice || 0;
+          let calc = 0;
+          let base = quantity * basePrice;
+          console.log('basePrice==>', basePrice);
+
+          if (selectPrice === 'discounted%') {
+            calc = quantity * basePrice * (1 - discountPercent / 100); console.log('calc==>', calc);
+          } else if (selectPrice === 'discounted$') {
+            calc = quantity * basePrice - (quantity * discountPercent);
+          } else if (selectPrice === 'specific') {
+            calc = discountPrice || "0";
+          } else {
+            calc = quantity * basePrice;
+          }
+
+          totalBase += base;
+          totalCalc += calc;
+        });
 
         html += `
           <div class="xcart-main-quantity-break" data-bundle-id="${bundleItem.id}">
@@ -312,7 +397,7 @@
 
         if (bundleItem.badgeStyle === 'Simple' && bundleItem.badgeText) {
           html += `
-                <div class="xcart-bundle_bar_most_popular_content">${bundleItem.badgeText}</div>
+                <div class="xcart-bundle_bar_most_popular_content" style='font-weight: ${upsellWeight}; font-style: ${upsellStyle}'>${bundleItem.badgeText}</div>
           `;
         } else if (bundleItem.badgeStyle === 'mostpopular') {
           html += `
@@ -332,16 +417,16 @@
                       <div class="xcart-bundle-checkbox-body">.</div>
                     <div class="xcart-bundle-left">
                       <div class="xcart-bundle-title-with-label">
-                        <span class="xcart-bundle-title">${bundleItem.title || ''}</span>
-                        <span class="xcart-bundle-label">${bundleItem.label || ''}</span>
+                        <span class="xcart-bundle-title" style='font-weight: ${bartitleFontWeight}; font-style: ${bartitleStyle}'>${bundleItem.title || ''}</span>
+                        <span class="xcart-bundle-label" style='font-weight: ${labelWeight}; font-style: ${labelStyle}'>${bundleItem.label || ''}</span>
                       </div>
-                      <div class="xcart-bundle-subtitle">${bundleItem.subtitle || ''}</div>
+                      <div class="xcart-bundle-subtitle" style='font-weight: ${subTitleWeight}; font-style: ${subTitleStyle}'>${bundleItem.subtitle || ''}</div>
                     </div>
                   </div>
                   <div class="xcart--bundle-price">
-                    <div class="xcart-bundle-discounted-price"></div>
+                    <div class="xcart-bundle-discounted-price" style='font-weight: ${bartitleFontWeight}; font-style: ${bartitleStyle}'>$${(totalCalc.toFixed(2))}</div>
                     <div class="xcart-bundle-full-price">
-                      <span>${(Number.isFinite(it.final_line_price) ? it.final_line_price : it.line_price)}</span>
+                      <span>$${(totalBase.toFixed(2))}</span>
                     </div>
                   </div>
                 </div>
@@ -350,10 +435,29 @@
         `;
 
         productArray.forEach((productItem) => {
+          console.log('productItem==>', productItem);
+          const quantity = productItem.productQuantity || 1;
+          const basePrice = productItem.selectedProduct?.[0]?.variants?.[0]?.node?.price || 0;
+          const selectPrice = productItem.selectPrice || '';
+          const discountPercent = productItem.discountPrice || 0;
+          const discountPrice = productItem.discountPrice || 0;
+          let calc = 0;
+          let base = quantity * basePrice;
+          console.log('basePrice==>', basePrice);
+
+          if (selectPrice === 'discounted%') {
+            calc = quantity * basePrice * (1 - discountPercent / 100); console.log('calc==>', calc);
+          } else if (selectPrice === 'discounted$') {
+            calc = quantity * basePrice - (quantity * discountPercent);
+          } else if (selectPrice === 'specific') {
+            calc = discountPrice || "0";
+          } else {
+            calc = quantity * basePrice;
+          }
           html += `
               <div class="xcart-bundles__bunlde-products--product">
                 <div class="xcart-bundles__bundle-products__link">
-                  <img alt="" class="xcart-bundles__bundle-products__image" height="50" width="50" src="https://cdn.shopify.com/s/files/1/0922/2415/9928/files/snowboard_purple_hydrogen_200x200.png?v=1763374257">
+                  <img alt="" class="xcart-bundles__bundle-products__image" height="50" width="50" src="${productItem?.selectedProduct?.[0]?.imageUrl || ''}">
                 </div>
                 <div class="xcart-bundles__bundle-products__link">
                   <div class="xcart-bundles__bundle-products__title">
@@ -361,8 +465,8 @@
                   </div>
                 </div>
                 <div class="xcart-bundles__bundle-products__pricing">
-                  <span class="xcart-bundles__bundle-products__price">$20</span>
-                  <span class="xcart-bundles__bundle-products__full-price">$30</span>
+                  <span class="xcart-bundles__bundle-products__price">$${(calc.toFixed(2))}</span>
+                  <span class="xcart-bundles__bundle-products__full-price">$${(base.toFixed(2))}</span>
                 </div>
               </div>
 
@@ -385,16 +489,23 @@
         `;
 
         upsellArray.forEach((upsellItem) => {
+          const imageUrl = upsellItem?.selectedProduct?.[0]?.imageUrl;
           html += `
               <div class="xcart-upsell-container">
                 <div class="xcart-upsell-checkbox-with-product--info">
-                  <input type="checkbox">
-                  <div class="xcart-upsell-img"><img src="${upsellItem.imageUrl || ''}" alt="${upsellItem.title || ''}" /></div>
-                  <div class="xcart-upsell-product-title">${upsellItem.priceText || ''}</div>
+                  <input
+                  type="checkbox"
+                  class="xcart-upsell-checkbox"
+                  data-variant-id="${upsellItem?.selectedProduct?.[1]?.id || ''}"
+                  data-quantity="${upsellItem.quantity || 1}">
+                  <div class="xcart-upsell-img" style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px">
+                    <img style="width: ${upsellItem?.imageSize || 40}px; height: ${upsellItem?.imageSize || 40}px" src="${imageUrl || ''}" alt="${upsellItem.title || ''}" />
+                  </div>
+                  <div class="xcart-upsell-product-title" style='font-weight: ${upsellWeight}; font-style: ${upsellStyle}'>${upsellItem.priceText || ''}</div>
                 </div>
                 <div class="xcart-upsell-prices">
-                  <div class="xcart-upsell-original-price">$${upsellItem.discountPrice || ''}</div>
-                  <div class="xcart-upsell-current-price">$${upsellItem.selectPrice || ''}</div>
+                  <div class="xcart-upsell-original-price" style='font-weight: ${upsellWeight}; font-style: ${upsellStyle}'>$${upsellItem.calc || ''}</div>
+                  <div class="xcart-upsell-current-price">$${upsellItem.base || ''}</div>
                 </div>
               </div>
           `;
@@ -438,20 +549,115 @@
     form.addEventListener(
       'submit',
       (e) => {
-        const selectedBundleId = bundleRoot.dataset.selectedBundleId;
-        if (!selectedBundleId) return;
+        // 1) Only intercept when a bundle is actually selected
+        const selectedEl = bundleRoot.querySelector('.xcart-main-quantity-break.is-selected');
+        if (!selectedEl) {
+          // No bundle selected – let Shopify's default form submit run
+          return;
+        }
 
         e.preventDefault();
 
+        const selectedBundleItemId = selectedEl.dataset.bundleId;
+
+        // 2) Get selected bundle info from stored arrays
+        const qbBundle = qbListArrayStore.find(
+          (item) => String(item.id) === String(selectedBundleItemId)
+        );
+        const xyBundle = xyListArrayStore.find(
+          (item) => String(item.id) === String(selectedBundleItemId)
+        );
+        const buBundle = buListArrayStore.find(
+          (item) => String(item.id) === String(selectedBundleItemId)
+        );
+
+        let quantity = 1;
+        let bundleType = 'default';
+
+        if (qbBundle) bundleType = 'qb';
+        else if (xyBundle) bundleType = 'xy';
+        else if (buBundle) bundleType = 'bu';
+
+        switch (bundleType) {
+          case 'qb':
+            quantity = qbBundle.quantity || 1;
+            break;
+          case 'xy':
+            quantity =
+              (xyBundle.buyQuantity || 0) + (xyBundle.getQuantity || 0) || 1;
+            break;
+          case 'bu':
+          default:
+            quantity = 1;
+            break;
+        }
+
+        // 3) Collect checked upsell items under this bundle
+        const upsellCheckboxes = selectedEl.querySelectorAll(
+          '.xcart-upsell-checkbox-with-product--info input[type="checkbox"]:checked'
+        );
+
+        const upsellItems = Array.from(upsellCheckboxes).map((checkbox) => {
+          const rawId = checkbox.dataset.variantId; // GID or numeric
+          const match = rawId?.match(/ProductVariant\/(\d+)/);
+          const variantId = match ? match[1] : rawId; // use numeric if GID, else raw
+
+          return {
+            id: variantId,
+            quantity: Number(checkbox.dataset.quantity || '1'),
+          };
+        });
+
+        console.log('upsellItems ==>', upsellItems);
+
+        // 4) Main product add-to-cart
         const formData = new FormData(form);
-        formData.append('properties[_xcart_bundle_id]', selectedBundleId);
+        formData.set('quantity', String(quantity));
+        // Use the bundle item ID as the bundle identifier
+        formData.append('properties[_xcart_bundle_id]', selectedBundleItemId);
 
         fetch('/cart/add.js', {
           method: 'POST',
           body: formData,
           headers: { Accept: 'application/json' },
         })
+          .then((res) => {
+            if (!res.ok) {
+              return res.text().then((msg) => {
+                throw new Error(`[XCART] main add.js failed: ${msg}`);
+              });
+            }
+
+            // 5) Add each checked upsell (but don't break everything if one fails)
+            if (!upsellItems.length) return null;
+
+            return Promise.allSettled(
+              upsellItems
+                .filter((item) => item.id)
+                .map((item) => {
+                  const upsellFormData = new FormData();
+                  upsellFormData.append('id', item.id);
+                  upsellFormData.append('quantity', String(item.quantity));
+                  upsellFormData.append(
+                    'properties[_xcart_bundle_parent_id]',
+                    selectedBundleItemId
+                  );
+
+                  return fetch('/cart/add.js', {
+                    method: 'POST',
+                    body: upsellFormData,
+                  }).then((r) => {
+                    if (!r.ok) {
+                      return r.text().then((msg) => {
+                        console.warn('[XCART] upsell add.js failed:', msg);
+                      });
+                    }
+                  });
+                })
+            );
+          })
           .then(() => {
+            // 6) Always notify theme/cart drawer, even if upsell calls partially fail
             document.dispatchEvent(
               new CustomEvent('cart:added', { bubbles: true })
             );
@@ -463,6 +669,7 @@
       true
     );
   }
+
 
   /* -----------------------------
      Variant sync

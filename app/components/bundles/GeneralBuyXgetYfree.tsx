@@ -53,7 +53,6 @@ export function GeneralBuyXgetYfree({
   barId,
   bundleId,
   open,
-  bundleId,
   itemData,
   onToggle,
   heading,
@@ -162,8 +161,10 @@ export function GeneralBuyXgetYfree({
       id: newId,
       bxGyId: id,
       isSelectedProduct: "upsellSelectedproduct",
-      selectedVariants: "",
-      selectedProduct: "",
+      selectedVariants: "[]",
+      selectedProduct: "[]",
+      base: 10.00,
+      calc: 20.00,
       selectPrice: "Specific (e.g. $29)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
@@ -377,7 +378,7 @@ export function GeneralBuyXgetYfree({
               </Grid.Cell>
 
               <Grid.Cell columnSpan={{ xs: 6, sm: 5, lg: 5 }}>
-                
+
               </Grid.Cell>
             </Grid>
 

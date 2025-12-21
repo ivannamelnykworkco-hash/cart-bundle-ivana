@@ -348,7 +348,9 @@ model BxGyUpsellItem {
   isSelectedProduct   String
   selectedVariants    String
   selectedProduct     Json?
-  quantity            Int 
+  quantity            Int
+  base                Decimal  @default(10.00)
+  calc                Decimal  @default(20.00) 
   selectPrice         String
   discountPrice       Float?
   priceText           String
@@ -373,6 +375,8 @@ model BundleUpsellItem {
   selectedVariants    String
   selectedProduct     Json?
   quantity            Int 
+  base                Decimal  @default(10.00)
+  calc                Decimal  @default(20.00)
   selectPrice         String
   discountPrice       Float?
   priceText           String
