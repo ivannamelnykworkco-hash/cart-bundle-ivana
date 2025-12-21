@@ -38,7 +38,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const labelSize = Number(getGeneralStyleConfigS?.labelSize) || 16;
   const upsellSize = Number(getGeneralStyleConfigS?.upsellSize) || 16;
   const unitLabelSize = Number(getGeneralStyleConfigS?.unitLabelSize) || 16;
-
   const countdownTimerConfig = await getCountdownTimer().catch(() => null);
   const msgAlignmentIndex = Number(countdownTimerConfig?.msgAlignment) || '';
   const msgAlignment = msgAlignmentIndex === 0 ? "left" : msgAlignmentIndex === 1 ? "center" : "right";
@@ -74,7 +73,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       --label-size: ${labelSize}px;
       --upsell-size: ${upsellSize}px;
       --unitLabel-size: ${unitLabelSize}px;
-
       --msg-alignment: ${msgAlignment};
       --msgItalic-style: ${msgItalic};
       --msgBold-weight: ${msgBold};
@@ -108,6 +106,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const buList = await getBundleUpsells().catch(() => null);
   // generalsetting 
   const gsList = await getGeneralSetting();
+  const stList = await getGeneralStyle();
 
   // Fetch products and countdown config in parallel
   const [response, countdownTimerConfig] = await Promise.all([
@@ -190,6 +189,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       xyList: Array.isArray(xyList) ? xyList : [],
       buList: Array.isArray(buList) ? buList : [],
       gsList: gsList ? [gsList] : [],
+      stList: stList ? [stList] : [],
     };
   });
 

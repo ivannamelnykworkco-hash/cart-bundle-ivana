@@ -196,6 +196,8 @@ export function GeneralBundleUpsell({
       isSelectedProduct: "upsellSelectedproduct",
       selectedVariants: "[]",
       selectedProduct: "[]",
+      base: 10.00,
+      calc: 20.00,
       selectPrice: "Specific (e.g. $29)",
       discountPrice: 20,
       priceText: "+ Add at 20% discount",
