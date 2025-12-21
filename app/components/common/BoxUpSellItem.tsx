@@ -62,6 +62,7 @@ export function BoxUpSellItem({
     selectedProduct?.[1]?.price ??
     selectedProduct?.variants?.[0]?.price ??
     undefined;
+  const parsedSelectedProduct = Array.isArray(selectedProduct) ? selectedProduct : JSON.parse(selectedProduct ?? '[]');
 
   useEffect(() => {
     const basePerUnit = Number(barAddUpsellDefaultPrice);
@@ -73,7 +74,6 @@ export function BoxUpSellItem({
     // 3. Base price for quantity
     const basePrice = safeBasePerUnit * safeQuantity || 0; // 4. Calculate final price based on selectPrice
     console.log("basePrice==>", safeQuantity);
-
 
     let calculated = basePrice;
 
@@ -186,7 +186,7 @@ export function BoxUpSellItem({
 
         {isSelectedProduct === "upsellSelectedproduct" && (
           <>
-            {!selectedProduct && (
+            {parsedSelectedProduct.length === 0 && (
               <SelectProductModal
                 productArray={productArray}
                 onSelect={setSelectedProduct}

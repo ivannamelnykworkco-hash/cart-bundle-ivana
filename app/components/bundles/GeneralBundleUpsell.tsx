@@ -14,13 +14,16 @@ import { SelectVariantModal } from "../common/SelectVariantModal";
 import { BoxProductItem } from "../common/BoxProductItem";
 import type { BundleUpsell } from "../../models/types";
 
-function safeJsonParse(value) {
-  if (typeof value !== "string") return value;
-
+function safeJsonParse(obj) {
+  if (Array.isArray(obj)) {
+    return obj;
+  }
+  if (typeof obj !== "string")
+    return obj;
   try {
-    return JSON.parse(value);
+    return JSON.parse(obj);
   } catch {
-    return value;
+    return obj;
   }
 }
 
@@ -238,8 +241,8 @@ export function GeneralBundleUpsell({
       quantity: 1,
       selectPrice: "Discounted % (e.g. 25% off)",
       discountPrice: 20,
-      selectedVariants: "",
-      selectedProduct: ""
+      selectedVariants: "[]",
+      selectedProduct: "[]"
     };
     setProducts(prev => [...prev, newProduct]); // local child state if needed
     onAddProduct?.(barId, newProduct); // send barId + new upsell to parent

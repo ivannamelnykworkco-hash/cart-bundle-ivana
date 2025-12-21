@@ -42,7 +42,16 @@ import { getGeneralSetting, updateGeneralSetting } from "app/models/generalSetti
 import { getQuantityBreaks, updateQuantityBreaks } from "app/models/quantityBreak.server";
 import { getBuyXGetYs, updateBuyXGetYs } from "app/models/buyXGetY.server";
 import { getBundleUpsells, updateBundleUpsells } from "app/models/bundleUpsell.server";
-
+import { getBundle, updateBundle } from "app/models/bundle.server";
+import {
+  getAutomaticAppDiscount,
+  checkDuplicateDiscountName,
+  createDiscountAutomaticApp,
+  updateDiscountAutomaticApp,
+  addMetafield,
+  makeAddMetafieldVariables,
+  safeJsonParse
+} from "app/utils/discountFunction";
 
 import {
   GET_DISCOUNT_QUERY,
@@ -56,8 +65,6 @@ import {
 import {
   GET_PRODUCT_QUERY
 } from "../graphql/product";
-import { getBundle, updateBundle } from "app/models/bundle.server";
-
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -162,233 +169,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 };
 
-async function getAutomaticAppDiscount(admin: any, discountId: string) {
-  if (!discountId)
-    return null;
-  try {
-    const response = await admin.graphql(GET_DISCOUNT_QUERY, {
-      variables: { id: discountId },
-    });
-    const body = await response.json();
-    const node = body?.data?.automaticDiscountNode;
-    if (!node) return null;
-    // Ensure it's an App Discount
-    if (node.automaticDiscount.__typename !== "DiscountAutomaticApp") {
-      return null;
-    }
-    return node.id;
-  } catch (err) {
-    return err.message;
-  }
-}
-
-async function checkDuplicateDiscountName(admin: any, discountName: string): Promise<boolean> {
-  const getDiscountVariables = {
-    titleQuery: `title:${discountName}`,
-  };
-  try {
-    const graphqlResult = await admin.graphql(GET_DISCOUNT_WITH_TITLE_QUERY, { variables: getDiscountVariables });
-    const body = await graphqlResult.json();
-
-    const discounts = body?.data?.discountNodes?.edges
-      ?.map(edge => edge.node.discount)
-      ?.filter(d => d && d.__typename === "DiscountAutomaticApp" && d.title === discountName) || [];
-    return discounts.length > 0;
-  } catch (err: any) {
-    return false;
-  }
-}
-
-async function createDiscountAutomaticApp(admin: any, variables: any) {
-  try {
-    const graphqlResult = await admin.graphql(CREATE_DISCOUNT_QUERY, { variables: variables });
-    const body = await graphqlResult.json();
-    const userErrors = body.data?.discountAutomaticAppCreate?.userErrors || [];
-    if (userErrors.length > 0) {
-      return null;
-    }
-    const automaticAppDiscount = body?.data?.discountAutomaticAppCreate?.automaticAppDiscount ?? null;
-    return automaticAppDiscount;
-  } catch (err: any) {
-    // Network or other exceptions
-    return null;
-  }
-}
-
-async function updateDiscountAutomaticApp(admin: any, discountId: string, discountData: any) {
-  const updateDiscountQuery = UPDATE_DISCOUNT_QUERY;
-  const updateVariables = {
-    id: discountId,
-    automaticAppDiscount: {
-      title: discountData.discountName,
-      startsAt: discountData.startsAt,
-      endsAt: discountData.endsAt === "" ? null : discountData.endsAt,
-    }
-  };
-  try {
-    const graphqlResult = await admin.graphql(updateDiscountQuery, { variables: updateVariables });
-    const body = await graphqlResult.json();
-    const userErrors = body.data?.discountAutomaticAppUpdate?.userErrors || [];
-    if (body.errors?.length) {
-      return "body error";
-    }
-    if (userErrors.length > 0) {
-      return "usererror";
-    }
-    const automaticAppDiscount = body?.data?.discountAutomaticAppUpdate?.automaticAppDiscount ?? null;
-    if (automaticAppDiscount == null)
-      return body.errors[0].message;
-    if (!automaticAppDiscount) {
-      return "Unknown error: discountAutomaticAppUpdate returned null";
-    }
-    return automaticAppDiscount;
-  } catch (err: any) {
-    // Network or other exceptions
-    // return err.message;
-    return "othererror";
-  }
-}
-
-async function addMetafield(admin: any, variables: any) {
-  try {
-    const addMetafieldQuery = ADD_METAFIELD_QUERY;
-    const response = await admin.graphql(addMetafieldQuery, { variables: variables });
-    const json = await response.json?.() || response;
-    if (json.errors?.length) {
-      throw new Error(json.errors[0].message);
-    }
-    const userErrors = json.data?.metafieldsSet?.userErrors;
-    if (userErrors?.length) {
-      throw new Error(userErrors[0].message);
-    }
-    return json.data.metafieldsSet.metafields;
-  } catch (err) {
-    // throw new Error(`Failed to set metafields: ${err.message}`);
-    throw new Error(`Failed to set metafields: ${variables.ownerId}`);
-  }
-}
-
-function makeAddMetafieldVariables(
-  generalSetting: any,
-  quantityBreak: any,
-  buyXGetY: any,
-  bundleUpsell: any
-) {
-  const discountId = generalSetting.discountId;
-  let productList;
-  let collectionList;
-  // apply discount to specific products(4 types - all, except, specific, collection)
-  const productScope = generalSetting.visibility;
-
-  switch (productScope) {
-    case "specific":
-      productList = generalSetting.selectedProductData;
-      break;
-    case "collections":
-      collectionList = generalSetting.selectedCollectionData;
-      break;
-    case "except":
-      collectionList = generalSetting?.excludedCollectionData ?? [];
-      productList = generalSetting?.excludedProductData ?? [];
-      break;
-    default:
-      productList = [];
-      collectionList = [];
-  }
-  productList = safeParse(productList);
-  collectionList = safeParse(collectionList);
-  // Set discount configuration
-  // discountConf type: quantity_break, buyx_gety, bundle_upsell
-  // discout Type: default, percent, fixed_amount, total_price
-  const discountConf: any[] = [];
-  const priceTypeMap = {
-    "discounted%": "percent",
-    "discounted$": "fixed_amount",
-    "specific": "total_price"
-  };
-  quantityBreak.forEach(record => {
-    discountConf.push({
-      type: "quantity_break",
-      quantity: record.quantity,
-      discountType: priceTypeMap[record.selectPrice] || "default",
-      discountPricePerItem: record.discountPrice,
-      upsellItems: (record.upsellItems || []).map(item => ({
-        id: item.selectedProduct?.[0].id ?? null,
-        quantity: item.quantity,
-        discountType: priceTypeMap[item.selectPrice] || "default",
-        discountPricePerItem: item.discountPrice
-      }))
-    });
-  });
-
-  buyXGetY.forEach(record => {
-    discountConf.push({
-      type: "buyx_gety",
-      buyQuantity: record.buyQuantity,
-      getQuantity: record.getQuantity,
-      upsellItems: (record.upsellItems || []).map(item => ({
-        id: item.selectedProduct?.[0].id ?? null,
-        quantity: item.quantity,
-        discountType: priceTypeMap[item.selectPrice] || "default",
-        discountPricePerItem: item.discountPrice
-      }))
-    });
-  });
-
-  bundleUpsell.forEach(record => {
-    const defaultVariant = record.defaultVariant;
-    // Make sure variants exist
-    discountConf.push({
-      type: "bundle_upsell",
-      defaultProduct: {
-        id: defaultVariant?.variants?.[0]?.node?.id ?? defaultVariant?.id,
-        quantity: record.quantity,
-        discountType: priceTypeMap[record.selectPrice] || "default",
-        discountPricePerItem: record.discountPrice
-      },
-      addedProducts: (record.productItems || []).map(product => ({
-        id: product.selectedProduct?.[0].id ?? null,
-        quantity: product.quantity,
-        discountType: priceTypeMap[product.selectPrice] || "default",
-        discountPricePerItem: product.discountPrice
-      })),
-      upsellItems: (record.upsellItems || []).map(item => ({
-        id: item.selectedProduct?.[0].id ?? null,
-        quantity: item.quantity,
-        discountType: priceTypeMap[item.selectPrice] || "default",
-        discountPricePerItem: item.discountPrice
-      }))
-    });
-  });
-
-  // add metafields of product info
-  const addMetafieldVariables = {
-    metafields: [
-      {
-        ownerId: discountId,
-        namespace: "$app:discountInfo",
-        key: "productInfo",
-        type: "json",
-        value: JSON.stringify({
-          productScope: productScope,
-          productList: productList,
-          selectedCollectionIds: collectionList,
-          discountConf: discountConf
-        })
-      }
-    ]
-  };
-  return addMetafieldVariables;
-}
-
-function safeParse(json) {
-  try {
-    return JSON.parse(json);
-  } catch {
-    return [];
-  }
-}
-
 async function updateAllPromises({
   bundle,
   countdownTimer,
@@ -451,7 +231,7 @@ export async function action({ request, params }) {
   const buyXGetY = JSON.parse(form.buyXGetY);
   const bundleUpsell = JSON.parse(form.bundleUpsell);
 
-  const existingDiscountId = await getAutomaticAppDiscount(admin, generalSetting.discountId);
+  const existingDiscountId = await getAutomaticAppDiscount(admin, GET_DISCOUNT_QUERY, generalSetting.discountId);
 
   //if a discount exists, update it
   if (existingDiscountId) {
@@ -462,7 +242,7 @@ export async function action({ request, params }) {
         { status: 500 }
       );
     }
-    const automaticAppDiscount = await updateDiscountAutomaticApp(admin, discountId, discountData);
+    const automaticAppDiscount = await updateDiscountAutomaticApp(admin, UPDATE_DISCOUNT_QUERY, discountId, discountData);
 
     if (automaticAppDiscount == null) {
       return json(
@@ -474,7 +254,7 @@ export async function action({ request, params }) {
     bundle.discountname = generalSetting.discountName;
     const addMetafieldVariables = makeAddMetafieldVariables(generalSetting, quantityBreak, buyXGetY, bundleUpsell);
     try {
-      const result = await addMetafield(admin, addMetafieldVariables);
+      const result = await addMetafield(admin, ADD_METAFIELD_QUERY, addMetafieldVariables);
       try {
         // update prisma db
         await updateAllPromises({
@@ -526,22 +306,14 @@ export async function action({ request, params }) {
         { status: 500 }
       );
     }
-    const duplicatedDiscountName = await checkDuplicateDiscountName(admin, discountData.discountName);
+    const duplicatedDiscountName = await checkDuplicateDiscountName(admin, GET_DISCOUNT_WITH_TITLE_QUERY, discountData.discountName);
     if (duplicatedDiscountName) {
       return json(
         { success: false, error: "Discount name duplicated!" },
         { status: 500 }
       );
     }
-    //---------------------discountName is duplicated----------------------
-    // const duplicatedDiscountName = await checkDuplicateDiscountName(admin, discountData.discountName)
-    // if (duplicatedDiscountName) {
-    //   return json(
-    //     { success: false, error: "Discount name duplicated!" },
-    //     { status: 500 }
-    //   );
-    // }
-    const automaticAppDiscount = await createDiscountAutomaticApp(admin, createVariables);
+    const automaticAppDiscount = await createDiscountAutomaticApp(admin, CREATE_DISCOUNT_QUERY, createVariables);
     if (automaticAppDiscount == null) {
       return json(
         { success: false, error: "Discount create failed" },
@@ -554,7 +326,7 @@ export async function action({ request, params }) {
     // Add metafield
     const addMetafieldVariables = makeAddMetafieldVariables(generalSetting, quantityBreak, buyXGetY, bundleUpsell);
     try {
-      const result = await addMetafield(admin, addMetafieldVariables);
+      const result = await addMetafield(admin, ADD_METAFIELD_QUERY, addMetafieldVariables);
       try {
         // update prisma db
         await updateAllPromises({
@@ -612,6 +384,7 @@ const fontStyleMap = {
 /************************************************************* */
 export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
+  console.log("loaderdata>>>", loaderData);
   const checkboxUpsellConf = loaderData.checkboxUpsellConf;
   const shopifyFunctions = loaderData.shopifyFunctions;
   /**************recevie response from action function************/
@@ -651,14 +424,14 @@ export default function BundleSettingsAdvanced() {
   const handleToastDismiss = () => {
     setToastActive(false);
   };
-  const bundleData = loaderData.bundleConf;
-  const bundleId = bundleData.id;
+  const bundleData = loaderData?.bundleConf;
+  const bundleId = bundleData?.id;
   const [countdownTimerData, setCountdownTimerData] = useState(loaderData.countdownTimerConf);
   const [generalVolumeData, setGeneralVolumeData] = useState(loaderData.generalVolumeConf);
-  const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf); console.log("checkboxUpsellData==>", checkboxUpsellData);
+  const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
   const [generalStickyAddData, setGeneralStickyAddData] = useState(loaderData.generalStickyAddConf);
   const [generalSettingData, setGeneralSettingData] = useState(loaderData.generalSettingConf);
-  const [defaultVariant, setDefaultVariant] = useState(loaderData.generalSettingConf.setDefaultVariant ?? {});
+  const [defaultVariant, setDefaultVariant] = useState(loaderData?.generalSettingConf?.setDefaultVariant ?? {});
   const handleCountdownTimerChange = useCallback((updated: any) => {
     setCountdownTimerData(prev => ({ ...prev, ...updated }));
   }, []);
@@ -672,14 +445,14 @@ export default function BundleSettingsAdvanced() {
     setGeneralStickyAddData(prev => ({ ...prev, ...updated }));
   }, []);
   const handleGeneralSetting = useCallback((updated: any) => {
-    setDefaultVariant(updated.defaultVariant);
     setGeneralSettingData(prev => ({ ...prev, ...updated }));
   }, []);
+  const handleDefaultVariantChange = (value: any) => {
+    setDefaultVariant(value);
+  }
 
   // Send data to action
   const submit = useSubmit();
-  console.log('generalStickyAddData==>', generalStickyAddData);
-
 
   function formDataToObject(fd) {
     return Object.fromEntries(fd.entries());
@@ -777,11 +550,13 @@ export default function BundleSettingsAdvanced() {
     generalStyleFormData.append("createdAt", GeneralStyleConf.createdAt);
     // Create discount automatic app 
 
-    const functionId = shopifyFunctions.find((f) => f.title === "bundle-discount").id;
+
     const discountFormData = new FormData();
     const discountName = generalSettingData.discountName;
     const startsAt = new Date(`${generalSettingData.startDate}T${generalSettingData.startTime}`).toISOString();
     const endsAt = generalSettingData.setEndDate ? new Date(`${generalSettingData.endDate}T${generalSettingData.endTime}`).toISOString() : "";
+    const functionId = shopifyFunctions.find((f) => f.title === "bundle-discount").id;
+
     discountFormData.append("discountName", discountName);
     discountFormData.append("functionId", functionId);
     discountFormData.append("startsAt", startsAt);
@@ -797,6 +572,7 @@ export default function BundleSettingsAdvanced() {
     fd.append("discountData", JSON.stringify(formDataToObject(discountFormData)));
     //Save quantityBreak data
     fd.append("quantityBreak", JSON.stringify(quantityBreakData));
+    console.log("quantityBreak>>>", quantityBreakData);
     // Save buyXGetY data
     fd.append("buyXGetY", JSON.stringify(buyXGetYData));
     // Save bundleUpsell data
@@ -1045,68 +821,6 @@ export default function BundleSettingsAdvanced() {
     upUnitLabelStyleChange: setUnitLabelStyleChange
   };
 
-  // const discountConf: any[] = [];
-  // const priceTypeMap = {
-  //   "discounted%": "percent",
-  //   "discounted$": "fixed_amount",
-  //   "specific": "total_price"
-  // };
-  // quantityBreakData.forEach(record => {
-  //   discountConf.push({
-  //     type: "quantity_break",
-  //     quantity: record.quantity,
-  //     discountType: priceTypeMap[record.selectPrice] || "default",
-  //     discountPricePerItem: record.discountPrice,
-  //     upsellItems: (record.upsellItems || []).map(item => ({
-  //       id: item.selectedProduct?.[0].id ?? null,
-  //       quantity: item.quantity,
-  //       discountType: priceTypeMap[item.selectPrice] || "default",
-  //       discountPricePerItem: item.discountPrice
-  //     }))
-  //   });
-  // });
-
-  // buyXGetYData.forEach(record => {
-  //   discountConf.push({
-  //     type: "buyx_gety",
-  //     buyQuantity: record.buyQuantity,
-  //     getQuantity: record.getQuantity,
-  //     upsellItems: (record.upsellItems || []).map(item => ({
-  //       id: item.selectedProduct?.[0].id ?? null,
-  //       quantity: item.quantity,
-  //       discountType: priceTypeMap[item.selectPrice] || "default",
-  //       discountPricePerItem: item.discountPrice
-  //     }))
-  //   });
-  // });
-
-  // bundleUpsellData.forEach(record => {
-  //   const defaultVariant = record.defaultVariant;
-
-  //   discountConf.push({
-  //     type: "bundle_upsell",
-  //     defaultProduct: {
-  //       id: defaultVariant?.variants?.[0]?.node?.id ?? defaultVariant?.id,
-  //       quantity: record.quantity,
-  //       discountType: priceTypeMap[record.selectPrice] || "default",
-  //       discountPricePerItem: record.discountPrice
-  //     },
-  //     addedProducts: (record.productItems || []).map(product => ({
-  //       id: product.selectedProduct?.[0].id ?? null,
-  //       quantity: product.quantity,
-  //       discountType: priceTypeMap[product.selectPrice] || "default",
-  //       discountPricePerItem: product.discountPrice
-  //     })),
-  //     upsellItems: (record.upsellItems || []).map(item => ({
-  //       id: item.selectedProduct?.[0].id ?? null,
-  //       quantity: item.quantity,
-  //       discountType: priceTypeMap[item.selectPrice] || "default",
-  //       discountPricePerItem: item.discountPrice
-  //     }))
-  //   });
-  // });
-  // console.log("discountconf>>>", discountConf);
-
   return (
     <Page
       title="Carting Bundles"
@@ -1129,6 +843,7 @@ export default function BundleSettingsAdvanced() {
                   }
                   generalSettingData={generalSettingData}
                   bundleId={bundleId}
+                  onDefaultVariantChange={handleDefaultVariantChange}
                   onDataChange={handleGeneralSetting}
                 />
 
@@ -2420,7 +2135,7 @@ export default function BundleSettingsAdvanced() {
                             <div className="sticky-image-with-content">
                               <div className="sticky-image" style={{ width: `${generalStickyAddData?.stylePhotoSize}px`, height: `${generalStickyAddData?.stylePhotoSize}px` }}>
                                 <Thumbnail
-                                  source={generalStickyAddData?.imageUrl || NoteIcon}
+                                  source={safeJsonParse(defaultVariant)?.imageUrl || NoteIcon}
                                   alt={generalStickyAddData?.contentTitleText || 'Sticky Add to Cart Image'}
                                 />
                               </div>

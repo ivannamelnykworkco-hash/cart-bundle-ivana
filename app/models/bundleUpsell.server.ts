@@ -185,16 +185,15 @@ export async function updateBundleUpsell(data) {
 
   // Upsert each ProductItem
   // delete useless data
-  const incomingProductIds = bundleUpsellData.productItems
-    .map(u => u.id)
-    .filter(Boolean);
-  await db.productItem.deleteMany({
-    where: {
-      buId: bundleUpsell.id,
-      id: { notIn: incomingProductIds },
-    },
-  });
-
+  // const incomingProductIds = bundleUpsellData.productItems
+  //   .map(u => u.id)
+  //   .filter(Boolean);
+  // await db.productItem.deleteMany({
+  //   where: {
+  //     buId: bundleUpsell.id,
+  //     id: { notIn: incomingProductIds },
+  //   },
+  // });
   for (const u of bundleUpsellData.productItems) {
     await db.productItem.upsert({
       where: { id: u.id ?? crypto.randomUUID() },
@@ -221,16 +220,16 @@ export async function updateBundleUpsell(data) {
   }
   // UPSERT each upsell
   // delete useless data
-  const incomingUpsellIds = bundleUpsellData.upsellItems
-    .map(u => u.id)
-    .filter(Boolean);
+  // const incomingUpsellIds = bundleUpsellData.upsellItems
+  //   .map(u => u.id)
+  //   .filter(Boolean);
 
-  await db.bundleUpsellItem.deleteMany({
-    where: {
-      buId: bundleUpsell.id,
-      id: { notIn: incomingUpsellIds },
-    },
-  });
+  // await db.bundleUpsellItem.deleteMany({
+  //   where: {
+  //     buId: bundleUpsell.id,
+  //     id: { notIn: incomingUpsellIds },
+  //   },
+  // });
 
   for (const u of bundleUpsellData.upsellItems) {
 
@@ -291,12 +290,12 @@ export async function updateBundleUpsell(data) {
 }
 
 export async function updateBundleUpsells(bundleUpsellList) {
-  const newIds = bundleUpsellList.map(r => r.id);
-  await db.bundleUpsell.deleteMany({
-    where: {
-      id: { notIn: newIds }
-    }
-  });
+  // const newIds = bundleUpsellList.map(r => r.id);
+  // await db.bundleUpsell.deleteMany({
+  //   where: {
+  //     id: { notIn: newIds }
+  //   }
+  // });
   return Promise.all(bundleUpsellList.map(bundleUpsell => updateBundleUpsell(bundleUpsell)));
 }
 

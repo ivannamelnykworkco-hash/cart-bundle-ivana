@@ -9,14 +9,13 @@ import {
 import { EditIcon } from '@shopify/polaris-icons';
 import { IndexDataTable } from "./IndexDataTable";
 
-export function SelectProductModal({ productArray, onSelect, title, selectionMode, buttonText }) {
+export function SelectProductModal({ productArray, onSelect, title, selectionMode, buttonText, selected }) {
   //inputArray: an array of product array to input
   //onSelect: an array of product array for parents
   //title: modal title
   //selectionMode: single or multiple
   const [active, setActive] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
+  const [selectedProduct, setSelectedProduct] = useState(selected);
   // Open modal
   const handleOpen = useCallback(() => {
     setActive(true);
@@ -68,7 +67,7 @@ export function SelectProductModal({ productArray, onSelect, title, selectionMod
         <InlineStack InlineStack align="space-between" blockAlign="center" >
           <Text variant="bodySm" tone="subdued">
             {/* {selectedProduct?.length ? selectedProduct?.length : 0}/{productArray?.length} products selected */}
-            {(selectedProduct ?? [])?.filter(obj => obj.variants).length ?? 0}/{productArray?.length} products selected
+            {selectedProduct?.filter(obj => obj.variants).length ?? 0}/{productArray?.length} products selected
           </Text>
         </InlineStack >
       }

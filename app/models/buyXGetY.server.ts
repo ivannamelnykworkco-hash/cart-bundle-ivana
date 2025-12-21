@@ -134,17 +134,15 @@ export async function updateBuyXGetY(data) {
       where: { id: { in: buyXGetYData.upsellItemsToDeleteIds } }
     });
   }
-  const incomingIds = buyXGetYData.upsellItems
-    .map(u => u.id)
-    .filter(Boolean);
-
-  await db.bxGyUpsellItem.deleteMany({
-    where: {
-      bxGyId: buyXGetY.id,
-      id: { notIn: incomingIds },
-    },
-  });
-
+  // const incomingIds = buyXGetYData.upsellItems
+  //   .map(u => u.id)
+  //   .filter(Boolean);
+  // await db.bxGyUpsellItem.deleteMany({
+  //   where: {
+  //     bxGyId: buyXGetY.id,
+  //     id: { notIn: incomingIds },
+  //   },
+  // });
   // UPSERT each upsell
   for (const u of buyXGetYData.upsellItems) {
     await db.bxGyUpsellItem.upsert({
@@ -204,12 +202,12 @@ export async function updateBuyXGetY(data) {
 }
 
 export async function updateBuyXGetYs(buyXGetYList) {
-  const newIds = buyXGetYList.map(r => r.id);
-  await db.buyXGetY.deleteMany({
-    where: {
-      id: { notIn: newIds }
-    }
-  });
+  // const newIds = buyXGetYList.map(r => r.id);
+  // await db.buyXGetY.deleteMany({
+  //   where: {
+  //     id: { notIn: newIds }
+  //   }
+  // });
   return Promise.all(buyXGetYList.map(buyXGetY => updateBuyXGetY(buyXGetY)));
 }
 

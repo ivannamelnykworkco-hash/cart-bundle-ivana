@@ -1,7 +1,7 @@
 import type { CheckboxUpsell } from "./types";
 import db from "../db.server";
 
-export async function getCheckboxUpsell(bundleId: String): Promise<CheckboxUpsell> {
+export async function getCheckboxUpsell(bundleId: string): Promise<CheckboxUpsell> {
   // TODO: Implement database query
   const result = await db.checkboxUpsell.findFirst({
     where: {

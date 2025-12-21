@@ -120,7 +120,6 @@ export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>
   return result;
 }
 
-
 export async function deleteGeneralStyle(params: { id?: string, bundleId?: string }) {
   const { id, bundleId } = params;
   if (!id && !bundleId) {

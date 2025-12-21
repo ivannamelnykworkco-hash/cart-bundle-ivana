@@ -9,13 +9,13 @@ import {
 import { EditIcon } from '@shopify/polaris-icons';
 import { IndexDataTable } from "./IndexDataTable";
 
-export function SelectCollectionModal({ collectionArray, onSelect, title, selectionMode }) {
+export function SelectCollectionModal({ collectionArray, onSelect, title, selectionMode, selected }) {
   //inputArray: an array of product array to input
   //onSelect: an array of product array for parents
   //title: modal title
   //selectionMode: single or multiple
   const [active, setActive] = useState(false);
-  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [selectedCollection, setSelectedCollection] = useState(selected ?? []);
   // Open modal
   const handleOpen = useCallback(() => {
     setActive(true);
@@ -51,7 +51,7 @@ export function SelectCollectionModal({ collectionArray, onSelect, title, select
       primaryAction={{
         content: "Select",
         onAction: handleSave,
-        disabled: !selectedCollection,   // Disable when nothing selected
+        disabled: selectedCollection?.length === 0,   // Disable when nothing selected
       }}
       secondaryActions={[
         {
