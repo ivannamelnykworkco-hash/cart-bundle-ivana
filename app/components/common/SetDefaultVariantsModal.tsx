@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   BlockStack,
   Box,
@@ -30,27 +30,49 @@ export function SetDefaultVariantsModal({
   onSelect }) {
 
   const loaderData = useLoaderData<typeof loader>();
-  const [activeModalSetDefaultVariants, setActiveModalSetDefaultVariants] = useState(false);
+  const [activeModal, setActiveModal] = useState(false);
   const [bundleType, setBundleType] = useState('singleType');
-  const [selectedProduct, setSelectedProduct] = useState<any>([defaultVariant]);
-
-  //FUNCTIONS
   const parsedDefaultVariant = safeJsonParse(defaultVariant);
+  const [selectedProduct, setSelectedProduct] = useState<any[]>([]);
+
   const handleBundleType = useCallback(
     (_: boolean, newValue: string) => setBundleType(newValue),
     [],
   );
 
-  const handleReceiveProduct = (value) => {
-    setSelectedProduct(value); // receive → store
+  useEffect(() => {
+    if (parsedDefaultVariant) {
+      setSelectedProduct([parsedDefaultVariant]);
+    }
+  }, [defaultVariant]);
+
+  const handleReceiveProduct = (value: any[]) => {
+    if (Array.isArray(value)) {
+      setSelectedProduct(value);
+    }
   };
-  const handleShowSetDefaultVariants = useCallback(() => {
-    if (selectedProduct) {
+
+  const openModal = useCallback(() => {
+    setActiveModal(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setActiveModal(false);
+  }, []);
+
+  const handleApply = useCallback(() => {
+    if (selectedProduct.length > 0) {
       onSelect(selectedProduct[0]);
     }
-    setActiveModalSetDefaultVariants(!activeModalSetDefaultVariants);
-  }, [activeModalSetDefaultVariants]);
-  const modalSetDefaultVariantsActivator = <Button icon={VariantIcon} onClick={handleShowSetDefaultVariants}>Set default variants</Button>;
+    closeModal();
+  }, [selectedProduct, onSelect, closeModal]);
+
+  const modalSetDefaultVariantsActivator = (
+    <Button icon={VariantIcon} onClick={openModal}>
+      Set default variants
+    </Button>
+  );
+
   const row = [
     <Box width="60px">
       <Thumbnail
@@ -81,19 +103,21 @@ export function SetDefaultVariantsModal({
     <Modal
       size="large"
       activator={modalSetDefaultVariantsActivator}
-      open={activeModalSetDefaultVariants}
-      onClose={handleShowSetDefaultVariants}
+      open={activeModal}
+      onClose={closeModal}
       title="Reach more shoppers with Instagram product tags"
       primaryAction={{
         content: 'Apply',
-        onAction: handleShowSetDefaultVariants,
+        onAction: handleApply,
+        disabled: selectedProduct.length === 0,
       }}
       secondaryActions={[
         {
           content: 'Cancel',
-          onAction: handleShowSetDefaultVariants,
+          onAction: closeModal,
         },
       ]}
+
     >
       <Modal.Section>
         <InlineStack align="space-between">

@@ -141,16 +141,16 @@ export async function updateQuantityBreak(data) {
     });
   }
 
-  const incomingIds = qbData.upsellItems
-    .map(u => u.id)
-    .filter(Boolean);
+  // const incomingIds = qbData.upsellItems
+  //   .map(u => u.id)
+  //   .filter(Boolean);
 
-  await db.qbUpsellItem.deleteMany({
-    where: {
-      qbId: quantityBreak.id,
-      id: { notIn: incomingIds },
-    },
-  });
+  // await db.qbUpsellItem.deleteMany({
+  //   where: {
+  //     qbId: quantityBreak.id,
+  //     id: { notIn: incomingIds },
+  //   },
+  // });
   // UPSERT each upsell
   for (const u of qbData.upsellItems) {
 
@@ -211,12 +211,12 @@ export async function updateQuantityBreak(data) {
 }
 
 export async function updateQuantityBreaks(qbList) {
-  const newIds = qbList.map(r => r.id);
-  await db.quantityBreak.deleteMany({
-    where: {
-      id: { notIn: newIds }
-    }
-  });
+  // const newIds = qbList.map(r => r.id);
+  // await db.quantityBreak.deleteMany({
+  //   where: {
+  //     id: { notIn: newIds }
+  //   }
+  // });
   return Promise.all(qbList.map(qb => updateQuantityBreak(qb)));
 }
 

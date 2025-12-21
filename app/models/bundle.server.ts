@@ -68,7 +68,7 @@ export async function createBundle(data?: Partial<Bundle>, shopId?: string): Pro
         shop: "",
         name: "Name",
         type: "single",
-        products: [],
+        products: "[]",
         status: "draft",
         discountId: null,
         discountType: "",

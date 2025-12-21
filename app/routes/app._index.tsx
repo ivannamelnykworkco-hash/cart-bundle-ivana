@@ -37,6 +37,7 @@ import { deleteQuantityBreaks } from "app/models/quantityBreak.server";
 import { deleteBuyXGetYs } from "app/models/buyXGetY.server";
 import { deleteBundleUpsells } from "app/models/bundleUpsell.server";
 import { DELETE_DISCOUNT_QUERY } from "app/graphql/discount";
+import { safeJsonParse } from "app/utils/discountFunction";
 
 async function deleteBundleData(id: string): Promise<boolean> {
   try {
@@ -54,7 +55,6 @@ async function deleteBundleData(id: string): Promise<boolean> {
     ]);
     return true; // all deletes succeeded
   } catch (err) {
-    console.error("Failed to delete bundle data:", err);
     return false; // at least one delete failed
   }
 }
@@ -185,19 +185,6 @@ export default function Index() {
     }
   }, [actionData]);
 
-  const actionData = useActionData();
-  useEffect(() => {
-    if (actionData) {
-      if (actionData.success) {
-        console.log("Deleted successfully!", JSON.stringify(actionData, null, 2));
-        showToast("Deleted successfully!", "success");
-      } else {
-        showToast(`Error: ${actionData.error} `, "error");
-        console.log("Delete failed!", JSON.stringify(actionData, null, 2));
-      }
-    }
-  }, [actionData]);
-
   const rows = bundles.map((bundle, index) => [
     // Deal Column
     <div key={index}
@@ -211,7 +198,7 @@ export default function Index() {
           <Badge tone="info">{bundle.status}</Badge>
         </div>
         <Text as="span" variant="bodySm" tone="subdued">
-          {bundle.products.length} products
+          {safeJsonParse(bundle.products).length} products
         </Text>
       </div>
     </div>,

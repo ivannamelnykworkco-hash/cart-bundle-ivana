@@ -31,7 +31,13 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "../product/ProductList";
 import { ColorPickerPopoverItem } from "../common/ColorPickerPopoverItem";
 
-export function GeneralSettingsPanel({ open, onToggle, onDataChange, generalSettingData, bundleId }) {
+export function GeneralSettingsPanel({
+  open,
+  onToggle,
+  onDataChange,
+  generalSettingData,
+  onDefaultVariantChange,
+  bundleId }) {
   // const loaderData = useContext(LoaderDataContext);
   const loaderData = useLoaderData<typeof loader>();
   const productArray = loaderData?.products?.map((product: any) => ({
@@ -100,6 +106,14 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange, generalSett
   const [swatchData, setSwatchData] = useState<any>(null);
   const id = generalSettingData.id ?? "";
   const discountId = generalSettingData.discountId ?? "";
+  const parsedSelectedProduct = Array.isArray(selectedProduct) ? selectedProduct : JSON.parse(selectedProduct ?? '[]');
+  const parsedSelectedCollection = Array.isArray(selectedCollection) ? selectedCollection : JSON.parse(selectedCollection ?? '[]');
+  const parsedExcludedProduct = Array.isArray(excludedProduct) ? excludedProduct : JSON.parse(excludedProduct ?? '[]');
+  const parsedExcludedCollection = Array.isArray(excludedCollection) ? excludedCollection : JSON.parse(excludedCollection ?? '[]');
+  const selectedProductArray = productArray.filter(product => parsedSelectedProduct.includes(product.id));
+  const selectedCollectionArray = collectionArray.filter(collection => parsedSelectedCollection.includes(collection.id));
+  const excludedProductArray = productArray.filter(product => parsedExcludedProduct.includes(product.id));
+  const excludedCollectionArray = collectionArray.filter(collection => parsedExcludedCollection.includes(collection.id));
   //FUNCTIONS
   const addCluryDobule = () => {
     setTextValue(prev => prev + "{{stack}}"); // append "abc"
@@ -130,13 +144,13 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange, generalSett
     setExcludedProduct(value); // get excluded products array from product modal
     setSelectedProduct(null);
     setSelectedCollection(null);
-    setExcludedCollection(null);
+    // setExcludedCollection(null);
   }, []);
   const handleReceiveExcludedCollection = useCallback((value) => {
     setExcludedCollection(value); // get excluded collection array from collection modal
     setSelectedProduct(null); // get products array from product modal
     setSelectedCollection(null);
-    setExcludedProduct(null);
+    // setExcludedProduct(null);
   }, []);
   const handleOnSaveSwatch = (swatchData) => {
     setSwatchData(swatchData);
@@ -146,6 +160,7 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange, generalSett
   }
   const handleReceiveDefaultVariant = (value) => {
     setDefaultVariant(value);
+    onDefaultVariantChange(value);
   }
 
   const selectedProductData = visibility === "all" ? [] : Array.isArray(selectedProduct) ? selectedProduct.map(item => item.id) : [];
@@ -314,13 +329,23 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange, generalSett
                     <BlockStack gap="200">
                       <InlineStack align="space-around" gap="200" >
                         <Box width="48%">
-                          < SelectProductModal productArray={productArray} onSelect={handleReceiveExcludedProduct} title="Select excluded products" selectionMode="multipleProduct" buttonText='Select product' />
+                          < SelectProductModal
+                            productArray={productArray}
+                            onSelect={handleReceiveExcludedProduct}
+                            title="Select excluded products"
+                            selectionMode="multipleProduct"
+                            selected={excludedProductArray}
+                            buttonText='Select product' />
                         </Box>
                         <Box width="48%">
-                          < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveExcludedCollection} title="Select excluded collections" selectionMode="multipleCollection" />
+                          < SelectCollectionModal
+                            collectionArray={collectionArray}
+                            onSelect={handleReceiveExcludedCollection}
+                            title="Select excluded collections"
+                            selectionMode="multipleCollection"
+                            selected={excludedCollectionArray} />
                         </Box>
                       </InlineStack>
-
                       <Banner
                         title={`Some of the products are in "Bundle" deal which may result in conflicting discounts`}
                         tone="warning"
@@ -328,17 +353,25 @@ export function GeneralSettingsPanel({ open, onToggle, onDataChange, generalSett
                     </BlockStack>
                   )
                 }
-
                 {
                   visibility === "specific" && (
-                    < SelectProductModal productArray={productArray} onSelect={handleReceiveProduct} title="Select Products" selectionMode="multipleProduct" buttonText='Select products' />
+                    < SelectProductModal
+                      productArray={productArray}
+                      onSelect={handleReceiveProduct}
+                      title="Select Products"
+                      selectionMode="multipleProduct"
+                      selected={selectedProductArray}
+                      buttonText='Select products' />
                   )
                 }
-
                 {
                   visibility === "collections" && (
-                    < SelectCollectionModal collectionArray={collectionArray} onSelect={handleReceiveCollection} title="Select collections" selectionMode="multipleCollection" />
-
+                    < SelectCollectionModal
+                      collectionArray={collectionArray}
+                      onSelect={handleReceiveCollection}
+                      title="Select collections"
+                      selected={selectedCollectionArray}
+                      selectionMode="multipleCollection" />
                   )
                 }
               </BlockStack>

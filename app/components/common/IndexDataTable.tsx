@@ -20,6 +20,7 @@ export function IndexDataTable({ inputArray, onSelect, selectionMode, selected }
     if (!selected) return [];
     return Array.isArray(selected) ? selected : [selected]; // ✅ ensures it's always an array
   }, [selected]);
+  console.log("selected>>>", selected);
 
   const [queryValue, setQueryValue] = useState("");
   const [searchMode, setSearchMode] = useState("all");
