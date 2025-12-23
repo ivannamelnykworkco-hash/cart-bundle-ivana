@@ -35,11 +35,11 @@
   </header>
 
   {% comment %} countdownTimer {% endcomment %}
-    <div class="countdown-timer-container">
+    {% comment %} <div class="countdown-timer-container">
       <span class="countdown-text">
         Hurry! Offer ends in {{timer}}
       </span>
-    </div>   
+    </div>    {% endcomment %}
 
   <section class="xcart-drawer__body">
     <div class="xcart-line-items-with-bundle">
@@ -72,7 +72,7 @@
 
 {% schema %}
 {
-  "name": "CartBundle0000",
+  "name": "CartBundle",
   "target": "body",
   "settings": []
 }

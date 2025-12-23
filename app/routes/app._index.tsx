@@ -13,8 +13,17 @@ import {
   Text,
   Tabs,
   Frame,
-  Toast
+  Toast,
+  MediaCard,
+  Box,
+  InlineStack,
+  VideoThumbnail,
+  Icon,
+  BlockStack
 } from "@shopify/polaris";
+import {
+  StarIcon
+} from '@shopify/polaris-icons';
 import { useEffect, useState } from "react";
 import { authenticate } from "../shopify.server";
 import {
@@ -105,9 +114,11 @@ export const action = async ({ request }: { request: Request }) => {
       return json({ success: false, error: "Delete failed (No discount found)" }, { status: 500 });
     }
     const discountId = bundle.discountId;
-    const graphqlResult = await deleteAutomaticAppDiscount(admin, discountId || "gid://shopify/DiscountAutomaticNode/1510751207703");
-    if (!graphqlResult.success) {
-      return json({ success: false, error: graphqlResult.errors }, { status: 500 });
+    if (discountId) {
+      const graphqlResult = await deleteAutomaticAppDiscount(admin, discountId || "gid://shopify/DiscountAutomaticNode/1510751207703");
+      if (!graphqlResult.success) {
+        return json({ success: false, error: graphqlResult.errors }, { status: 500 });
+      }
     }
     const dbResult = await deleteBundleData(id);
     if (!dbResult) {
@@ -185,103 +196,142 @@ export default function Index() {
     }
   }, [actionData]);
 
-  const rows = bundles.map((bundle, index) => [
-    // Deal Column
-    <div key={index}
-      onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
-      style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <Text as="span" fontWeight="semibold">
-            {bundle.name}
+  // Put this at the top of your component (NOT inside map)
+  const [loadingState, setLoadingState] = useState(null);
+
+  const rows = bundles.map((bundle) => {
+    const isEditLoading =
+      loadingState?.bundleId === bundle.id && loadingState?.action === "edit";
+    const isViewLoading =
+      loadingState?.bundleId === bundle.id && loadingState?.action === "view";
+    const isDeleteLoading =
+      loadingState?.bundleId === bundle.id && loadingState?.action === "delete";
+
+    return [
+      // Deal Column
+      <div
+        key={`deal-${bundle.id}`}
+        onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
+        style={{ display: "flex", alignItems: "center", gap: "12px", cursor: "pointer" }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Text as="span" fontWeight="semibold">
+              {bundle.name}
+            </Text>
+            <Badge tone="info">{bundle.status}</Badge>
+          </div>
+          <Text as="span" variant="bodySm" tone="subdued">
+            {safeJsonParse(bundle.products).length} products
           </Text>
-          <Badge tone="info">{bundle.status}</Badge>
         </div>
-        <Text as="span" variant="bodySm" tone="subdued">
-          {safeJsonParse(bundle.products).length} products
-        </Text>
-      </div>
-    </div>,
+      </div>,
 
-    // Stats Column
-    <div key={index} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
-      style={{ display: "flex", gap: "48px", alignItems: "center", paddingLeft: "16px", cursor: "pointer" }}>
-      <div style={{ minWidth: "60px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          Visitors
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          {bundle.stats.visitors}
-        </Text>
-      </div>
-      <div style={{ minWidth: "60px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          CR
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          {bundle.stats.conversionRate}%
-        </Text>
-      </div>
-      <div style={{ minWidth: "60px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          Bundles
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          {bundle.stats.bundlesRate}%
-        </Text>
-      </div>
-      <div style={{ minWidth: "60px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          AOV
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          ${bundle.stats.aov.toFixed(2)}
-        </Text>
-      </div>
-      <div style={{ minWidth: "80px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          Add. rev.
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          ${bundle.stats.addedRevenue}
-        </Text>
-      </div>
-      <div style={{ minWidth: "80px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          Total rev.
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          ${bundle.stats.totalRevenue}
-        </Text>
-      </div>
-      <div style={{ minWidth: "100px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          Rev. per visitor
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          ${bundle.stats.revenuePerVisitor.toFixed(2)}
-        </Text>
-      </div>
-      <div style={{ minWidth: "100px" }}>
-        <Text as="span" variant="bodySm" tone="subdued">
-          Profit per visitor
-        </Text>
-        <Text as="span" fontWeight="semibold">
-          {bundle.stats.profitPerVisitor === 0 ? "-" : `$${bundle.stats.profitPerVisitor}`}
-        </Text>
-      </div>
-    </div>,
+      // Stats Column
+      <div
+        key={`stats-${bundle.id}`}
+        onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)}
+        style={{
+          display: "flex",
+          gap: "48px",
+          alignItems: "center",
+          paddingLeft: "16px",
+          cursor: "pointer",
+        }}
+      >
+        <div style={{ minWidth: "60px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">Visitors</Text>
+          <Text as="span" fontWeight="semibold">{bundle.stats.visitors}</Text>
+        </div>
 
-    // Actions Column
-    <div key={index} style={{ display: "flex", gap: "8px", justifyContent: "flex-start" }}>
-      {/* <Button onClick={() => navigate(`/app/bundles/${bundle.id}/test`)}>
-        Run A/B test
-      </Button> */}
-      <Button icon={EditIcon} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)} />
-      <Button icon={ViewIcon} onClick={() => navigate(`/app/bundles/choose?bundleId=${bundle.id}`)} />
-      <Button icon={DeleteIcon} onClick={() => { deleteBundleData(bundle.id) }} />
-    </div>,
-  ]);
+        <div style={{ minWidth: "60px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">CR</Text>
+          <Text as="span" fontWeight="semibold">{bundle.stats.conversionRate}%</Text>
+        </div>
+
+        <div style={{ minWidth: "60px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">Bundles</Text>
+          <Text as="span" fontWeight="semibold">{bundle.stats.bundlesRate}%</Text>
+        </div>
+
+        <div style={{ minWidth: "60px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">AOV</Text>
+          <Text as="span" fontWeight="semibold">${bundle.stats.aov.toFixed(2)}</Text>
+        </div>
+
+        <div style={{ minWidth: "80px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">Add. rev.</Text>
+          <Text as="span" fontWeight="semibold">${bundle.stats.addedRevenue}</Text>
+        </div>
+
+        <div style={{ minWidth: "80px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">Total rev.</Text>
+          <Text as="span" fontWeight="semibold">${bundle.stats.totalRevenue}</Text>
+        </div>
+
+        <div style={{ minWidth: "100px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">Rev. per visitor</Text>
+          <Text as="span" fontWeight="semibold">
+            ${bundle.stats.revenuePerVisitor.toFixed(2)}
+          </Text>
+        </div>
+
+        <div style={{ minWidth: "100px" }}>
+          <Text as="span" variant="bodySm" tone="subdued">Profit per visitor</Text>
+          <Text as="span" fontWeight="semibold">
+            {bundle.stats.profitPerVisitor === 0 ? "-" : `$${bundle.stats.profitPerVisitor}`}
+          </Text>
+        </div>
+      </div>,
+
+      // Actions Column
+      <div
+        key={`actions-${bundle.id}`}
+        style={{ display: "flex", gap: "8px", justifyContent: "flex-start" }}
+      >
+        <Button
+          icon={EditIcon}
+          loading={isEditLoading}
+          disabled={isEditLoading || isViewLoading || isDeleteLoading}
+          onClick={() => {
+            setLoadingState({ bundleId: bundle.id, action: "edit" });
+            setTimeout(() => {
+              navigate(`/app/bundles/choose?bundleId=${bundle.id}`);
+            }, 0);
+          }}
+          accessibilityLabel="Edit bundle"
+        />
+        <Button
+          icon={ViewIcon}
+          loading={isViewLoading}
+          disabled={isEditLoading || isViewLoading || isDeleteLoading}
+          onClick={() => {
+            setLoadingState({ bundleId: bundle.id, action: "view" });
+            setTimeout(() => {
+              navigate(`/app/bundles/choose?bundleId=${bundle.id}`);
+            }, 0);
+          }}
+          accessibilityLabel="View bundle"
+        />
+
+        <Button
+          icon={DeleteIcon}
+          loading={isDeleteLoading}
+          disabled={isEditLoading || isViewLoading || isDeleteLoading}
+          onClick={async () => {
+            setLoadingState({ bundleId: bundle.id, action: "delete" });
+            try {
+              await deleteBundleData(bundle.id);
+            } finally {
+              setLoadingState(null);
+            }
+          }}
+          accessibilityLabel="Delete bundle"
+        />
+      </div>,
+    ];
+  });
+
   const [toastActive, setToastActive] = useState(false);
   const [toastContent, setToastContent] = useState('');
   const [toastError, setToastError] = useState(false); // For styling, optional
@@ -297,7 +347,7 @@ export default function Index() {
 
   return (
     <Page
-      title="Bundle deals"
+      title="Welcome and get ready to increase your AOV!"
       primaryAction={{
         content: "Create bundle deal",
         onAction: () => navigate("/app/bundles/new"),
@@ -403,6 +453,92 @@ export default function Index() {
             )}
           </Card>
         </Layout.Section>
+        <Layout.Section>
+          {showBanner && (
+            <Banner
+              title="Your bundles need more visibility"
+              tone="info"
+              action={{ content: "Get started", disabled: true, }}
+              secondaryAction={{ content: "Maybe later", disabled: true, }}
+              onDismiss={() => setShowBanner(false)}>
+              <p>This order was archived on March 7, 2017 at 3:12pm EDT.</p>
+            </Banner>
+          )}
+        </Layout.Section>
+        {/* <Layout.Section>
+          <InlineStack align="space-between">
+            <Box maxWidth="49%">
+              <BlockStack gap="300">
+                <MediaCard
+                  size='small'
+                  title="Need more reviews?"
+                  description="
+          A quick reminder can make all the difference.
+          Set up Automatic Email Reminders to nudge customers who haven’t left a review yet – just choose the timing, and we’ll take care of the rest.
+          Easy to set up, big impact!🚀."
+                  popoverActions={[{ content: 'Dismiss', onAction: () => { } }]}
+                >
+                  <img
+                    alt=""
+                    width="100%"
+                    height="100%"
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
+                    src="https://burst.shopifycdn.com/photos/person-typing-while-wearing-a-smartwatch.jpg?width=373&format=pjpg&exif=0&iptc=0?width=1850"
+                  />
+                </MediaCard>
+                <div className="reviews-card">
+                  <InlineStack align="space-between">
+                    <Box width="49%">
+                      <Card>
+                        <BlockStack align="center" gap='300'>
+                          <Icon source={ViewIcon} tone="info"></Icon>
+                          <Text as="h2" variant="bodyMd" alignment="center">
+                            A list of top reviewed products will show here.
+                          </Text>
+                          <Button disabled={true}>
+                            View all reviews
+                          </Button>
+                        </BlockStack>
+                      </Card>
+                    </Box>
+                    <Box width="49%">
+                      <Card>
+                        <BlockStack align="space-between" gap='300'>
+                          <Icon source={StarIcon} tone="warning"></Icon>
+                          <Text as="h2" variant="bodyMd" alignment="center">
+                            You can view your recent reviews here.
+                          </Text>
+                          <Button disabled={true}>
+                            Request reviews
+                          </Button>
+                        </BlockStack>
+                      </Card>
+                    </Box>
+                  </InlineStack>
+                </div>
+              </BlockStack>
+            </Box>
+            <Box maxWidth="49%">
+              <MediaCard
+                portrait
+                size='small'
+                title="Need more reviews?"
+                description="
+          A quick reminder can make all the difference.
+          Set up Automatic Email Reminders to nudge customers who haven’t left a review yet – just choose the timing, and we’ll take care of the rest.
+          Easy to set up, big impact!🚀."
+                popoverActions={[{ content: 'Dismiss', onAction: () => { } }]}
+              >
+                <VideoThumbnail
+                  videoLength={80}
+                  thumbnailUrl="https://burst.shopifycdn.com/photos/business-woman-smiling-in-office.jpg?width=1850"
+                  onClick={() => console.log('clicked')}
+                />
+              </MediaCard>
+            </Box>
+          </InlineStack>
+        </Layout.Section> */}
+
         {
           toastActive && (
             <Frame>
@@ -415,6 +551,6 @@ export default function Index() {
           )
         }
       </Layout>
-    </Page>
+    </Page >
   );
 }

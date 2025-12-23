@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { redirect, json, type LoaderFunctionArgs } from "@remix-run/node";
-import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { PlusCircleIcon, DiscountIcon, MegaphoneIcon, ProductIcon, NoteIcon } from '@shopify/polaris-icons';
 import {
   Page,
@@ -426,6 +426,7 @@ export default function BundleSettingsAdvanced() {
   };
   const bundleData = loaderData?.bundleConf;
   const bundleId = bundleData?.id;
+  const [isSaving, setIsSaving] = useState(false);
   const [countdownTimerData, setCountdownTimerData] = useState(loaderData.countdownTimerConf);
   const [generalVolumeData, setGeneralVolumeData] = useState(loaderData.generalVolumeConf);
   const [checkboxUpsellData, setCheckboxUpsellData] = useState(loaderData.checkboxUpsellConf);
@@ -458,7 +459,16 @@ export default function BundleSettingsAdvanced() {
     return Object.fromEntries(fd.entries());
   }
 
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    // When Remix is idle again, stop spinner
+    if (navigation.state === "idle") {
+      setIsSaving(false);
+    }
+  }, [navigation.state]);
   async function saveData() {
+    setIsSaving(true);
     const bundleFormData = new FormData();
     Object.entries(bundleData).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
@@ -756,7 +766,7 @@ export default function BundleSettingsAdvanced() {
   const [barSubTitleColor, setBarSubTitleColor] = useState(GeneralStyleConf?.barSubTitleColor) ?? null;
   const [barPriceColor, setBarPriceColor] = useState(GeneralStyleConf?.barPriceColor) ?? null;
   const [barFullPriceColor, setBarFullPriceColor] = useState(GeneralStyleConf?.barFullPriceColor) ?? null;
-  const [barLabelBack, setBarLabelBack] = useState(GeneralStyleConf?.barFullPriceColor) ?? null;
+  const [barLabelBack, setBarLabelBack] = useState(GeneralStyleConf?.barLabelBackColor) ?? null;
   const [barLabelTextColor, setBarLabelTextColor] = useState(GeneralStyleConf?.barLabelTextColor) ?? null;
   const [barBadgebackColor, setBarBadgebackColor] = useState(GeneralStyleConf?.barBadgebackColor) ?? null;
   const [barBadgeTextColor, setBarBadgeTextColor] = useState(GeneralStyleConf?.barBadgeTextColor) ?? null;
@@ -827,7 +837,9 @@ export default function BundleSettingsAdvanced() {
       backAction={{ content: "Back", url: "/app" }}
       primaryAction={{
         content: "Save",
-        onAction: saveData, /////////////
+        onAction: saveData,
+        loading: isSaving,
+        disabled: isSaving,
       }}
     >
       <Layout>
@@ -1125,6 +1137,7 @@ export default function BundleSettingsAdvanced() {
                                       alignItems: "center",
                                       justifyContent: "space-between",
                                       flexDirection: layoutSelectedStyle === "layout2" ? "column" : "row",
+                                      flexWrap: "nowrap",
                                     }}
                                   >
                                     <InlineStack gap="200" blockAlign="center" align="center">
@@ -1136,9 +1149,7 @@ export default function BundleSettingsAdvanced() {
                                           borderRadius: "50%",
                                           border: "2px solid",
                                           borderColor: currentIsSelected ? borderColor : "grey",
-                                          display: "flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
+                                          position: "relative",
                                         }}
                                       >
                                         <div
@@ -1147,16 +1158,20 @@ export default function BundleSettingsAdvanced() {
                                             height: "12px",
                                             borderRadius: "50%",
                                             backgroundColor: currentIsSelected ? borderColor : "white",
+                                            position: "absolute",
+                                            top: "50%",
+                                            left: "50%",
+                                            transform: "translate(-50%, -50%)",
                                           }}
                                         />
                                       </div>
 
-                                      <BlockStack gap="050">
-                                        <InlineStack gap="100">
+                                      <BlockStack gap="050" align="start">
+                                        <InlineStack gap="100" wrap={false}>
                                           <span
                                             className="barTitle"
                                             style={{
-                                              textAlign: "center",
+                                              textAlign: "start",
                                               color: barTitleColor,
                                               fontSize: `${bartitleSize}px`,
                                               fontWeight:
@@ -1175,7 +1190,7 @@ export default function BundleSettingsAdvanced() {
                                           <div
                                             className="bar-label--text-container"
                                             style={{
-                                              background: qbData?.barLabelText ? barLabelBack : null,
+                                              background: qbData?.labelText ? barLabelBack : null,
                                               borderRadius: `${cornerRadius}px`,
                                             }}
                                           >
@@ -1190,7 +1205,7 @@ export default function BundleSettingsAdvanced() {
                                                   fontStyleMap[labelStyle as keyof typeof fontWeightMap],
                                               }}
                                             >
-                                              {qbData?.labelTitle || ""}
+                                              {qbData?.labelText || ""}
                                             </span>
                                           </div>
                                         </InlineStack>
@@ -1398,6 +1413,7 @@ export default function BundleSettingsAdvanced() {
                                       alignItems: "center",
                                       justifyContent: "space-between",
                                       flexDirection: layoutSelectedStyle === "layout2" ? "column" : "row",
+                                      flexWrap: "nowrap",
                                     }}
                                   >
                                     <InlineStack gap="200" blockAlign="center" align="center">
@@ -1409,9 +1425,7 @@ export default function BundleSettingsAdvanced() {
                                           borderRadius: "50%",
                                           border: "2px solid",
                                           borderColor: currentIsSelected ? borderColor : "grey",
-                                          display: "flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
+                                          position: "relative",
                                         }}
                                       >
                                         <div
@@ -1420,16 +1434,20 @@ export default function BundleSettingsAdvanced() {
                                             height: "12px",
                                             borderRadius: "50%",
                                             backgroundColor: currentIsSelected ? borderColor : "white",
+                                            position: "absolute",
+                                            top: "50%",
+                                            left: "50%",
+                                            transform: "translate(-50%, -50%)",
                                           }}
                                         />
                                       </div>
 
-                                      <BlockStack gap="050">
-                                        <InlineStack gap="100">
+                                      <BlockStack gap="050" align="start">
+                                        <InlineStack gap="100" wrap={false}>
                                           <span
                                             className="barTitle"
                                             style={{
-                                              textAlign: "center",
+                                              textAlign: "start",
                                               color: barTitleColor,
                                               fontSize: `${bartitleSize}px`,
                                               fontWeight:
@@ -1688,6 +1706,7 @@ export default function BundleSettingsAdvanced() {
                                       justifyContent: "space-between",
                                       flexDirection:
                                         layoutSelectedStyle === "layout2" ? "column" : "row",
+                                      flexWrap: "nowrap",
                                     }}
                                   >
                                     <InlineStack gap="200" blockAlign="center" align="center">
@@ -1699,9 +1718,8 @@ export default function BundleSettingsAdvanced() {
                                           borderRadius: "50%",
                                           border: "2px solid",
                                           borderColor: selectedId === item.id ? borderColor : "grey",
-                                          display: "flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
+                                          position: "relative",
+
                                         }}
                                       >
                                         <div
@@ -1711,16 +1729,20 @@ export default function BundleSettingsAdvanced() {
                                             borderRadius: "50%",
                                             backgroundColor:
                                               selectedId === item.id ? borderColor : "white",
+                                            position: "absolute",
+                                            top: "50%",
+                                            left: "50%",
+                                            transform: "translate(-50%, -50%)",
                                           }}
                                         />
                                       </div>
 
-                                      <BlockStack gap="050">
-                                        <InlineStack gap="100">
+                                      <BlockStack gap="050" align="start" blockAlign="start">
+                                        <InlineStack gap="100" wrap={false}>
                                           <span
                                             className="barTitle"
                                             style={{
-                                              textAlign: "center",
+                                              textAlign: "start",
                                               color: barTitleColor,
                                               fontSize: `${bartitleSize}px`,
                                               fontWeight:

@@ -499,3 +499,16 @@
   align-items: center;
   gap: 5px;
 }
+.reviews-card {
+  height: 100%;
+}
+.reviews-card .Polaris-InlineStack {
+  height: 100%;
+}
+.reviews-card .Polaris-InlineStack  .Polaris-ShadowBevel {
+  height: 100%;
+}
+.reviews-card .Polaris-InlineStack  .Polaris-ShadowBevel .Polaris-Icon {
+  width: 100px;
+  height: 100px;
+}

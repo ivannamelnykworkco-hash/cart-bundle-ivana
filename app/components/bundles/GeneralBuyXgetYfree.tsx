@@ -33,8 +33,8 @@ export function createNewBuyXGetY(): BuyXGetY {
     id: Math.random().toString(36).substr(2, 9),
     buyQuantity: 3,
     getQuantity: 1,
-    title: 'Buy 3 Get Y', //title
-    subtitle: 'bogo', //subtitle
+    title: 'Buy 3 Get 1 Free', //title
+    subtitle: '', //subtitle
     badgeText: '',//badgetext
     badgeStyle: 'simple',//badgestyle
     isSelectedByDefault: false,//isSelectedByDefault

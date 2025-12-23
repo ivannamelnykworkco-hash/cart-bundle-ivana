@@ -11,7 +11,7 @@ const defaultColor = {
   barSubTitleColor: "#555555",
   barPriceColor: "#000000",
   barFullPriceColor: "#555555",
-  barLabelBackColor: "#D9EDFF",
+  barLabelBackColor: "#cadeef",
   barLabelTextColor: "#000000",
   barBadgebackColor: "#0085FF",
   barBadgeTextColor: "#FFFFFF",
@@ -37,8 +37,8 @@ export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
     data: {
       id: Math.random().toString(36).substr(2, 9),
       bundleId: bundleId,
-      cornerRadius: 0,
-      spacing: 0,
+      cornerRadius: 8,
+      spacing: 20,
       cardsBgColor: defaultColor.cardsBgColor,
       selectedBgColor: defaultColor.selectedBgColor, //
       borderColor: defaultColor.borderColor,//
@@ -55,11 +55,11 @@ export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
       barUpsellTextColor: defaultColor.barUpsellTextColor,
       barUpsellSelectedBackColor: defaultColor.barUpsellSelectedBackColor,////
       barUpsellSelectedTextColor: defaultColor.barUpsellSelectedTextColor,////
-      barBlocktitle: 10,
-      barBlocktitleFontStyle: "styleRegular",
-      bartitleSize: 10,
-      bartitleFontStyle: "styleRegular",
-      subTitleSize: 10,
+      barBlocktitle: 20,
+      barBlocktitleFontStyle: "styleBold",
+      bartitleSize: 20,
+      bartitleFontStyle: "styleBold",
+      subTitleSize: 13,
       subTitleStyle: "styleRegular",
       labelSize: 12,
       labelStyle: "styleRegular",
@@ -77,8 +77,8 @@ export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
 export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>) {
   const updateData: any = {
     bundleId: data.bundleId,
-    cornerRadius: parseInt(data.cornerRadius, 10),
-    spacing: parseInt(data.spacing, 10),
+    cornerRadius: parseInt(data.cornerRadius, 8),
+    spacing: parseInt(data.spacing, 20),
     cardsBgColor: data.cardsBgColor,
     selectedBgColor: data.selectedBgColor, //
     borderColor: data.borderColor,//
@@ -95,15 +95,15 @@ export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>
     barUpsellTextColor: data.barUpsellTextColor,
     barUpsellSelectedBackColor: data.barUpsellSelectedBackColor,////
     barUpsellSelectedTextColor: data.barUpsellSelectedTextColor,////
-    barBlocktitle: parseInt(data.barBlocktitle, 10),
+    barBlocktitle: parseInt(data.barBlocktitle, 20),
     barBlocktitleFontStyle: data.barBlocktitleFontStyle,
-    bartitleSize: parseInt(data.bartitleSize, 10),
+    bartitleSize: parseInt(data.bartitleSize, 20),
     bartitleFontStyle: data.bartitleFontStyle,
-    subTitleSize: parseInt(data.subTitleSize, 10),
+    subTitleSize: parseInt(data.subTitleSize, 13),
     subTitleStyle: data.subTitleStyle,
-    labelSize: parseInt(data.labelSize, 10),
+    labelSize: parseInt(data.labelSize, 13),
     labelStyle: data.labelStyle,
-    upsellSize: parseInt(data.upsellSize, 10),
+    upsellSize: parseInt(data.upsellSize, 14),
     upsellStyle: data.upsellStyle,
     unitLabelSize: parseInt(data.unitLabelSize, 10),
     unitLabelStyle: data.unitLabelStyle,

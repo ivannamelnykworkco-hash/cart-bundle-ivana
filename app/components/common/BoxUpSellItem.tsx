@@ -47,7 +47,7 @@ export function BoxUpSellItem({
   const [isVisibleOnly, setIsVisibleOnly] = useState(upsellItemData.isVisibleOnly);
   const [selectedProduct, setSelectedProduct] = useState(upsellItemData.selectedProduct);
   const [priceText, setPriceText] = useState(upsellItemData.priceText);
-  const [quantity, setQuantity] = useState(upsellItemData.quantity);
+  const [quantity, setQuantity] = useState(upsellItemData.quantity || 1);
   const [discountPrice, setDiscountPrice] = useState(upsellItemData.discountPrice);
   const productArray =
     loaderData?.products?.map((product: any) => ({
@@ -67,7 +67,7 @@ export function BoxUpSellItem({
   useEffect(() => {
     const basePerUnit = Number(barAddUpsellDefaultPrice);
     const safeBasePerUnit = Number.isFinite(basePerUnit) ? basePerUnit : 10;
-    const safeQuantity = Number.isFinite(quantity) ? quantity : 0;
+    const safeQuantity = Number.isFinite(quantity) ? quantity : 1;
     // 2. Safe discount value
     const rawValue = Number(discountPrice);
     const safeValue = Number.isFinite(rawValue) ? rawValue : 0;

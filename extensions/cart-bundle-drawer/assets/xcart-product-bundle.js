@@ -43,7 +43,7 @@
       </div>
     `;
 
-    submitBtn.parentNode.insertBefore(bundleRoot, submitBtn);
+    // submitBtn.parentNode.insertBefore(bundleRoot, submitBtn);
 
     loadBundles(bundleRoot);
   }
@@ -461,7 +461,7 @@
                 </div>
                 <div class="xcart-bundles__bundle-products__link">
                   <div class="xcart-bundles__bundle-products__title">
-                    <span>The Inventory Not Tracked Snowboard</span>
+                    <span>${productItem?.selectedProduct?.[0]?.title || ''}</span>
                   </div>
                 </div>
                 <div class="xcart-bundles__bundle-products__pricing">

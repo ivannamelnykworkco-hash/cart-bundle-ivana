@@ -257,8 +257,8 @@ export function GeneralQuantityBreack({
           <BlockStack gap="300">
             {/* Quantity */}
             <Grid>
-              <Grid.Cell columnSpan={{ xs: 4, sm: 2, md: 2 }}>
-                <BlockStack gap="150">
+              <Grid.Cell columnSpan={{ xs: 4, sm: 3, md: 3 }}>
+                <BlockStack gap="300">
                   <Text as="span">Quantity</Text>
                   <TextField
                     label=""
@@ -277,7 +277,7 @@ export function GeneralQuantityBreack({
                 </BlockStack>
               </Grid.Cell>
 
-              <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 5 }}>
+              <Grid.Cell columnSpan={{ xs: 4, sm: 4, md: 4 }}>
                 <PopUpover
                   title="Title"
                   defaultPopText={title}

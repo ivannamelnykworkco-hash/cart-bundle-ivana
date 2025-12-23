@@ -31,8 +31,8 @@ export function createNewBundleUpsell(): BundleUpsell {
   return {
     id: Math.random().toString(36).substr(2, 9),
     layoutOption: "",
-    title: 'Single', //title
-    subtitle: 'standard price', //subtitle
+    title: 'Complete the bundle', //title
+    subtitle: 'Save', //subtitle
     badgeText: '',//badgetext
     badgeStyle: 'simple',//badgestyle
     labelText: '',//labelText

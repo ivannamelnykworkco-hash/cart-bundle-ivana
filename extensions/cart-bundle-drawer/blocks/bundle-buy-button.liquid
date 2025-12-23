@@ -25,9 +25,16 @@
 {% endif %}
 
 {% schema %}
-{
-  "name": "ProductBundle",
-  "target": "body",
-  "settings": []
-}
+  {
+    "name": "Product Bundle",
+    "target": "section",
+    "enabled_on": {
+      "templates": ["product"]
+    },
+    "stylesheet": "cartdrawer-bundle.css",
+    "settings": [
+        { "label": "Color", "id": "color", "type": "color", "default": "#000000" }
+    ]
+  }
 {% endschema %}
+
