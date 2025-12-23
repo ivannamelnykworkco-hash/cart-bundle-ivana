@@ -489,9 +489,10 @@
   justify-content: center;
   font-size: 18px;
   font-weight: 600;
-  color: #01f3a2;
+  color: red;
   border-radius: 12px;
   pointer-events: none;
+  z-index: 50;
 }
 .checkboxupsell-right {
   display: flex;

@@ -77,8 +77,8 @@ export async function getGeneralStyle(bundleId: string): Promise<GeneralStyle> {
 export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>) {
   const updateData: any = {
     bundleId: data.bundleId,
-    cornerRadius: parseInt(data.cornerRadius, 8),
-    spacing: parseInt(data.spacing, 20),
+    cornerRadius: parseInt(data.cornerRadius, 10),
+    spacing: parseInt(data.spacing, 10),
     cardsBgColor: data.cardsBgColor,
     selectedBgColor: data.selectedBgColor, //
     borderColor: data.borderColor,//
@@ -95,15 +95,15 @@ export async function updateGeneralStyle(id: string, data: Partial<GeneralStyle>
     barUpsellTextColor: data.barUpsellTextColor,
     barUpsellSelectedBackColor: data.barUpsellSelectedBackColor,////
     barUpsellSelectedTextColor: data.barUpsellSelectedTextColor,////
-    barBlocktitle: parseInt(data.barBlocktitle, 20),
+    barBlocktitle: parseInt(data.barBlocktitle, 10),
     barBlocktitleFontStyle: data.barBlocktitleFontStyle,
-    bartitleSize: parseInt(data.bartitleSize, 20),
+    bartitleSize: parseInt(data.bartitleSize, 10),
     bartitleFontStyle: data.bartitleFontStyle,
-    subTitleSize: parseInt(data.subTitleSize, 13),
+    subTitleSize: parseInt(data.subTitleSize, 10),
     subTitleStyle: data.subTitleStyle,
-    labelSize: parseInt(data.labelSize, 13),
+    labelSize: parseInt(data.labelSize, 10),
     labelStyle: data.labelStyle,
-    upsellSize: parseInt(data.upsellSize, 14),
+    upsellSize: parseInt(data.upsellSize, 10),
     upsellStyle: data.upsellStyle,
     unitLabelSize: parseInt(data.unitLabelSize, 10),
     unitLabelStyle: data.unitLabelStyle,
