@@ -73,7 +73,6 @@ export function BoxUpSellItem({
     const safeValue = Number.isFinite(rawValue) ? rawValue : 0;
     // 3. Base price for quantity
     const basePrice = safeBasePerUnit * safeQuantity || 0; // 4. Calculate final price based on selectPrice
-    console.log("basePrice==>", safeQuantity);
 
     let calculated = basePrice;
 

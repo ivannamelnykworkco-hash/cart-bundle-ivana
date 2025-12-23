@@ -184,7 +184,6 @@ export default function Index() {
   }
 
   const actionData = useActionData();
-  console.log("actionData==>", actionData);
 
   useEffect(() => {
     if (actionData) {

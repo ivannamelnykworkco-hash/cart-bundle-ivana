@@ -110,8 +110,6 @@
         compare_at_price: productJson.compare_at_price, // may be null
       }
       : null;
-    console.log('it==>', it)
-    ///////////////////////////////////////////-----------------------
     // selected product id (safe)
     const selected = gsListArray?.[0]?.selectedProducts
       ? gsListArray[0].selectedProducts.split(',').map((id) => id.trim())
@@ -172,7 +170,6 @@
       `;
 
       // ----- QB bundles -----
-      console.log(qbListArray)
       qbListArray.forEach((bundleItem) => {
         const upsellArray = Array.isArray(bundleItem.upsellItems)
           ? bundleItem.upsellItems
@@ -241,7 +238,6 @@
 
         upsellArray.forEach((upsellItem) => {
           const imageUrl = upsellItem?.selectedProduct?.[0]?.imageUrl;
-          console.log('upsellItem==>', upsellItem);
           html += `
               <div class="xcart-upsell-container">  
                 <div class="xcart-upsell-checkbox-with-product--info">
@@ -274,7 +270,6 @@
         const upsellArray = Array.isArray(bundleItem.upsellItems)
           ? bundleItem.upsellItems
           : [];
-        console.log('upsellArray==>', upsellArray);
         const bQuantity = bundleItem.buyQuantity;
         const gQuantity = bundleItem.getQuantity;
         const tQuantity = bQuantity + gQuantity;
@@ -373,10 +368,8 @@
           const discountPrice = productItem.discountPrice || 0;
           let calc = 0;
           let base = quantity * basePrice;
-          console.log('basePrice==>', basePrice);
-
           if (selectPrice === 'discounted%') {
-            calc = quantity * basePrice * (1 - discountPercent / 100); console.log('calc==>', calc);
+            calc = quantity * basePrice * (1 - discountPercent / 100);
           } else if (selectPrice === 'discounted$') {
             calc = quantity * basePrice - (quantity * discountPercent);
           } else if (selectPrice === 'specific') {
@@ -435,7 +428,6 @@
         `;
 
         productArray.forEach((productItem) => {
-          console.log('productItem==>', productItem);
           const quantity = productItem.productQuantity || 1;
           const basePrice = productItem.selectedProduct?.[0]?.variants?.[0]?.node?.price || 0;
           const selectPrice = productItem.selectPrice || '';
@@ -443,10 +435,8 @@
           const discountPrice = productItem.discountPrice || 0;
           let calc = 0;
           let base = quantity * basePrice;
-          console.log('basePrice==>', basePrice);
-
           if (selectPrice === 'discounted%') {
-            calc = quantity * basePrice * (1 - discountPercent / 100); console.log('calc==>', calc);
+            calc = quantity * basePrice * (1 - discountPercent / 100);
           } else if (selectPrice === 'discounted$') {
             calc = quantity * basePrice - (quantity * discountPercent);
           } else if (selectPrice === 'specific') {
@@ -607,9 +597,6 @@
             quantity: Number(checkbox.dataset.quantity || '1'),
           };
         });
-
-        console.log('upsellItems ==>', upsellItems);
-
         // 4) Main product add-to-cart
         const formData = new FormData(form);
         formData.set('quantity', String(quantity));

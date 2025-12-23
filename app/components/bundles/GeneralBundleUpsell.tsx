@@ -32,7 +32,7 @@ export function createNewBundleUpsell(): BundleUpsell {
     id: Math.random().toString(36).substr(2, 9),
     layoutOption: "",
     title: 'Complete the bundle', //title
-    subtitle: 'Save', //subtitle
+    subtitle: 'Save ', //subtitle
     badgeText: '',//badgetext
     badgeStyle: 'simple',//badgestyle
     labelText: '',//labelText
@@ -229,7 +229,6 @@ export function GeneralBundleUpsell({
           : item
       )
     );
-    console.log("bundleupsell", data);
   }, []);
 
   // add product select button and delete product

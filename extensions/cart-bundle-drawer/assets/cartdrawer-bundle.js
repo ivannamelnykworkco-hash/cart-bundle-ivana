@@ -171,9 +171,6 @@
         buListArray = product.buList || [];
         gsListArray = product.gsList || [];
         stListArray = product.stList || [];
-
-        console.log("qbListArray==>", qbListArray);
-
         qbListArrayStore = qbListArray;
         xyListArrayStore = xyListArray;
         buListArrayStore = buListArray;
@@ -183,7 +180,6 @@
     }
 
     cart.items.forEach((it) => {
-      console.log('it=======>', it);
       const isUpsellLine =
         it.properties && it.properties._xcart_bundle_parent_id; // upsell product get from property
       const current = Number.isFinite(it.price) ? it.price : 0; // unit price
@@ -292,7 +288,6 @@
 
         // ----- QB bundles -----
         qbListArray.forEach((bundleItem) => {
-          console.log('bundleItem==>', bundleItem);
           const upsellArray = Array.isArray(bundleItem.upsellItems)
             ? bundleItem.upsellItems
             : [];
@@ -362,7 +357,6 @@
             `;
 
           upsellArray.forEach((upsellItem) => {
-            console.log("upsellArray==>", upsellArray);
             const imageUrl = upsellItem?.selectedProduct?.[0]?.imageUrl;
 
             const upsellVariantGid =
@@ -519,10 +513,8 @@
             const discountPrice = productItem.discountPrice || 0;
             let calc = 0;
             let base = quantity * basePrice;
-            console.log('basePrice==>', basePrice);
-
             if (selectPrice === 'discounted%') {
-              calc = quantity * basePrice * (1 - discountPercent / 100); console.log('calc==>', calc);
+              calc = quantity * basePrice * (1 - discountPercent / 100);
             } else if (selectPrice === 'discounted$') {
               calc = quantity * basePrice - (quantity * discountPercent);
             } else if (selectPrice === 'specific') {
@@ -589,10 +581,8 @@
             const discountPrice = productItem.discountPrice || 0;
             let calc = 0;
             let base = quantity * basePrice;
-            console.log('basePrice==>', basePrice);
-
             if (selectPrice === 'discounted%') {
-              calc = quantity * basePrice * (1 - discountPercent / 100); console.log('calc==>', calc);
+              calc = quantity * basePrice * (1 - discountPercent / 100);
             } else if (selectPrice === 'discounted$') {
               calc = quantity * basePrice - (quantity * discountPercent);
             } else if (selectPrice === 'specific') {

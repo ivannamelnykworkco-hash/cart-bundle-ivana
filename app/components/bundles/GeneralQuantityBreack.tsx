@@ -187,7 +187,6 @@ export function GeneralQuantityBreack({
         const updated = Array.isArray(prev)
           ? prev.map(item => (item.id === childId ? { ...item, ...data } : item))
           : [];
-        console.log("Updated boxUpsells:", updated); // log here
         return updated;
       });
     },

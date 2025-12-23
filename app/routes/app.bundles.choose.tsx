@@ -109,11 +109,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       apiType: node.apiType
     }));
   } catch (err) {
-    console.error("Shopify GraphQL fetch failed:", err);
-    // Optional: return empty arrays instead of throwing
     products = [];
     collections = [];
     shopifyFunctions = [];
+    // throw redirect(`/auth?redirectTo=${encodeURIComponent(request.url)}`);
   }
   // fetch data from prisma
   try {
@@ -384,12 +383,10 @@ const fontStyleMap = {
 /************************************************************* */
 export default function BundleSettingsAdvanced() {
   const loaderData = useLoaderData<typeof loader>();
-  console.log("loaderdata>>>", loaderData);
   const checkboxUpsellConf = loaderData.checkboxUpsellConf;
   const shopifyFunctions = loaderData.shopifyFunctions;
   /**************recevie response from action function************/
   const actionData = useActionData();
-  console.log("actionData>>>", actionData);
   useEffect(() => {
     if (actionData) {
       if (actionData.success) {
@@ -580,12 +577,8 @@ export default function BundleSettingsAdvanced() {
     fd.append("generalSetting", JSON.stringify(formDataToObject(generalSettingFormData)));
     fd.append("generalStyle", JSON.stringify(formDataToObject(generalStyleFormData)));
     fd.append("discountData", JSON.stringify(formDataToObject(discountFormData)));
-    //Save quantityBreak data
     fd.append("quantityBreak", JSON.stringify(quantityBreakData));
-    console.log("quantityBreak>>>", quantityBreakData);
-    // Save buyXGetY data
     fd.append("buyXGetY", JSON.stringify(buyXGetYData));
-    // Save bundleUpsell data
     fd.append("bundleUpsell", JSON.stringify(bundleUpsellData));
 
     submit(fd, { method: "post" });
@@ -706,13 +699,6 @@ export default function BundleSettingsAdvanced() {
     },
     [setAddProducts],
   );
-
-  useEffect(() => {
-    Object.keys(addProducts).forEach((itemId) => {
-      console.log('addProducts for item:', itemId, addProducts[itemId]);
-    });
-  }, [addProducts]);
-  /////////////////////////////////////////////////////////////////////////
   /// set layout
   const layoutStyleOptions = [
     { id: "layout1", src: bundleVertical },
@@ -1076,12 +1062,9 @@ export default function BundleSettingsAdvanced() {
                           {/* {add quantity Breaks} */}
                           {quantityBreakData.map((item) => {
                             const qbData = item;
-                            console.log('qbData==>', quantityBreakData);
                             const currentIsSelected = selectedId === item.id;
-
                             const qbCalc = qbData?.calc != null ? Number(qbData.calc) : 0;
                             const qbBase = qbData?.base != null ? Number(qbData.base) : 0;
-
                             return (
                               <div
                                 key={item.id}

@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return response.json();
     })
     .then((data) => {
-      console.log("cart-drawer-settings:", data);
-
       // data from your action is an array of products
       const firstProduct = Array.isArray(data) ? data[0] : null;
       const conf = firstProduct?.countdownTimerConfig;
